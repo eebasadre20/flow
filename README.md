@@ -1,5 +1,10 @@
 # Flow
 
+[![Gem Version](https://badge.fury.io/rb/flow.svg)](https://badge.fury.io/rb/flow)
+[![Build Status](https://semaphoreci.com/api/v1/freshly/flow/branches/master/badge.svg)](https://semaphoreci.com/freshly/flow)
+[![Maintainability](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/maintainability)](https://codeclimate.com/github/Freshly/flow/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/test_coverage)](https://codeclimate.com/github/Freshly/flow/test_coverage)
+
 Business logic is like nuclear fuel. 
 
 Managed properly, it's incredibly powerful and can do a lot of good.
