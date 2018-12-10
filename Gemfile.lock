@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    flow (0.2.0)
+    flow (0.3.0)
       activemodel (~> 5.2.1)
       activesupport (~> 5.2.1)
       spicerack (~> 0.5.0)
