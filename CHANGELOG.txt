@@ -1,3 +1,8 @@
+# 0.3.0
+
+- Added Spicerack gem
+- Added logging around flows and operations
+
 # 0.2.0
 
 - FlowBase
