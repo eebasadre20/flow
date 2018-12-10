@@ -7,6 +7,8 @@ RSpec.describe FlowBase, type: :flow do
   let(:example_state_class) { Class.new(StateBase) }
   let(:example_flow_name) { Faker::Internet.domain_word.capitalize }
 
+  it { is_expected.to include_module Technologic }
+
   before do
     stub_const("#{example_flow_name}Flow", example_flow_class)
     stub_const("#{example_flow_name}State", example_state_class)
