@@ -159,5 +159,12 @@ RSpec.describe FlowBase, type: :flow do
       trigger
       expect(operations).to all(have_received(:execute).with(state).ordered)
     end
+
+    it "is surveiled" do
+      allow(flow).to receive(:surveil).with(:trigger) do |&block|
+        block.call
+        expect(operations).to all(have_received(:execute).with(state).ordered)
+      end
+    end
   end
 end

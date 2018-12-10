@@ -2,6 +2,8 @@
 
 # A flow is a collection of procedurally executed operations sharing a common state.
 class FlowBase
+  include Technologic
+
   class_attribute :_operations, instance_writer: false, default: []
 
   class << self
@@ -32,7 +34,10 @@ class FlowBase
   end
 
   def trigger
-    _operations.each { |operation| operation.execute(state) }
+    surveil(:trigger) do
+      _operations.each { |operation| operation.execute(state) }
+    end
+
     state
   end
 end
