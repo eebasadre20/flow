@@ -12,6 +12,8 @@ RSpec.describe FlowBase, type: :flow do
     stub_const("#{example_flow_name}State", example_state_class)
   end
 
+  it { is_expected.to include_module Technologic }
+
   it { is_expected.to delegate_method(:state_class).to(:class) }
 
   describe ".trigger" do
@@ -158,6 +160,13 @@ RSpec.describe FlowBase, type: :flow do
     it "executes operations" do
       trigger
       expect(operations).to all(have_received(:execute).with(state).ordered)
+    end
+
+    it "is surveiled" do
+      allow(flow).to receive(:surveil).with(:trigger) do |&block|
+        block.call
+        expect(operations).to all(have_received(:execute).with(state).ordered)
+      end
     end
   end
 end

@@ -1,10 +1,16 @@
 require "bundler/setup"
-require "flow"
+require "simplecov"
 
 require "rspice"
 require "shoulda-matchers"
 
 require_relative "support/shared_context/with_an_example_operation"
+
+SimpleCov.start do
+  add_filter "/spec/"
+end
+
+require "flow"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
