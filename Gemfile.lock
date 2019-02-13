@@ -4,7 +4,6 @@ PATH
     flow (0.3.0)
       activemodel (~> 5.2.1)
       activesupport (~> 5.2.1)
-      railties (~> 5.2.1)
       spicerack (~> 0.5.0)
 
 GEM

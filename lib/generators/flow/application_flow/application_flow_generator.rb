@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "flow"
-require "rails/generators/named_base"
 
 module Flow
   module Generators
