@@ -5,5 +5,5 @@ Example:
     `rails generate operation foo`
 
     Generates:
-      State: app/operations/foo.rb
+  Operation: app/operations/foo.rb
        Test: spec/operations/foo_spec.rb
