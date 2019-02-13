@@ -13,9 +13,9 @@
 # end
 
 RSpec::Matchers.define :use_operations do |operations|
-  match { |instance| expect(instance._operations).to eq Array.wrap(operations) }
+  match { expect(described_class._operations).to eq Array.wrap(operations) }
   description { "uses operations #{display_operations(operations)}" }
-  failure_message { |instance| "expected #{instance.class.name}# to use operations #{display_operations(operations)}" }
+  failure_message { "expected #{described_class.name}# to use operations #{display_operations(operations)}" }
 
   def display_operations(operations)
     Array.wrap(operations).join(", ")

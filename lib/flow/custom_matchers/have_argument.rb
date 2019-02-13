@@ -13,7 +13,7 @@
 # end
 
 RSpec::Matchers.define :have_argument do |argument|
-  match { |instance| expect(instance._arguments).to include argument }
+  match { expect(described_class._arguments).to include argument }
   description { "has argument #{argument}" }
-  failure_message { |instance| "expected #{instance.class.name}# to have argument #{argument}" }
+  failure_message { "expected #{described_class.name}# to have argument #{argument}" }
 end
