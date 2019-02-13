@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationState test.
+    Create ApplicationState test.
 
 Example:
     `rails generate rspec:application_state`

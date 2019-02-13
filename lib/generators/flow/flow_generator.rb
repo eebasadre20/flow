@@ -3,8 +3,11 @@
 module Flow
   module Generators
     class FlowGenerator < Rails::Generators::NamedBase
+      class_option :state, type: :boolean, default: true
+
       source_root File.expand_path("templates", __dir__)
 
+      hook_for :state, as: "flow:state"
       hook_for :test_framework
 
       def create_application_flow

@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationOperation file, with test.
+    Create the ApplicationOperation and test.
 
 Example:
     `rails generate flow:application_operation`

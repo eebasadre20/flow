@@ -1,5 +1,5 @@
 Description:
-    Creates ApplicationFlow, ApplicationOperation, and ApplicationState, with tests.
+    Creates ApplicationFlow, ApplicationOperation, and ApplicationState with tests.
 
 Example:
     `rails generate flow:install`

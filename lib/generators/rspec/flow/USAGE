@@ -1,5 +1,5 @@
 Description:
-    Stub an ApplicationFlow test.
+    Stub a Flow test.
 
 Example:
     `rails generate rspec:flow foo`

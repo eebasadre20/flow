@@ -1,0 +1,24 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe <%= class_name %>, type: :operation do
+  subject(:operation) { described_class.new(state) }
+
+  let(:state) { example_state_class.new(**state_input) }
+  let(:example_state_class) do
+    Class.new(ApplicationState) do
+      # argument :foo
+      # option :bar
+    end
+  end
+  let(:state_input) do
+    {}
+  end
+
+  it { is_expected.to inherit_from ApplicationOperation }
+
+  describe "#execute" do
+    pending "add some examples to (or delete) #{__FILE__}"
+  end
+end

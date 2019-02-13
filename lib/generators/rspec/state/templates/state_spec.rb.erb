@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe <%= class_name %>State, type: :state do
+  subject(:state) { described_class.new(**input) }
+
+  let(:input) do
+    {}
+  end
+
+  it { is_expected.to inherit_from ApplicationState }
+  # TODO: take_argument custom matcher
+  # it { is_expected.to take_argument :foo }
+  # TODO: define_option custom matcher
+  # it { is_expected.to define_option(:foo) }
+  # it { is_expected.to define_option(:foo).with_default_value(:bar) }
+  # it { is_expected.to define_option(:foo).with_default_value_block }
+  # TODO: validate matcher?? Does something like this already exist for activemodel?
+  # it { is_expected.to validate ... }
+end

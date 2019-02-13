@@ -1,0 +1,9 @@
+Description:
+    Stub a State with test.
+
+Example:
+    `rails generate state foo`
+
+    Generates:
+      State: app/states/foo_state.rb
+       Test: spec/states/foo_state_spec.rb

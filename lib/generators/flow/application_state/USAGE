@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationState file, with test.
+    Create the ApplicationState and test.
 
 Example:
     `rails generate flow:application_state`

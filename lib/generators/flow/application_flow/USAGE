@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationFlow file, with test.
+    Create the ApplicationFlow and test.
 
 Example:
     `rails generate flow:application_flow`

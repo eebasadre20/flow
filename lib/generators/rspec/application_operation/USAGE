@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationOperation test.
+    Create ApplicationOperation test.
 
 Example:
     `rails generate rspec:application_operation`
