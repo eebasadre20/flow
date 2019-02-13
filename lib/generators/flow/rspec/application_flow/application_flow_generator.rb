@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Rspec
-  module Flow
+module Flow
+  module Rspec
     module Generators
       class ApplicationFlowGenerator < Rails::Generators::Base
         source_root File.expand_path("templates", __dir__)
@@ -13,4 +13,3 @@ module Rspec
     end
   end
 end
-
