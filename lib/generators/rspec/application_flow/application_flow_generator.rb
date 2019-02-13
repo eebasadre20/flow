@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require "flow"
-
-module Flow
-  module Rspec
+module Rspec
+  module Flow
     module Generators
-      class ApplicationFlowGenerator < Rails::Generators::NamedBase
+      class ApplicationFlowGenerator < Rails::Generators::Base
         source_root File.expand_path("templates", __dir__)
 
         def create_spec_file
