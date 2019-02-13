@@ -5,7 +5,7 @@ require "flow"
 module Flow
   module Rspec
     module Generators
-      class ApplicationFlowSpecGenerator < Rails::Generators::NamedBase
+      class ApplicationFlowGenerator < Rails::Generators::NamedBase
         source_root File.expand_path("templates", __dir__)
 
         def create_spec_file
