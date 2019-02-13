@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "activesupport", "~> 5.2.1"
   spec.add_runtime_dependency "activemodel", "~> 5.2.1"
+  spec.add_runtime_dependency "railties", "~> 5.2.1"
   spec.add_runtime_dependency "spicerack", "~> 0.5.0"
 
   spec.add_development_dependency "bundler", "~> 1.16"
