@@ -5,5 +5,5 @@ Example:
     `rails generate flow:application_flow`
 
     Generates:
-      Cache: app/flows/application_flow.rb
+       Flow: app/flows/application_flow.rb
        Test: spec/flows/application_flow_spec.rb

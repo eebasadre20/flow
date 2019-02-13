@@ -1,0 +1,8 @@
+Description:
+    Create the ApplicationState test.
+
+Example:
+    `rails generate rspec:application_state`
+
+    Generates:
+      Test: spec/states/application_state_spec.rb

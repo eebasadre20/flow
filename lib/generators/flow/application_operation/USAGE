@@ -1,0 +1,9 @@
+Description:
+    Create the ApplicationOperation file, with test.
+
+Example:
+    `rails generate flow:application_operation`
+
+    Generates:
+  Operation: app/operations/application_operation.rb
+       Test: spec/operations/application_operation_spec.rb
