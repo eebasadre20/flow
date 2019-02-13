@@ -2,7 +2,7 @@
 
 module Rspec
   module Generators
-    class FlowGenerator < Rails::Generators::Base
+    class FlowGenerator < Rails::Generators::NamedBase
       source_root File.expand_path("templates", __dir__)
 
       def create_spec_file
