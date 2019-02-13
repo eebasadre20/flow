@@ -1,5 +1,5 @@
 Description:
-    Create the ApplicationFlow test.
+    Create ApplicationFlow test.
 
 Example:
     `rails generate rspec:application_flow`

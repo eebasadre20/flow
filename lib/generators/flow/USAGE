@@ -1,0 +1,11 @@
+Description:
+    Stub an Flow and State with test.
+
+Example:
+    `rails generate flow foo`
+
+    Generates:
+       Flow: app/flows/foo_flow.rb
+      State: app/states/foo_state.rb
+       Test: spec/flows/foo_flow_spec.rb
+       Test: spec/states/foo_state_spec.rb

@@ -1,0 +1,9 @@
+Description:
+    Stub a Operation with test.
+
+Example:
+    `rails generate operation foo`
+
+    Generates:
+  Operation: app/operations/foo.rb
+       Test: spec/operations/foo_spec.rb

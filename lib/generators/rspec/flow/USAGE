@@ -1,0 +1,8 @@
+Description:
+    Stub a Flow test.
+
+Example:
+    `rails generate rspec:flow foo`
+
+    Generates:
+      Test: spec/flows/foo_flow_spec.rb
