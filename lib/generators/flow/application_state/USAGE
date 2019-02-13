@@ -1,0 +1,9 @@
+Description:
+    Create the ApplicationState file, with test.
+
+Example:
+    `rails generate flow:application_state`
+
+    Generates:
+      State: app/states/application_state.rb
+       Test: spec/states/application_state_spec.rb

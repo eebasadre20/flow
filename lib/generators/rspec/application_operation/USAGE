@@ -1,0 +1,8 @@
+Description:
+    Create the ApplicationOperation test.
+
+Example:
+    `rails generate rspec:application_operation`
+
+    Generates:
+      Test: spec/operations/application_operation_spec.rb

@@ -1,0 +1,9 @@
+Description:
+    Create the ApplicationFlow file, with test.
+
+Example:
+    `rails generate flow:application_flow`
+
+    Generates:
+       Flow: app/flows/application_flow.rb
+       Test: spec/flows/application_flow_spec.rb

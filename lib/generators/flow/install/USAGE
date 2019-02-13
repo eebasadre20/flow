@@ -1,0 +1,13 @@
+Description:
+    Creates ApplicationFlow, ApplicationOperation, and ApplicationState, with tests.
+
+Example:
+    `rails generate flow:install`
+
+    Generates:
+       Flow: app/flows/application_flow.rb
+  Operation: app/operations/application_operation.rb
+      State: app/states/application_state.rb
+       Test: spec/flows/application_flow_spec.rb
+       Test: spec/operations/application_operation_spec.rb
+       Test: spec/states/application_state_spec.rb
