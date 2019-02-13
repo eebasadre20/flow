@@ -4,11 +4,17 @@
 class FlowBase
   include Technologic
 
+  class StateInvalid < StandardError; end
+
   class_attribute :_operations, instance_writer: false, default: []
 
   class << self
     def state_class
       "#{name.chomp("Flow")}State".constantize
+    end
+
+    def trigger!(*arguments)
+      new(*arguments).trigger!
     end
 
     def trigger(*arguments)
@@ -28,16 +34,25 @@ class FlowBase
   attr_reader :state
 
   delegate :state_class, :_operations, to: :class
+  delegate :valid?, to: :state, prefix: true
 
   def initialize(**input)
     @state = state_class.new(**input)
   end
 
-  def trigger
+  def trigger!
+    raise StateInvalid unless state_valid?
+
     surveil(:trigger) do
       _operations.each { |operation| operation.execute(state) }
     end
 
     state
+  end
+
+  def trigger
+    trigger!
+  rescue StateInvalid
+    nil
   end
 end
