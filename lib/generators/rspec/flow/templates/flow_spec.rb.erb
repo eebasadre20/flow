@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe <%= class_name %>Flow, type: :flow do
+  subject(:flow) { described_class.new(state) }
+
+  let(:state) { instance_double(described_class.state_class) }
+
+  it { is_expected.to inherit_from ApplicationFlow }
+  # TODO: use_operations custom matcher
+  # it { is_expected.to use_operations ExampleOperation }
+end

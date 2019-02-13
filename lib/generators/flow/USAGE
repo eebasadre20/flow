@@ -1,0 +1,9 @@
+Description:
+    Stub an ApplicationFlow, with test.
+
+Example:
+    `rails generate flow foo`
+
+    Generates:
+       Flow: app/flows/foo_flow.rb
+       Test: spec/flows/foo_flow_spec.rb
