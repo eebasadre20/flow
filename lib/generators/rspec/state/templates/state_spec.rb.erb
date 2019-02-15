@@ -10,12 +10,10 @@ RSpec.describe <%= class_name %>State, type: :state do
   end
 
   it { is_expected.to inherit_from ApplicationState }
-  # TODO: take_argument custom matcher
-  # it { is_expected.to have_argument :foo }
-  # TODO: define_option custom matcher
-  # it { is_expected.to have_option(:foo) }
-  # it { is_expected.to have_option(:foo).with_default_value(:bar) }
-  # it { is_expected.to have_option(:foo).with_default_value_block }
+  # it { is_expected.to define_argument :foo }
+  # it { is_expected.to define_option(:foo) }
+  # it { is_expected.to define_option(:foo).with_default_value(:bar) }
+  # it { is_expected.to define_option(:foo).with_default_value_block }
   # TODO: validate matcher?? Does something like this already exist for activemodel?
   # it { is_expected.to validate ... }
 end
