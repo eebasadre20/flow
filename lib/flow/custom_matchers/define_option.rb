@@ -9,11 +9,11 @@
 #
 #   let(:input) { {} }
 #
-#   it { is_expected.to have_option :foo }
-#   it { is_expected.to have_option :foo, default_value }
+#   it { is_expected.to define_option :foo }
+#   it { is_expected.to define_option :foo, default_value }
 # end
 
-RSpec::Matchers.define :have_option do |option, default_value = nil|
+RSpec::Matchers.define :define_option do |option, default_value = nil|
   match { |state| expect(state._options[option].default_value).to eq default_value }
   description { "has option #{option}" }
   failure_message { |state| "expected #{state.class.name}# to have option #{option}, #{for_default(default_value)}" }
