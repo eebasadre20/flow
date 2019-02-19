@@ -24,7 +24,6 @@ module State
 
         attr_accessor attribute
         define_attribute_methods attribute
-        protected "#{attribute}=".to_sym
       end
     end
   end

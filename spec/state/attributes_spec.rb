@@ -20,10 +20,12 @@ RSpec.describe State::Attributes, type: :module do
     end
 
     describe "accessors" do
+      subject { example_class }
+
       before { define_attribute }
 
       it { is_expected.to be_public_method_defined attribute }
-      it { is_expected.to be_protected_method_defined "#{attribute}=" }
+      it { is_expected.to be_public_method_defined "#{attribute}=" }
     end
   end
 
