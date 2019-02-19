@@ -2,11 +2,7 @@
 
 RSpec.describe Flow::Callbacks, type: :module do
   describe "callbacks" do
-    subject(:example_class) do
-      Class.new do
-        include Flow::Callbacks
-      end
-    end
+    subject(:example_class) { Class.new.include Flow::Callbacks }
 
     it { is_expected.to include_module ActiveSupport::Callbacks }
 
