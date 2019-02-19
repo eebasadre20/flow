@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Accepts input representing the arguments and input which define the initial state.
+# Accepts input representing the arguments and options which define the initial state.
 module State
   module Core
     extend ActiveSupport::Concern

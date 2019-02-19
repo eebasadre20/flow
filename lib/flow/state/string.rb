@@ -15,7 +15,7 @@ module State
       string_for(__method__)
     end
 
-    protected
+    private
 
     def stringable_attributes
       self.class._attributes

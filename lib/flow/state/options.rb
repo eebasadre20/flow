@@ -20,7 +20,7 @@ module State
         super
       end
 
-      protected
+      private
 
       def option(option, default: nil, &block)
         _options[option] = Option.new(default: default, &block)

@@ -2,35 +2,12 @@
 
 RSpec.describe State::Core, type: :module do
   describe "#initialize" do
+    include_context "with example class having callback", :initialize
+
     subject(:instance) { example_class.new(**arguments) }
 
     let(:arguments) { Hash[*Faker::Lorem.words(4)].symbolize_keys }
-    let(:example_class) do
-      Class.new do
-        include ActiveSupport::Callbacks
-        define_callbacks :initialize
-
-        @before_hook_run = false
-        @after_hook_run = false
-
-        class << self
-          attr_writer :before_hook_run, :after_hook_run
-
-          def before_hook_run?
-            @before_hook_run
-          end
-
-          def after_hook_run?
-            @after_hook_run
-          end
-        end
-
-        set_callback(:initialize, :before) { |obj| obj.class.before_hook_run = true }
-        set_callback(:initialize, :after) { |obj| obj.class.after_hook_run = true }
-
-        include State::Core
-      end
-    end
+    let(:example_class) { example_class_having_callback.include(State::Core) }
 
     context "when no writers are defined for the arguments" do
       it "raises" do

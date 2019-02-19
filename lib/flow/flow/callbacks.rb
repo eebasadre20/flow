@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Callbacks provide an extensible mechanism for hooking into a State.
-module State
+# Callbacks provide an extensible mechanism for hooking into a Flow.
+module Flow
   module Callbacks
     extend ActiveSupport::Concern
 

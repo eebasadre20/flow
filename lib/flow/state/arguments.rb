@@ -19,7 +19,7 @@ module State
         super
       end
 
-      protected
+      private
 
       def argument(argument)
         _arguments << argument
