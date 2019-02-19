@@ -14,6 +14,5 @@ RSpec.describe <%= class_name %>State, type: :state do
   # it { is_expected.to define_option(:foo) }
   # it { is_expected.to define_option(:foo).with_default_value(:bar) }
   # it { is_expected.to define_option(:foo).with_default_value_block }
-  # TODO: validate matcher?? Does something like this already exist for activemodel?
-  # it { is_expected.to validate ... }
+  # it { is_expected.to validate_presence_of ... }
 end
