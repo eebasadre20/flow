@@ -17,13 +17,15 @@ module Flow
 
     included do
       delegate :valid?, to: :state, prefix: true
+
+      set_callback :trigger, :around, ->(_, block) { surveil(:trigger) { block.call } }
     end
 
     def trigger!
       raise Flow::Errors::StateInvalid unless state_valid?
 
-      surveil(:trigger) do
-        _operations.each { |operation| operation.execute(state) }
+      run_callbacks(:trigger) do
+        _operations.each { |operation| surveil(operation.name) { operation.execute(state) } }
       end
 
       state

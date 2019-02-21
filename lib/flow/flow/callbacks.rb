@@ -7,7 +7,7 @@ module Flow
 
     included do
       include ActiveSupport::Callbacks
-      define_callbacks :initialize
+      define_callbacks :initialize, :trigger
     end
   end
 end

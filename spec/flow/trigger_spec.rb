@@ -21,20 +21,27 @@ RSpec.describe Flow::Trigger, type: :module do
     subject(:trigger!) { flow.trigger! }
 
     let(:flow) { example_flow_class.new }
-    let(:operation0) { double }
-    let(:operation1) { double }
-    let(:operation2) { double }
+    let(:operation0) { Class.new(OperationBase) }
+    let(:operation1) { Class.new(OperationBase) }
+    let(:operation2) { Class.new(OperationBase) }
+    let(:operation0_name) { Faker::Internet.unique.domain_word.capitalize }
+    let(:operation1_name) { Faker::Internet.unique.domain_word.capitalize }
+    let(:operation2_name) { Faker::Internet.unique.domain_word.capitalize }
     let(:operations) { [ operation0, operation1, operation2 ] }
     let(:state) { instance_double(example_state_class) }
 
     before do
+      stub_const(operation0_name, operation0)
+      stub_const(operation1_name, operation1)
+      stub_const(operation2_name, operation2)
+
       example_flow_class._operations = operations.each { |operation| allow(operation).to receive(:execute) }
       allow(flow).to receive(:state).and_return(state)
       allow(state).to receive(:valid?).and_return(state_valid?)
     end
 
     context "when the state is valid" do
-      before { allow(flow).to receive(:surveil).with(:trigger).and_call_original }
+      before { allow(flow).to receive(:surveil).and_call_original }
 
       let(:state_valid?) { true }
 
@@ -44,6 +51,7 @@ RSpec.describe Flow::Trigger, type: :module do
         trigger!
         expect(operations).to all(have_received(:execute).with(state).ordered)
         expect(flow).to have_received(:surveil).with(:trigger)
+        operations.each { |operation| expect(flow).to have_received(:surveil).with(operation.name) }
       end
     end
 
