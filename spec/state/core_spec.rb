@@ -27,6 +27,7 @@ RSpec.describe State::Core, type: :module do
       it "runs the callbacks" do
         expect { instance }.
           to change { example_class.before_hook_run? }.from(false).to(true).
+          and change { example_class.around_hook_run? }.from(false).to(true).
           and change { example_class.after_hook_run? }.from(false).to(true)
       end
     end

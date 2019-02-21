@@ -46,6 +46,7 @@ RSpec.describe Flow::Core, type: :module do
       it "runs the callbacks" do
         expect { instance }.
           to change { example_flow_class.before_hook_run? }.from(false).to(true).
+          and change { example_flow_class.around_hook_run? }.from(false).to(true).
           and change { example_flow_class.after_hook_run? }.from(false).to(true)
       end
     end

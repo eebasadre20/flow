@@ -4,6 +4,7 @@ require "simplecov"
 require "rspice"
 require "shoulda-matchers"
 
+require_relative "support/shared_context/with_an_example_state"
 require_relative "support/shared_context/with_an_example_operation"
 require_relative "support/shared_context/with_example_class_having_callback"
 require_relative "support/shared_context/with_example_flow_having_state"

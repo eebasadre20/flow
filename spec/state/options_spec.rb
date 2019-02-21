@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe State::Options, type: :module do
+  include_context "with an example state", State::Options
+
   describe ".option" do
-    subject(:define_option) { example_class.__send__(:option, option) }
+    subject(:define_option) { example_state_class.__send__(:option, option) }
 
     let(:option) { Faker::Lorem.word.to_sym }
-    let(:example_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Options
-      end
-    end
 
-    before { allow(example_class).to receive(:define_attribute).and_call_original }
+    before { allow(example_state_class).to receive(:define_attribute).and_call_original }
 
     describe "defines option" do
       let(:default) { Faker::Lorem.word }
@@ -22,12 +17,12 @@ RSpec.describe State::Options, type: :module do
 
       shared_examples_for "an option is defined" do
         it "adds to _options" do
-          expect { define_option }.to change { example_class._options }.from({}).to(expected_options)
+          expect { define_option }.to change { example_state_class._options }.from({}).to(expected_options)
         end
       end
 
       context "when no block is given" do
-        subject(:define_option) { example_class.__send__(:option, option, default: default) }
+        subject(:define_option) { example_state_class.__send__(:option, option, default: default) }
 
         before { allow(State::Options::Option).to receive(:new).with(default: default).and_return(instance) }
 
@@ -35,7 +30,7 @@ RSpec.describe State::Options, type: :module do
       end
 
       context "when a block is given" do
-        subject(:define_option) { example_class.__send__(:option, option, default: default, &block) }
+        subject(:define_option) { example_state_class.__send__(:option, option, default: default, &block) }
 
         let(:block) do
           ->(_) { :block }
@@ -49,19 +44,13 @@ RSpec.describe State::Options, type: :module do
 
     it "defines an attribute" do
       define_option
-      expect(example_class).to have_received(:define_attribute).with(option)
+      expect(example_state_class).to have_received(:define_attribute).with(option)
     end
   end
 
   describe ".inherited" do
     let(:base_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Options
-
-        option :base
-      end
+      Class.new(example_state_class) { option :base }
     end
 
     let(:parentA_class) do

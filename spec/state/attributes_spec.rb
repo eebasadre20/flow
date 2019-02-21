@@ -1,26 +1,22 @@
 # frozen_string_literal: true
 
 RSpec.describe State::Attributes, type: :module do
+  include_context "with an example state", State::Options
+
   describe ".define_attribute" do
-    subject(:define_attribute) { example_class.__send__(:define_attribute, attribute) }
+    subject(:define_attribute) { example_state_class.__send__(:define_attribute, attribute) }
 
     let(:attribute) { Faker::Lorem.word.to_sym }
-    let(:example_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-      end
-    end
 
-    before { allow(example_class).to receive(:define_attribute_methods) }
+    before { allow(example_state_class).to receive(:define_attribute_methods) }
 
     it "adds to _attributes" do
-      expect { define_attribute }.to change { example_class._attributes }.from([]).to([ attribute ])
-      expect(example_class).to have_received(:define_attribute_methods).with(attribute)
+      expect { define_attribute }.to change { example_state_class._attributes }.from([]).to([ attribute ])
+      expect(example_state_class).to have_received(:define_attribute_methods).with(attribute)
     end
 
     describe "accessors" do
-      subject { example_class }
+      subject { example_state_class }
 
       before { define_attribute }
 
@@ -31,12 +27,7 @@ RSpec.describe State::Attributes, type: :module do
 
   describe ".inherited" do
     let(:base_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-
-        define_attribute :base
-      end
+      Class.new(example_state_class) { define_attribute :base }
     end
 
     let(:parentA_class) do
@@ -69,8 +60,8 @@ RSpec.describe State::Attributes, type: :module do
       end
     end
 
-    shared_examples_for "an object with inherited arguments" do
-      it "has expected _arguments" do
+    shared_examples_for "an object with inherited attributes" do
+      it "has expected _attributes" do
         expect(example_class._attributes).to eq expected_attributes
       end
     end
@@ -80,7 +71,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
 
     describe "#parentA" do
@@ -88,7 +79,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base parentA] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
 
     describe "#parentB" do
@@ -96,7 +87,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base parentB] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
 
     describe "#childA1" do
@@ -104,7 +95,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base parentA childA1] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
 
     describe "#childA2" do
@@ -112,7 +103,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base parentA childA2] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
 
     describe "#childB" do
@@ -120,7 +111,7 @@ RSpec.describe State::Attributes, type: :module do
 
       let(:expected_attributes) { %i[base parentB childB] }
 
-      include_examples "an object with inherited arguments"
+      include_examples "an object with inherited attributes"
     end
   end
 end

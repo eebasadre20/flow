@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Options::Option, type: :internal do
+RSpec.describe State::Options::Option, type: :subclass do
   describe "#initialize" do
     subject { instance.instance_variable_get(:@default_value) }
 
@@ -38,12 +38,3 @@ RSpec.describe State::Options::Option, type: :internal do
     end
   end
 end
-# def initialize(default:, &block)
-#   @default_value = (default_value.nil? && block_given?) ? block : default
-# end
-#
-# def default_value
-#   return instance_eval(&@default_value) if @default_value.respond_to?(:call)
-#
-#   @default_value
-# end
