@@ -9,12 +9,6 @@ RSpec.describe State::String, type: :module do
     end
   end
 
-  describe "#class_name" do
-    subject { instance }
-
-    it { is_expected.to delegate_method(:name).to(:class).with_prefix(true) }
-  end
-
   shared_examples_for "a stringable method" do |method|
     subject { instance }
 

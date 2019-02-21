@@ -17,7 +17,7 @@ module State
         super
       end
 
-      protected
+      private
 
       def define_attribute(attribute)
         _attributes << attribute

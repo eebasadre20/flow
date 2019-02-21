@@ -1,58 +1,17 @@
 # frozen_string_literal: true
 
+require_relative "flow/errors/state_invalid"
+
+require_relative "flow/callbacks"
+require_relative "flow/core"
+require_relative "flow/operations"
+require_relative "flow/trigger"
+
 # A flow is a collection of procedurally executed operations sharing a common state.
 class FlowBase
   include Technologic
-
-  class StateInvalid < StandardError; end
-
-  class_attribute :_operations, instance_writer: false, default: []
-
-  class << self
-    def state_class
-      "#{name.chomp("Flow")}State".constantize
-    end
-
-    def trigger!(*arguments)
-      new(*arguments).trigger!
-    end
-
-    def trigger(*arguments)
-      new(*arguments).trigger
-    end
-
-    def operations(*operations)
-      _operations.concat(operations.flatten)
-    end
-
-    def inherited(base)
-      base._operations = _operations.dup
-      super
-    end
-  end
-
-  attr_reader :state
-
-  delegate :state_class, :_operations, to: :class
-  delegate :valid?, to: :state, prefix: true
-
-  def initialize(**input)
-    @state = state_class.new(**input)
-  end
-
-  def trigger!
-    raise StateInvalid unless state_valid?
-
-    surveil(:trigger) do
-      _operations.each { |operation| operation.execute(state) }
-    end
-
-    state
-  end
-
-  def trigger
-    trigger!
-  rescue StateInvalid
-    nil
-  end
+  include Flow::Callbacks
+  include Flow::Core
+  include Flow::Operations
+  include Flow::Trigger
 end

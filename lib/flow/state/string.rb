@@ -5,8 +5,6 @@ module State
   module String
     extend ActiveSupport::Concern
 
-    delegate :name, to: :class, prefix: true
-
     def to_s
       string_for(__method__)
     end
@@ -15,16 +13,14 @@ module State
       string_for(__method__)
     end
 
-    protected
+    private
 
     def stringable_attributes
       self.class._attributes
     end
 
-    private
-
     def string_for(method)
-      "#<#{class_name} #{attribute_string(method)}>"
+      "#<#{self.class.name} #{attribute_string(method)}>"
     end
 
     def attribute_string(method)
