@@ -19,6 +19,7 @@ RSpec.describe Operation::Execute, type: :module do
     subject(:execute!) { example_operation.execute! }
 
     before do
+      allow(example_operation).to receive(:surveil).and_call_original
       allow(example_operation).to receive(:behavior)
 
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
@@ -39,6 +40,11 @@ RSpec.describe Operation::Execute, type: :module do
     it "calls #behavior" do
       execute!
       expect(example_operation).to have_received(:behavior).with(no_args)
+    end
+
+    it "is surveiled" do
+      execute!
+      expect(example_operation).to have_received(:surveil).with(:execute)
     end
   end
 

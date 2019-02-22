@@ -47,7 +47,7 @@ RSpec.describe Flow::Trigger, type: :module do
 
       it { is_expected.to eq state }
 
-      it "executes surveiled operations" do
+      it "is surveiled" do
         trigger!
         expect(operations).to all(have_received(:execute).with(state).ordered)
         expect(flow).to have_received(:surveil).with(:trigger)
