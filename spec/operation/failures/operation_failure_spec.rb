@@ -9,10 +9,33 @@ RSpec.describe Operation::Failures::OperationFailure, type: :subclass do
   it { is_expected.to inherit_from StandardError }
 
   describe "#initialize" do
-    it "structures the details of the given problem" do
-      expect(example_failure.message).to eq problem.to_s
-      expect(example_failure.problem).to eq problem
-      expect(example_failure.details).to eq OpenStruct.new(details)
+    context "with a problem and details" do
+      it "structures the details of the given problem" do
+        expect(example_failure.message).to eq problem.to_s
+        expect(example_failure.problem).to eq problem
+        expect(example_failure.details).to eq OpenStruct.new(details)
+      end
+    end
+
+    context "with a problem but no details" do
+      let(:details) { {} }
+
+      it "creates an empty structures for the given problem" do
+        expect(example_failure.message).to eq problem.to_s
+        expect(example_failure.problem).to eq problem
+        expect(example_failure.details).to eq OpenStruct.new
+      end
+    end
+
+    context "without a problem or details" do
+      let(:problem) { nil }
+      let(:details) { {} }
+
+      it "creates an empty structures for the unknown problem" do
+        expect(example_failure.message).to eq described_class.name
+        expect(example_failure.problem).to eq nil
+        expect(example_failure.details).to eq OpenStruct.new
+      end
     end
   end
 end

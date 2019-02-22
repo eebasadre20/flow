@@ -14,9 +14,9 @@ RSpec.describe Operation::Failures, type: :module do
 
     it "defines a callback" do
       expect { define_failure }.
-        to change { example_operation_class.__callbacks.keys }.
-        from(%i[failure]).
-        to(%I[failure #{problem}])
+        to change { example_operation_class.__callbacks.keys.include? problem }.
+        from(false).
+        to(true)
     end
 
     it "defines #on_<problem>_failure" do

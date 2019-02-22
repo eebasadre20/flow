@@ -25,7 +25,7 @@ module Flow
       raise Flow::Errors::StateInvalid unless state_valid?
 
       run_callbacks(:trigger) do
-        _operations.each { |operation| surveil(operation.name) { operation.execute(state) } }
+        _operations.each { |operation| operation.execute(state) }
       end
 
       state

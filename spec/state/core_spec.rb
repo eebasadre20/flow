@@ -24,8 +24,10 @@ RSpec.describe State::Core, type: :module do
         arguments.each { |argument, value| expect(instance.public_send(argument)).to eq value }
       end
 
-      it_behaves_like "an class with callback" do
+      it_behaves_like "a class with callback" do
         subject(:callback_runner) { instance }
+
+        let(:example) { example_class }
       end
     end
   end
