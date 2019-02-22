@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Triggering a Flow executes all its operations in sequential order if it has a valid state.
+# Triggering a Flow executes all its operations in sequential order *iff* it has a valid state.
 module Flow
   module Trigger
     extend ActiveSupport::Concern

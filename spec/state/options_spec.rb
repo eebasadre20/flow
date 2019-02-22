@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe State::Options, type: :module do
+  include_context "with an example state", State::Options
+
   describe ".option" do
-    subject(:define_option) { example_class.__send__(:option, option) }
+    subject(:define_option) { example_state_class.__send__(:option, option) }
 
     let(:option) { Faker::Lorem.word.to_sym }
-    let(:example_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Options
-      end
-    end
 
-    before { allow(example_class).to receive(:define_attribute).and_call_original }
+    before { allow(example_state_class).to receive(:define_attribute).and_call_original }
 
     describe "defines option" do
       let(:default) { Faker::Lorem.word }
@@ -22,12 +17,12 @@ RSpec.describe State::Options, type: :module do
 
       shared_examples_for "an option is defined" do
         it "adds to _options" do
-          expect { define_option }.to change { example_class._options }.from({}).to(expected_options)
+          expect { define_option }.to change { example_state_class._options }.from({}).to(expected_options)
         end
       end
 
       context "when no block is given" do
-        subject(:define_option) { example_class.__send__(:option, option, default: default) }
+        subject(:define_option) { example_state_class.__send__(:option, option, default: default) }
 
         before { allow(State::Options::Option).to receive(:new).with(default: default).and_return(instance) }
 
@@ -35,7 +30,7 @@ RSpec.describe State::Options, type: :module do
       end
 
       context "when a block is given" do
-        subject(:define_option) { example_class.__send__(:option, option, default: default, &block) }
+        subject(:define_option) { example_state_class.__send__(:option, option, default: default, &block) }
 
         let(:block) do
           ->(_) { :block }
@@ -49,107 +44,18 @@ RSpec.describe State::Options, type: :module do
 
     it "defines an attribute" do
       define_option
-      expect(example_class).to have_received(:define_attribute).with(option)
+      expect(example_state_class).to have_received(:define_attribute).with(option)
     end
   end
 
   describe ".inherited" do
-    let(:base_class) do
-      Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Options
-
-        option :base
+    it_behaves_like "an inherited property", :option do
+      let(:root_class) { example_state_class }
+      let(:expected_attribute_value) do
+        expected_property_value.each_with_object({}) do |option, hash|
+          hash[option] = instance_of(State::Options::Option)
+        end
       end
-    end
-
-    let(:parentA_class) do
-      Class.new(base_class) do
-        option :parentA
-      end
-    end
-
-    let(:parentB_class) do
-      Class.new(base_class) do
-        option :parentB
-      end
-    end
-
-    let!(:childA1_class) do
-      Class.new(parentA_class) do
-        option :childA1
-      end
-    end
-
-    let!(:childA2_class) do
-      Class.new(parentA_class) do
-        option :childA2
-      end
-    end
-
-    let!(:childB_class) do
-      Class.new(parentB_class) do
-        option :childB
-      end
-    end
-
-    shared_examples_for "an object with inherited options" do
-      let(:expected_options_hash) do
-        expected_options.each_with_object({}) { |option, hash| hash[option] = instance_of(State::Options::Option) }
-      end
-
-      it "has expected _options" do
-        expect(example_class._options).to match expected_options_hash
-      end
-    end
-
-    describe "#base_class" do
-      subject(:example_class) { base_class }
-
-      let(:expected_options) { %i[base] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#parentA" do
-      subject(:example_class) { parentA_class }
-
-      let(:expected_options) { %i[base parentA] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#parentB" do
-      subject(:example_class) { parentB_class }
-
-      let(:expected_options) { %i[base parentB] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childA1" do
-      subject(:example_class) { childA1_class }
-
-      let(:expected_options) { %i[base parentA childA1] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childA2" do
-      subject(:example_class) { childA2_class }
-
-      let(:expected_options) { %i[base parentA childA2] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childB" do
-      subject(:example_class) { childB_class }
-
-      let(:expected_options) { %i[base parentB childB] }
-
-      include_examples "an object with inherited options"
     end
   end
 

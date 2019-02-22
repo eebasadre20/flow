@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Execute the operation.
+# Abstract placeholder for defining the behavior of the Operation. Child classes *must* implement `#execute`.
 module Operation
   module Execute
     extend ActiveSupport::Concern

@@ -6,23 +6,16 @@ RSpec.shared_context "with example class having callback" do |callback|
       include ActiveSupport::Callbacks
       define_callbacks callback
 
-      @before_hook_run = false
-      @after_hook_run = false
-
       class << self
-        attr_writer :before_hook_run, :after_hook_run
-
-        def before_hook_run?
-          @before_hook_run
-        end
-
-        def after_hook_run?
-          @after_hook_run
-        end
+        attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
       end
 
       set_callback(callback, :before) { |obj| obj.class.before_hook_run = true }
       set_callback(callback, :after) { |obj| obj.class.after_hook_run = true }
+      set_callback callback, :around do |obj, block|
+        obj.class.around_hook_run = true
+        block.call
+      end
     end
   end
 end

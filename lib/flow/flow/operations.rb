@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Arguments describe input required to define the initial state.
+# Operations are an ordered list of the behaviors which should are executed with and possibly change the Flow's state.
 module Flow
   module Operations
     extend ActiveSupport::Concern
