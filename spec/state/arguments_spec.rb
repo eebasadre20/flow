@@ -21,7 +21,7 @@ RSpec.describe State::Arguments, type: :module do
   end
 
   describe ".inherited" do
-    it_behaves_like "an inherited array property", :argument do
+    it_behaves_like "an inherited property", :argument do
       let(:root_class) { example_state_class }
     end
   end

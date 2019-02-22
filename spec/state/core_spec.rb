@@ -24,11 +24,8 @@ RSpec.describe State::Core, type: :module do
         arguments.each { |argument, value| expect(instance.public_send(argument)).to eq value }
       end
 
-      it "runs the callbacks" do
-        expect { instance }.
-          to change { example_class.before_hook_run? }.from(false).to(true).
-          and change { example_class.around_hook_run? }.from(false).to(true).
-          and change { example_class.after_hook_run? }.from(false).to(true)
+      it_behaves_like "an class with callback" do
+        subject(:callback_runner) { instance }
       end
     end
   end

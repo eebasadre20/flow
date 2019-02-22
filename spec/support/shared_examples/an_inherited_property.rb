@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples_for "an inherited array property" do |property, attribute = "_#{property.to_s.pluralize}".to_sym|
+RSpec.shared_examples_for "an inherited property" do |property, attribute = "_#{property.to_s.pluralize}".to_sym|
   let(:base_class) do
     Class.new(root_class).tap { |klass| klass.__send__(property, :base) }
   end

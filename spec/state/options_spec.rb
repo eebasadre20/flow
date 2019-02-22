@@ -49,7 +49,7 @@ RSpec.describe State::Options, type: :module do
   end
 
   describe ".inherited" do
-    it_behaves_like "an inherited array property", :option do
+    it_behaves_like "an inherited property", :option do
       let(:root_class) { example_state_class }
       let(:expected_attribute_value) do
         expected_property_value.each_with_object({}) do |option, hash|

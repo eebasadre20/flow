@@ -35,7 +35,7 @@ RSpec.describe Operation::Failures, type: :module do
   end
 
   describe ".inherited" do
-    it_behaves_like "an inherited array property", :failure do
+    it_behaves_like "an inherited property", :failure do
       let(:root_class) { example_operation_class }
     end
   end

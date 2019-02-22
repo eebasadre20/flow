@@ -14,7 +14,7 @@ RSpec.describe Flow::Operations, type: :module do
   end
 
   describe ".inherited" do
-    it_behaves_like "an inherited array property", :operations do
+    it_behaves_like "an inherited property", :operations do
       let(:root_class) { example_flow_class }
     end
   end
