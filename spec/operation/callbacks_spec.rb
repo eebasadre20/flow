@@ -3,7 +3,7 @@
 RSpec.describe Operation::Callbacks, type: :module do
   subject(:example_class) { Class.new.include described_class }
 
-  it_behaves_like "an example class with callbacks", described_class, :failure
+  it_behaves_like "an example class with callbacks", described_class, %i[failure execute]
 
   describe "#on_failure" do
     subject(:failure) { instance.run_callbacks(:failure) }

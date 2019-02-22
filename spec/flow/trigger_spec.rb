@@ -51,7 +51,6 @@ RSpec.describe Flow::Trigger, type: :module do
         trigger!
         expect(operations).to all(have_received(:execute).with(state).ordered)
         expect(flow).to have_received(:surveil).with(:trigger)
-        operations.each { |operation| expect(flow).to have_received(:surveil).with(operation.name) }
       end
     end
 

@@ -55,7 +55,7 @@ module Operation
     class OperationFailure < StandardError
       attr_reader :problem, :details
 
-      def initialize(problem, **details)
+      def initialize(problem = nil, **details)
         super(problem)
         @problem = problem
         @details = OpenStruct.new(details)

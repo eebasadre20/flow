@@ -43,10 +43,10 @@ RSpec.describe Flow::Core, type: :module do
         arguments.each { |argument, value| expect(instance.state.public_send(argument)).to eq value }
       end
 
-      it_behaves_like "an class with callback" do
+      it_behaves_like "a class with callback" do
         subject(:callback_runner) { instance }
 
-        let(:example_class) { example_flow_class }
+        let(:example) { example_flow_class }
       end
     end
   end
