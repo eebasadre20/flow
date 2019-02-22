@@ -10,6 +10,7 @@ require_relative "support/shared_context/with_example_class_having_callback"
 require_relative "support/shared_context/with_example_flow_having_state"
 
 require_relative "support/shared_examples/an_example_class_with_callbacks"
+require_relative "support/shared_examples/an_inherited_array_property"
 
 SimpleCov.start do
   add_filter "/spec/"

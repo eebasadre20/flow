@@ -35,92 +35,8 @@ RSpec.describe Operation::Failures, type: :module do
   end
 
   describe ".inherited" do
-    let(:base_class) do
-      Class.new(example_operation_class) { failure :base }
-    end
-
-    let(:parentA_class) do
-      Class.new(base_class) do
-        failure :parentA
-      end
-    end
-
-    let(:parentB_class) do
-      Class.new(base_class) do
-        failure :parentB
-      end
-    end
-
-    let!(:childA1_class) do
-      Class.new(parentA_class) do
-        failure :childA1
-      end
-    end
-
-    let!(:childA2_class) do
-      Class.new(parentA_class) do
-        failure :childA2
-      end
-    end
-
-    let!(:childB_class) do
-      Class.new(parentB_class) do
-        failure :childB
-      end
-    end
-
-    shared_examples_for "an object with inherited failures" do
-      it "has expected _failures" do
-        expect(example_class._failures).to eq expected_failures
-      end
-    end
-
-    describe "#base_class" do
-      subject(:example_class) { base_class }
-
-      let(:expected_failures) { %i[base] }
-
-      include_examples "an object with inherited failures"
-    end
-
-    describe "#parentA" do
-      subject(:example_class) { parentA_class }
-
-      let(:expected_failures) { %i[base parentA] }
-
-      include_examples "an object with inherited failures"
-    end
-
-    describe "#parentB" do
-      subject(:example_class) { parentB_class }
-
-      let(:expected_failures) { %i[base parentB] }
-
-      include_examples "an object with inherited failures"
-    end
-
-    describe "#childA1" do
-      subject(:example_class) { childA1_class }
-
-      let(:expected_failures) { %i[base parentA childA1] }
-
-      include_examples "an object with inherited failures"
-    end
-
-    describe "#childA2" do
-      subject(:example_class) { childA2_class }
-
-      let(:expected_failures) { %i[base parentA childA2] }
-
-      include_examples "an object with inherited failures"
-    end
-
-    describe "#childB" do
-      subject(:example_class) { childB_class }
-
-      let(:expected_failures) { %i[base parentB childB] }
-
-      include_examples "an object with inherited failures"
+    it_behaves_like "an inherited array property", :failure do
+      let(:root_class) { example_operation_class }
     end
   end
 
@@ -183,10 +99,6 @@ RSpec.describe Operation::Failures, type: :module do
     rescue Operation::Failures::OperationFailure => operation_failure
       expect(operation_failure.problem).to eq problem
       expect(operation_failure.details).to eq OpenStruct.new(details)
-    end
-
-    it "calls error!" do
-
     end
   end
 end

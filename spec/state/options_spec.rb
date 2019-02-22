@@ -49,96 +49,13 @@ RSpec.describe State::Options, type: :module do
   end
 
   describe ".inherited" do
-    let(:base_class) do
-      Class.new(example_state_class) { option :base }
-    end
-
-    let(:parentA_class) do
-      Class.new(base_class) do
-        option :parentA
+    it_behaves_like "an inherited array property", :option do
+      let(:root_class) { example_state_class }
+      let(:expected_attribute_value) do
+        expected_property_value.each_with_object({}) do |option, hash|
+          hash[option] = instance_of(State::Options::Option)
+        end
       end
-    end
-
-    let(:parentB_class) do
-      Class.new(base_class) do
-        option :parentB
-      end
-    end
-
-    let!(:childA1_class) do
-      Class.new(parentA_class) do
-        option :childA1
-      end
-    end
-
-    let!(:childA2_class) do
-      Class.new(parentA_class) do
-        option :childA2
-      end
-    end
-
-    let!(:childB_class) do
-      Class.new(parentB_class) do
-        option :childB
-      end
-    end
-
-    shared_examples_for "an object with inherited options" do
-      let(:expected_options_hash) do
-        expected_options.each_with_object({}) { |option, hash| hash[option] = instance_of(State::Options::Option) }
-      end
-
-      it "has expected _options" do
-        expect(example_class._options).to match expected_options_hash
-      end
-    end
-
-    describe "#base_class" do
-      subject(:example_class) { base_class }
-
-      let(:expected_options) { %i[base] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#parentA" do
-      subject(:example_class) { parentA_class }
-
-      let(:expected_options) { %i[base parentA] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#parentB" do
-      subject(:example_class) { parentB_class }
-
-      let(:expected_options) { %i[base parentB] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childA1" do
-      subject(:example_class) { childA1_class }
-
-      let(:expected_options) { %i[base parentA childA1] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childA2" do
-      subject(:example_class) { childA2_class }
-
-      let(:expected_options) { %i[base parentA childA2] }
-
-      include_examples "an object with inherited options"
-    end
-
-    describe "#childB" do
-      subject(:example_class) { childB_class }
-
-      let(:expected_options) { %i[base parentB childB] }
-
-      include_examples "an object with inherited options"
     end
   end
 
