@@ -23,6 +23,8 @@ module Operation
 
     def execute!
       run_callbacks(:execute) { behavior }
+    rescue StandardError => exception
+      rescue_with_handler(exception) || raise
     end
 
     def execute
