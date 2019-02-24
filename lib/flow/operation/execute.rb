@@ -6,6 +6,8 @@ module Operation
     extend ActiveSupport::Concern
 
     included do
+      include ActiveSupport::Rescuable
+
       attr_reader :operation_failure
 
       set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
@@ -22,7 +24,9 @@ module Operation
     end
 
     def execute!
-      run_callbacks(:execute) { behavior }
+      run_callbacks(:execute) do
+        run_callbacks(:behavior) { behavior }
+      end
     rescue StandardError => exception
       rescue_with_handler(exception) || raise
     end

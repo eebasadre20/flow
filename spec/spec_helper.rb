@@ -37,3 +37,5 @@ Shoulda::Matchers.configure do |config|
     with.library :active_model
   end
 end
+
+ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"

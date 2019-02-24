@@ -7,7 +7,7 @@ module Operation
 
     included do
       include ActiveSupport::Callbacks
-      define_callbacks :failure, :execute
+      define_callbacks :failure, :execute, :behavior
     end
 
     class_methods do
