@@ -5,7 +5,7 @@ RSpec.describe Operation::Execute, type: :module do
 
   it { is_expected.to include_module ActiveSupport::Rescuable }
 
-  include_context "with an example operation", [ ActiveSupport::Rescuable, Operation::Transactions, Operation::Execute ]
+  include_context "with an example operation", Operation::Execute
 
   describe ".execute!" do
     it_behaves_like "a class pass method", :execute! do
