@@ -5,10 +5,6 @@ module Operation
   module ErrorHandler
     extend ActiveSupport::Concern
 
-    included do
-      include ActiveSupport::Rescuable
-    end
-
     class_methods do
       private
 

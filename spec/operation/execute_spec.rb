@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe Operation::Execute, type: :module do
-  include_context "with an example operation", [ ActiveSupport::Rescuable, Operation::Execute ]
+  subject(:example_class) { Class.new.include described_class }
+
+  it { is_expected.to include_module ActiveSupport::Rescuable }
+
+  include_context "with an example operation", Operation::Execute
 
   describe ".execute!" do
     it_behaves_like "a class pass method", :execute! do
@@ -23,15 +27,30 @@ RSpec.describe Operation::Execute, type: :module do
       allow(example_operation).to receive(:behavior)
 
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
-      example_operation_class.set_callback(:execute, :before) { |obj| obj.before_hook_run = true }
-      example_operation_class.set_callback(:execute, :after) { |obj| obj.after_hook_run = true }
-      example_operation_class.set_callback :execute, :around do |obj, block|
-        obj.around_hook_run = true
-        block.call
+    end
+
+    shared_context "with operation callbacks" do |callback|
+      before do
+        example_operation_class.set_callback(callback, :before) { |obj| obj.before_hook_run = true }
+        example_operation_class.set_callback(callback, :after) { |obj| obj.after_hook_run = true }
+        example_operation_class.set_callback callback, :around do |obj, block|
+          obj.around_hook_run = true
+          block.call
+        end
       end
     end
 
     it_behaves_like "a class with callback" do
+      include_context "with operation callbacks", :execute
+
+      subject(:callback_runner) { execute! }
+
+      let(:example) { example_operation }
+    end
+
+    it_behaves_like "a class with callback" do
+      include_context "with operation callbacks", :behavior
+
       subject(:callback_runner) { execute! }
 
       let(:example) { example_operation }
