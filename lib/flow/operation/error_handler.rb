@@ -7,7 +7,6 @@ module Operation
 
     included do
       include ActiveSupport::Rescuable
-      include ActiveSupport::Inflector
     end
 
     class_methods do

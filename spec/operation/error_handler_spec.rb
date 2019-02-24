@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Operation::ErrorHandler, type: :module do
+  subject(:example_class) { Class.new.include described_class }
+
+  it { is_expected.to include_module ActiveSupport::Rescuable }
+
   include_context "with an example operation", [ Operation::Failures, Operation::Execute, Operation::ErrorHandler ]
 
   describe ".handle_error" do
