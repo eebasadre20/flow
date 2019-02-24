@@ -25,13 +25,14 @@ RSpec.describe Operation::Execute, type: :module do
     before do
       allow(example_operation).to receive(:surveil).and_call_original
       allow(example_operation).to receive(:behavior)
+
+      example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
     it_behaves_like "a class with callback" do
       subject(:callback_runner) { execute! }
 
       before do
-        example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
         example_operation_class.set_callback(:execute, :before) { |obj| obj.before_hook_run = true }
         example_operation_class.set_callback(:execute, :after) { |obj| obj.after_hook_run = true }
         example_operation_class.set_callback :execute, :around do |obj, block|
@@ -47,7 +48,6 @@ RSpec.describe Operation::Execute, type: :module do
       subject(:callback_runner) { execute! }
 
       before do
-        example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
         example_operation_class.set_callback(:behavior, :before) { |obj| obj.before_hook_run = true }
         example_operation_class.set_callback(:behavior, :after) { |obj| obj.after_hook_run = true }
         example_operation_class.set_callback :behavior, :around do |obj, block|
