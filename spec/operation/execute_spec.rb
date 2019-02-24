@@ -29,32 +29,29 @@ RSpec.describe Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
-    it_behaves_like "a class with callback" do
-      subject(:callback_runner) { execute! }
-
+    shared_context "operation callbacks" do |callback|
       before do
-        example_operation_class.set_callback(:execute, :before) { |obj| obj.before_hook_run = true }
-        example_operation_class.set_callback(:execute, :after) { |obj| obj.after_hook_run = true }
-        example_operation_class.set_callback :execute, :around do |obj, block|
+        example_operation_class.set_callback(callback, :before) { |obj| obj.before_hook_run = true }
+        example_operation_class.set_callback(callback, :after) { |obj| obj.after_hook_run = true }
+        example_operation_class.set_callback callback, :around do |obj, block|
           obj.around_hook_run = true
           block.call
         end
       end
+    end
+
+    it_behaves_like "a class with callback" do
+      include_context "operation callbacks", :execute
+
+      subject(:callback_runner) { execute! }
 
       let(:example) { example_operation }
     end
 
     it_behaves_like "a class with callback" do
-      subject(:callback_runner) { execute! }
+      include_context "operation callbacks", :behavior
 
-      before do
-        example_operation_class.set_callback(:behavior, :before) { |obj| obj.before_hook_run = true }
-        example_operation_class.set_callback(:behavior, :after) { |obj| obj.after_hook_run = true }
-        example_operation_class.set_callback :behavior, :around do |obj, block|
-          obj.around_hook_run = true
-          block.call
-        end
-      end
+      subject(:callback_runner) { execute! }
 
       let(:example) { example_operation }
     end
