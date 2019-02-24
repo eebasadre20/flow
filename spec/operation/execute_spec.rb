@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Operation::Execute, type: :module do
-  include_context "with an example operation", Operation::Execute
+  include_context "with an example operation", [ ActiveSupport::Rescuable, Operation::Execute ]
 
   describe ".execute!" do
     it_behaves_like "a class pass method", :execute! do
@@ -45,6 +45,54 @@ RSpec.describe Operation::Execute, type: :module do
     it "is surveiled" do
       execute!
       expect(example_operation).to have_received(:surveil).with(:execute)
+    end
+
+    context "when an error occurs" do
+      let(:example_error) { Class.new(StandardError) }
+
+      before { allow(example_operation).to receive(:behavior).and_raise(example_error) }
+
+      shared_examples_for "an error is raised" do
+        let(:expected_error) { example_error }
+
+        it "raises" do
+          expect { execute! }.to raise_error expected_error
+        end
+      end
+
+      context "with no rescue_from" do
+        it_behaves_like "an error is raised"
+      end
+
+      context "with a rescue_from" do
+        context "when it reraises" do
+          before do
+            example_operation_class.rescue_from(StandardError) { |exception| raise exception }
+          end
+
+          it_behaves_like "an error is raised"
+        end
+
+        context "when it raises a new error" do
+          before do
+            example_operation_class.rescue_from(StandardError) { raise StandardError }
+          end
+
+          it_behaves_like "an error is raised" do
+            let(:expected_error) { StandardError }
+          end
+        end
+
+        context "when it rescues" do
+          before do
+            example_operation_class.rescue_from(StandardError) { true }
+          end
+
+          it "doesn't raise" do
+            expect { execute! }.not_to raise_error
+          end
+        end
+      end
     end
   end
 

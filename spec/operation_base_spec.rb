@@ -8,5 +8,6 @@ RSpec.describe OperationBase, type: :operation do
   it { is_expected.to include_module Operation::Core }
   it { is_expected.to include_module Operation::Execute }
   it { is_expected.to include_module Operation::Failures }
+  it { is_expected.to include_module Operation::ErrorHandler }
   it { is_expected.to include_module Operation::Status }
 end
