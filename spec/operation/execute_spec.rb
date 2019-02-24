@@ -29,7 +29,7 @@ RSpec.describe Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
-    shared_context "operation callbacks" do |callback|
+    shared_context "with operation callbacks" do |callback|
       before do
         example_operation_class.set_callback(callback, :before) { |obj| obj.before_hook_run = true }
         example_operation_class.set_callback(callback, :after) { |obj| obj.after_hook_run = true }
@@ -41,7 +41,7 @@ RSpec.describe Operation::Execute, type: :module do
     end
 
     it_behaves_like "a class with callback" do
-      include_context "operation callbacks", :execute
+      include_context "with operation callbacks", :execute
 
       subject(:callback_runner) { execute! }
 
@@ -49,7 +49,7 @@ RSpec.describe Operation::Execute, type: :module do
     end
 
     it_behaves_like "a class with callback" do
-      include_context "operation callbacks", :behavior
+      include_context "with operation callbacks", :behavior
 
       subject(:callback_runner) { execute! }
 
