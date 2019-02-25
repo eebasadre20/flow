@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Abstract placeholder for defining the behavior of the Operation. Child classes *must* implement `#execute`.
+# Operations *must* define the `#behavior` that occurs when `#execute` is called.
 module Operation
   module Execute
     extend ActiveSupport::Concern
@@ -27,15 +27,20 @@ module Operation
       run_callbacks(:execute) do
         run_callbacks(:behavior) { behavior }
       end
+
+      self
     rescue StandardError => exception
       rescue_with_handler(exception) || raise
+
+      self
     end
 
     def execute
       execute!
     rescue Operation::Failures::OperationFailure => exception
       @operation_failure = exception
-      false
+
+      self
     end
 
     def behavior

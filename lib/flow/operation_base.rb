@@ -7,6 +7,7 @@ require_relative "operation/core"
 require_relative "operation/error_handler"
 require_relative "operation/execute"
 require_relative "operation/failures"
+require_relative "operation/rewind"
 require_relative "operation/status"
 require_relative "operation/transactions"
 
@@ -18,6 +19,7 @@ class OperationBase
   include Operation::ErrorHandler
   include Operation::Execute
   include Operation::Failures
+  include Operation::Rewind
   include Operation::Status
   include Operation::Transactions
 end

@@ -29,17 +29,6 @@ RSpec.describe Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
-    shared_context "with operation callbacks" do |callback|
-      before do
-        example_operation_class.set_callback(callback, :before) { |obj| obj.before_hook_run = true }
-        example_operation_class.set_callback(callback, :after) { |obj| obj.after_hook_run = true }
-        example_operation_class.set_callback callback, :around do |obj, block|
-          obj.around_hook_run = true
-          block.call
-        end
-      end
-    end
-
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :execute
 
@@ -107,6 +96,8 @@ RSpec.describe Operation::Execute, type: :module do
             example_operation_class.rescue_from(StandardError) { true }
           end
 
+          it { is_expected.to eq example_operation }
+
           it "doesn't raise" do
             expect { execute! }.not_to raise_error
           end
@@ -119,17 +110,13 @@ RSpec.describe Operation::Execute, type: :module do
     subject(:execute) { example_operation.execute }
 
     context "when nothing goes wrong" do
-      let(:execute_response) { double }
-
-      before { allow(example_operation).to receive(:execute!).and_return(execute_response) }
-
-      it { is_expected.to eq execute_response }
+      it { is_expected.to eq example_operation }
     end
 
     context "when a failure occurs" do
       before { allow(example_operation).to receive(:execute!).and_raise(Operation::Failures::OperationFailure) }
 
-      it { is_expected.to eq false }
+      it { is_expected.to eq example_operation }
 
       it "tracks the failure" do
         expect { execute }.
