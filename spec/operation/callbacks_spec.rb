@@ -5,7 +5,7 @@ RSpec.describe Operation::Callbacks, type: :module do
 
   it { is_expected.to include_module ActiveSupport::Callbacks }
 
-  it_behaves_like "an example class with callbacks", described_class, %i[failure execute behavior]
+  it_behaves_like "an example class with callbacks", described_class, %i[failure execute behavior rewind undo]
 
   describe "#on_failure" do
     subject(:failure) { instance.run_callbacks(:failure) }
