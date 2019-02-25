@@ -92,21 +92,21 @@ RSpec.describe Operation::Transactions, type: :module do
     end
 
     context "when except: is specified" do
-        context "with invalid method" do
-          it_behaves_like "methods are wrapped in a transaction with a variety of input" do
-            let(:listing_type) { :except }
-            let(:test_value) { Faker::Internet.domain_word }
-          end
-        end
-
-        context "with valid method" do
-          it_behaves_like "methods are wrapped in a transaction with a variety of input" do
-            let(:expected_wrapped_methods) { described_class::METHODS_TO_TRANSACTION_WRAP.without(test_value) }
-            let(:listing_type) { :except }
-            let(:test_value) { described_class::METHODS_TO_TRANSACTION_WRAP.sample }
-          end
+      context "with invalid method" do
+        it_behaves_like "methods are wrapped in a transaction with a variety of input" do
+          let(:listing_type) { :except }
+          let(:test_value) { Faker::Internet.domain_word }
         end
       end
+
+      context "with valid method" do
+        it_behaves_like "methods are wrapped in a transaction with a variety of input" do
+          let(:expected_wrapped_methods) { described_class::METHODS_TO_TRANSACTION_WRAP.without(test_value) }
+          let(:listing_type) { :except }
+          let(:test_value) { described_class::METHODS_TO_TRANSACTION_WRAP.sample }
+        end
+      end
+    end
 
     shared_examples_for "method is wrapped in a transaction" do |trigger_method, method|
       subject(:trigger) { example_operation.public_send(trigger_method) }
