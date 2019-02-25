@@ -92,72 +92,54 @@ RSpec.describe Operation::Transactions, type: :module do
     end
 
     context "when except: is specified" do
-      context "with invalid method" do
-        it_behaves_like "methods are wrapped in a transaction with a variety of input" do
-          let(:listing_type) { :except }
-          let(:test_value) { Faker::Internet.domain_word }
+        context "with invalid method" do
+          it_behaves_like "methods are wrapped in a transaction with a variety of input" do
+            let(:listing_type) { :except }
+            let(:test_value) { Faker::Internet.domain_word }
+          end
+        end
+
+        context "with valid method" do
+          it_behaves_like "methods are wrapped in a transaction with a variety of input" do
+            let(:expected_wrapped_methods) { described_class::METHODS_TO_TRANSACTION_WRAP.without(test_value) }
+            let(:listing_type) { :except }
+            let(:test_value) { described_class::METHODS_TO_TRANSACTION_WRAP.sample }
+          end
         end
       end
 
-      context "with valid method" do
-        it_behaves_like "methods are wrapped in a transaction with a variety of input" do
-          let(:expected_wrapped_methods) { described_class::METHODS_TO_TRANSACTION_WRAP.without(test_value) }
-          let(:listing_type) { :except }
-          let(:test_value) { described_class::METHODS_TO_TRANSACTION_WRAP.sample }
-        end
-      end
-    end
-
-    context "when executing" do
-      subject(:execute!) { example_operation.execute! }
+    shared_examples_for "method is wrapped in a transaction" do |trigger_method, method|
+      subject(:trigger) { example_operation.public_send(trigger_method) }
 
       context "when not wrapped" do
-        before { example_operation_class.__send__(:wrap_in_transaction, except: :behavior) }
+        before { example_operation_class.__send__(:wrap_in_transaction, except: method) }
 
         it "has no effect" do
-          expect { execute! }.not_to change { transaction_provider.connection.open_transactions }
+          expect { trigger }.not_to change { transaction_provider.connection.open_transactions }
         end
       end
 
       context "when wrapped" do
         let!(:original_transaction_count) { transaction_provider.connection.open_transactions }
 
-        before { example_operation_class.__send__(:wrap_in_transaction, only: :behavior) }
+        before { example_operation_class.__send__(:wrap_in_transaction, only: method) }
 
         it "has changes the transactions" do
-          allow(example_operation).to receive(:behavior) do
+          allow(example_operation).to receive(method) do
             expect(transaction_provider.connection.open_transactions).to eq original_transaction_count + 1
           end
 
-          execute!
+          trigger
         end
       end
     end
 
-    context "when rewinding" do
-      subject(:rewind) { example_operation.rewind }
+    context "when #execute!" do
+      it_behaves_like "method is wrapped in a transaction", :execute!, :behavior
+    end
 
-      context "when not wrapped" do
-        before { example_operation_class.__send__(:wrap_in_transaction, except: :undo) }
-
-        it "has no effect" do
-          expect { rewind }.not_to change { transaction_provider.connection.open_transactions }
-        end
-      end
-
-      context "when wrapped" do
-        let!(:original_transaction_count) { transaction_provider.connection.open_transactions }
-
-        before { example_operation_class.__send__(:wrap_in_transaction, only: :undo) }
-
-        it "has changes the transactions" do
-          allow(example_operation).to receive(:undo) do
-            expect(transaction_provider.connection.open_transactions).to eq original_transaction_count + 1
-          end
-
-          rewind
-        end
-      end
+    context "when #rewind" do
+      it_behaves_like "method is wrapped in a transaction", :rewind, :behavior
     end
   end
 end
