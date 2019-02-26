@@ -13,6 +13,8 @@ module Operation
       run_callbacks(:rewind) do
         run_callbacks(:undo) { undo }
       end
+
+      self
     end
 
     def undo

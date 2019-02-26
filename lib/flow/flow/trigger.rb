@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Triggering a Flow executes all its operations in sequential order *iff* it has a valid state.
+# Triggering a Flow executes all its operations in sequential order (see `Flow::Flux`) *iff* it has a valid state.
 module Flow
   module Trigger
     extend ActiveSupport::Concern
@@ -24,9 +24,7 @@ module Flow
     def trigger!
       raise Flow::Errors::StateInvalid unless state_valid?
 
-      run_callbacks(:trigger) do
-        _operations.each { |operation| operation.execute(state) }
-      end
+      run_callbacks(:trigger) { flux }
 
       state
     end
