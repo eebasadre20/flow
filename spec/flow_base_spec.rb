@@ -21,4 +21,3 @@ RSpec.describe FlowBase, type: :flow do
   it { is_expected.to include_module Flow::Revert }
   it { is_expected.to include_module Flow::Trigger }
 end
-
