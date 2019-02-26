@@ -32,8 +32,7 @@ module Flow
         _operations.each do |operation|
           executed_operation = operation.execute(state)
 
-          @failed_operation = executed_operation if executed_operation.failed?
-          raise Flow::Flux::Failure if failed_operation?
+          (@failed_operation = executed_operation) and raise Flow::Flux::Failure if executed_operation.failed?
 
           executed_operations << executed_operation
         end
