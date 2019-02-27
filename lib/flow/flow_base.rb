@@ -12,6 +12,7 @@ require_relative "flow/trigger"
 
 # A flow is a collection of procedurally executed operations sharing a common state.
 class FlowBase
+  include ShortCircuIt
   include Technologic
   include Flow::Callbacks
   include Flow::Core

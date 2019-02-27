@@ -11,11 +11,15 @@ module Flow
       private
 
       attr_reader :rewound_operations
+
+      def rewindable_operations
+        executed_operations - rewound_operations
+      end
     end
 
     def ebb
       run_callbacks(:ebb) do
-        executed_operations.reverse_each { |executed_operation| rewound_operations << executed_operation.rewind }
+        rewindable_operations.reverse_each { |executed_operation| rewound_operations << executed_operation.rewind }
       end
     end
   end

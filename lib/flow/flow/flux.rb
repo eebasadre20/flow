@@ -13,6 +13,15 @@ module Flow
       private
 
       attr_reader :executed_operations
+
+      def executable_operations
+        operation_instances - executed_operations
+      end
+
+      def operation_instances
+        _operations.map { |operation_class| operation_class.new(state) }
+      end
+      memoize :operation_instances
     end
 
     def failed_operation?
@@ -29,12 +38,10 @@ module Flow
 
     def flux!
       run_callbacks(:flux) do
-        _operations.each do |operation|
-          executed_operation = operation.execute(state)
-
-          (@failed_operation = executed_operation) and raise Flow::Flux::Failure if executed_operation.failed?
-
-          executed_operations << executed_operation
+        executable_operations.each do |operation|
+          operation.execute
+          (@failed_operation = operation) and raise Flow::Flux::Failure if operation.failed?
+          executed_operations << operation
         end
       end
     end

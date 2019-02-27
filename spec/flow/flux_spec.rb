@@ -76,6 +76,8 @@ RSpec.describe Flow::Flux, type: :module do
   end
 
   describe "#flux!" do
+    include_context "with operations for a flow"
+
     subject(:flux!) { example_flow.flux! }
 
     it_behaves_like "a class with callback" do
@@ -86,65 +88,70 @@ RSpec.describe Flow::Flux, type: :module do
       let(:example) { example_flow }
     end
 
-    let(:operation0_class) { Class.new(OperationBase) }
-    let(:operation1_class) { Class.new(OperationBase) }
-    let(:operation2_class) { Class.new(OperationBase) }
-    let(:operation0_name) { Faker::Internet.unique.domain_word.capitalize }
-    let(:operation1_name) { Faker::Internet.unique.domain_word.capitalize }
-    let(:operation2_name) { Faker::Internet.unique.domain_word.capitalize }
-    let(:operations) { [ operation0_class, operation1_class, operation2_class ] }
-    let(:state) { instance_double(example_state_class) }
     let(:operation_failure) { instance_double(Operation::Failures::OperationFailure) }
-    let(:executed_operations) do
-      operations.map { |operation| instance_of(operation) }
-    end
+    let(:operations) { example_flow.__send__(:operation_instances) }
 
     before do
-      stub_const(operation0_name, operation0_class)
-      stub_const(operation1_name, operation1_class)
-      stub_const(operation2_name, operation2_class)
-
-      example_flow_class._operations = operations.each do |operation|
-        allow(operation).to receive(:execute).and_call_original
-      end
-
-      allow(example_flow).to receive(:state).and_return(state)
+      example_flow_class._operations = operation_classes
+      operation_classes.each { |operation_class| allow(operation_class).to receive(:new).and_call_original }
+      operations.each { |operation| allow(operation).to receive(:execute).and_call_original }
     end
 
     context "when nothing goes wrong" do
       it "executes all operations" do
-        expect { flux! }.to change { example_flow.__send__(:executed_operations) }.from([]).to(executed_operations)
-        expect(operations).to all(have_received(:execute).with(state).ordered)
+        expect { flux! }.to change { example_flow.__send__(:executed_operations) }.from([]).to(instance_of_operations)
+        expect(operation_classes).to all(have_received(:new).with(state).ordered)
+        expect(operations).to all(have_received(:execute).ordered)
+      end
+    end
+
+    context "with already executed operations" do
+      before do
+        example_flow.__send__(:executed_operations) << operations.first
+      end
+
+      it "executes all unexecuted operations" do
+        expect { flux! }.
+          to change { example_flow.__send__(:executed_operations) }.
+          from([ operations.first ]).
+          to(operations)
+        expect(operations.first).not_to have_received(:execute)
+        expect(operations.last(2)).to all(have_received(:execute).ordered)
       end
     end
 
     context "when an operation fails" do
-      let(:operation1) { operation1_class.new(state) }
-
       before do
-        allow(operation1_class).to receive(:execute).and_return(operation1)
-        allow(operation1).to receive(:operation_failure).and_return(operation_failure)
+        allow(operations.second).to receive(:operation_failure).and_return(operation_failure)
       end
 
       it "raises, sets failed operation, and halts" do
         expect { flux! }.
           to raise_error(Flow::Flux::Failure).
-          and change { example_flow.__send__(:failed_operation) }.from(nil).to(operation1).
-          and change { example_flow.__send__(:executed_operations) }.from([]).to([ executed_operations.first ])
-        expect(operation2_class).not_to have_received(:execute)
+          and change { example_flow.__send__(:failed_operation) }.from(nil).to(operations.second).
+          and change { example_flow.__send__(:executed_operations) }.from([]).to([ instance_of_operations.first ])
+        expect(operations.last).not_to have_received(:execute)
       end
     end
 
     context "when an operation raises" do
       let(:example_error) { Class.new(StandardError) }
 
-      before { allow(operation1_class).to receive(:execute).and_raise example_error }
+      before do
+        operations.each_with_index do |operation, index|
+          if index == 1
+            allow(operation).to receive(:execute).and_raise example_error
+          else
+            allow(operation).to receive(:execute).and_call_original
+          end
+        end
+      end
 
       it "raises" do
         expect { flux! }.
           to raise_error(example_error).
-          and change { example_flow.__send__(:executed_operations) }.from([]).to([ executed_operations.first ])
-        expect(operation2_class).not_to have_received(:execute)
+          and change { example_flow.__send__(:executed_operations) }.from([]).to([ instance_of_operations.first ])
+        expect(operations.last).not_to have_received(:execute)
         expect(example_flow).not_to be_failed_operation
       end
     end

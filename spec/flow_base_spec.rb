@@ -12,6 +12,7 @@ RSpec.describe FlowBase, type: :flow do
     stub_const("#{example_flow_name}State", example_state_class)
   end
 
+  it { is_expected.to include_module ShortCircuIt }
   it { is_expected.to include_module Technologic }
   it { is_expected.to include_module Flow::Callbacks }
   it { is_expected.to include_module Flow::Core }
