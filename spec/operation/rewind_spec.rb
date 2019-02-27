@@ -13,6 +13,8 @@ RSpec.describe Operation::Rewind, type: :module do
       allow(example_operation).to receive(:undo)
     end
 
+    it { is_expected.to eq example_operation }
+
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :rewind
 

@@ -6,9 +6,12 @@ require "shoulda-matchers"
 
 require_relative "support/shared_context/with_an_example_state"
 require_relative "support/shared_context/with_an_example_operation"
+require_relative "support/shared_context/with_callbacks"
 require_relative "support/shared_context/with_example_class_having_callback"
 require_relative "support/shared_context/with_example_flow_having_state"
+require_relative "support/shared_context/with_flow_callbacks"
 require_relative "support/shared_context/with_operation_callbacks"
+require_relative "support/shared_context/with_operations_for_a_flow"
 
 require_relative "support/shared_examples/a_class_with_callback"
 require_relative "support/shared_examples/an_example_class_with_callbacks"
