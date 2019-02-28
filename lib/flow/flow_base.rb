@@ -8,6 +8,7 @@ require_relative "flow/ebb"
 require_relative "flow/flux"
 require_relative "flow/operations"
 require_relative "flow/revert"
+require_relative "flow/transactions"
 require_relative "flow/trigger"
 
 # A flow is a collection of procedurally executed operations sharing a common state.
@@ -20,5 +21,6 @@ class FlowBase
   include Flow::Flux
   include Flow::Operations
   include Flow::Revert
+  include Flow::Transactions
   include Flow::Trigger
 end

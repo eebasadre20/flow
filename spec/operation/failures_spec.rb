@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Operation::Failures, type: :module do
-  include_context "with an example operation", [ Operation::Execute, Operation::Failures ]
+  include_context "with an example operation", [ Operation::Execute, described_class ]
 
   let(:problem) { Faker::Lorem.word.to_sym }
 
