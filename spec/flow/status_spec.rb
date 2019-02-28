@@ -18,7 +18,9 @@ RSpec.describe Flow::Status, type: :module do
   describe "#triggered?" do
     subject(:triggered?) { example_flow.triggered? }
 
-    it { is_expected.to be false }
+    context "without executed_operations" do
+      it { is_expected.to be false }
+    end
 
     context "with executed_operations" do
       before { example_flow.__send__(:executed_operations) << :operation }
@@ -60,7 +62,9 @@ RSpec.describe Flow::Status, type: :module do
   describe "#success?" do
     subject(:success?) { example_flow.success? }
 
-    it { is_expected.to be false }
+    context "with no operation_instances nor executed_operations" do
+      it { is_expected.to be false }
+    end
 
     context "when operation_instances matches executed_operations" do
       before do
@@ -84,7 +88,9 @@ RSpec.describe Flow::Status, type: :module do
   describe "#reverted?" do
     subject(:reverted?) { example_flow.reverted? }
 
-    it { is_expected.to be false }
+    context "without rewound_operations" do
+      it { is_expected.to be false }
+    end
 
     context "with rewound_operations" do
       before { example_flow.__send__(:rewound_operations) << :operation }
