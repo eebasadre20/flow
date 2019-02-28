@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Operation::Status, type: :module do
-  include_context "with an example operation", [ Operation::Execute, Operation::Status ]
+  include_context "with an example operation", [ Operation::Execute, described_class ]
 
   describe "#executed?" do
     subject(:executed?) { example_operation.executed? }

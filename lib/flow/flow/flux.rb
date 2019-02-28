@@ -14,6 +14,14 @@ module Flow
 
       attr_reader :executed_operations
 
+      def _flux
+        executable_operations.each do |operation|
+          operation.execute
+          (@failed_operation = operation) and raise Flow::Flux::Failure if operation.failed?
+          executed_operations << operation
+        end
+      end
+
       def executable_operations
         operation_instances - executed_operations
       end
@@ -37,13 +45,7 @@ module Flow
     end
 
     def flux!
-      run_callbacks(:flux) do
-        executable_operations.each do |operation|
-          operation.execute
-          (@failed_operation = operation) and raise Flow::Flux::Failure if operation.failed?
-          executed_operations << operation
-        end
-      end
+      run_callbacks(:flux) { _flux }
     end
 
     class Failure < StandardError; end

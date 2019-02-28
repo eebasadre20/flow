@@ -11,5 +11,5 @@ RSpec.describe OperationBase, type: :operation do
   it { is_expected.to include_module Operation::ErrorHandler }
   it { is_expected.to include_module Operation::Rewind }
   it { is_expected.to include_module Operation::Status }
-  it { is_expected.to include_module Operation::Transactions }
+  it { is_expected.to include_module TransactionWrapper }
 end

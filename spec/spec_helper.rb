@@ -14,8 +14,12 @@ require_relative "support/shared_context/with_operation_callbacks"
 require_relative "support/shared_context/with_operations_for_a_flow"
 
 require_relative "support/shared_examples/a_class_with_callback"
+require_relative "support/shared_examples/a_transaction_wrapper"
 require_relative "support/shared_examples/an_example_class_with_callbacks"
 require_relative "support/shared_examples/an_inherited_property"
+require_relative "support/shared_examples/method_is_wrapped_in_a_transaction"
+require_relative "support/shared_examples/methods_are_wrapped_in_a_transaction"
+require_relative "support/shared_examples/methods_are_wrapped_in_a_transaction_with_a_variety_of_input"
 
 SimpleCov.start do
   add_filter "/spec/"

@@ -21,5 +21,5 @@ class OperationBase
   include Operation::Failures
   include Operation::Rewind
   include Operation::Status
-  include Operation::Transactions
+  include TransactionWrapper
 end
