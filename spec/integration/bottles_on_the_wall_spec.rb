@@ -45,7 +45,7 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.not_to be_reverted }
   end
 
-  shared_examples_for "a failed flow" do
+  shared_examples_for "a failed flow" do |failed_operation_class, failure_problem|
     it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
 
     it { is_expected.to be_state_valid }
@@ -56,10 +56,28 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.to be_reverted }
     it { is_expected.to be_failed_operation }
 
-    it "has a failed operation" do
-      expect(flow.failed_operation.operation_failure).to be_an_instance_of Operation::Failures::OperationFailure
-      expect(flow.failed_operation).to be_executed
-      expect(flow.failed_operation).not_to be_success
+    it "produces expected stanza" do
+      expect(flow.state.stanza).to eq expected_stanza
+    end
+
+    describe "#failed_operation" do
+      subject { flow.failed_operation }
+
+      it { is_expected.to be_an_instance_of failed_operation_class }
+      it { is_expected.to be_executed }
+      it { is_expected.not_to be_success }
+    end
+
+    describe "#failed_operation#operation_failure" do
+      subject { flow.failed_operation.operation_failure }
+
+      it { is_expected.to be_an_instance_of Operation::Failures::OperationFailure }
+    end
+
+    describe "#failed_operation#operation_failure#problem" do
+      subject { flow.failed_operation.operation_failure.problem }
+
+      it { is_expected.to eq failure_problem }
     end
   end
 
@@ -273,55 +291,40 @@ RSpec.describe Flow, type: :integration do
 
     before { bottles.update!(number_passed_around: 99) }
 
-    it_behaves_like "a failed flow"
-
-    it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of PassBottlesAround
-      expect(flow.failed_operation.operation_failure.problem).to eq :record_invalid
-    end
-
-    it "produces expected stanza" do
-      expect(flow.state.stanza).to eq <<~STANZA.chomp
-        4 bottles of beer on the wall, 4 bottles of beer.
-        You take 3 down.
-        Passing the bottles wasn't as sound, now there's 3 on the ground!
-      STANZA
+    it_behaves_like "a failed flow", PassBottlesAround, :record_invalid do
+      let(:expected_stanza) do
+        <<~STANZA.chomp
+          4 bottles of beer on the wall, 4 bottles of beer.
+          You take 3 down.
+          Passing the bottles wasn't as sound, now there's 3 on the ground!
+        STANZA
+      end
     end
   end
 
   context "when the second operation fails" do
     let(:number_to_take_down) { 5 }
 
-    it_behaves_like "a failed flow"
-
-    it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of TakeBottlesDown
-      expect(flow.failed_operation.operation_failure.problem).to eq :too_greedy
-    end
-
-    it "produces expected stanza" do
-      expect(flow.state.stanza).to eq <<~STANZA.chomp
-        99 bottles of beer on the wall, 99 bottles of beer.
-        Something went wrong! It's the end of the song, and there's 99 bottles of beer on the wall.
-      STANZA
+    it_behaves_like "a failed flow", TakeBottlesDown, :too_greedy do
+      let(:expected_stanza) do
+        <<~STANZA.chomp
+          99 bottles of beer on the wall, 99 bottles of beer.
+          Something went wrong! It's the end of the song, and there's 99 bottles of beer on the wall.
+        STANZA
+      end
     end
   end
 
   context "when the third operation fails" do
     let(:number_to_take_down) { 4 }
 
-    it_behaves_like "a failed flow"
-
-    it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of PassBottlesAround
-      expect(flow.failed_operation.operation_failure.problem).to eq :too_generous
-    end
-
-    it "produces expected stanza" do
-      expect(flow.state.stanza).to eq <<~STANZA.chomp
-        99 bottles of beer on the wall, 99 bottles of beer.
-        You take 4 down.
-      STANZA
+    it_behaves_like "a failed flow", PassBottlesAround, :too_generous do
+      let(:expected_stanza) do
+        <<~STANZA.chomp
+          99 bottles of beer on the wall, 99 bottles of beer.
+          You take 4 down.
+        STANZA
+      end
     end
   end
 end
