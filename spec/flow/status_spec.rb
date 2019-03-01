@@ -29,7 +29,7 @@ RSpec.describe Flow::Status, type: :module do
     subject(:failed?) { example_flow.failed? }
 
     before do
-      allow(example_flow).to receive(:triggered?).and_return(executed?)
+      allow(example_flow).to receive(:triggered?).and_return(triggered?)
       allow(example_flow).to receive(:success?).and_return(success?)
     end
 

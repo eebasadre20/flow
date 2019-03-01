@@ -13,6 +13,3 @@ RSpec.shared_context "with a bottles active record" do
 
   after { Bottle.destroy_all }
 end
-
-
-
