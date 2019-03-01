@@ -9,6 +9,7 @@ require_relative "state/string"
 
 # A flow state is the immutable structure of relevant data.
 class StateBase
+  include ShortCircuIt
   include Technologic
   include ActiveModel::Model
   include State::Callbacks

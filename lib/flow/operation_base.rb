@@ -13,7 +13,9 @@ require_relative "operation/transactions"
 
 # Operations are service objects which are executed with a state.
 class OperationBase
+  include ShortCircuIt
   include Technologic
+  include TransactionWrapper
   include Operation::Callbacks
   include Operation::Core
   include Operation::ErrorHandler
@@ -21,5 +23,5 @@ class OperationBase
   include Operation::Failures
   include Operation::Rewind
   include Operation::Status
-  include TransactionWrapper
+  include Operation::Transactions
 end

@@ -26,13 +26,13 @@ module Flow
 
       run_callbacks(:trigger) { flux }
 
-      state
+      self
     end
 
     def trigger
       trigger!
     rescue Flow::Errors::StateInvalid
-      nil
+      self
     end
   end
 end

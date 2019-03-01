@@ -3,12 +3,6 @@
 RSpec.describe Flow::Revert, type: :module do
   include_context "with example flow having state", [ Flow::Operations, Flow::Ebb, described_class ]
 
-  describe ".revert" do
-    it_behaves_like "a class pass method", :revert do
-      let(:test_class) { example_flow_class }
-    end
-  end
-
   describe "#revert" do
     subject(:revert) { flow.revert }
 

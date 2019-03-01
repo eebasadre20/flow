@@ -5,12 +5,6 @@ module Flow
   module Revert
     extend ActiveSupport::Concern
 
-    class_methods do
-      def revert(*arguments)
-        new(*arguments).revert
-      end
-    end
-
     included do
       set_callback :revert, :around, ->(_, block) { surveil(:revert) { block.call } }
     end

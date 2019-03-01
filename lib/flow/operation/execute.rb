@@ -13,16 +13,6 @@ module Operation
       set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
     end
 
-    class_methods do
-      def execute!(*arguments)
-        new(*arguments).execute!
-      end
-
-      def execute(*arguments)
-        new(*arguments).execute
-      end
-    end
-
     def execute!
       run_callbacks(:execute) do
         run_callbacks(:behavior) { behavior }

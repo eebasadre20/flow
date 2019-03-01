@@ -5,8 +5,10 @@ module Operation
   module Transactions
     extend ActiveSupport::Concern
 
-    CALLBACKS_FOR_TRANSACTIONS = %i[behavior undo].freeze
-
-    included { include TransactionWrapper }
+    class_methods do
+      def callbacks_for_transaction
+        %i[behavior undo].freeze
+      end
+    end
   end
 end

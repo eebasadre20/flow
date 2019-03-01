@@ -18,7 +18,7 @@ module Flow
     end
 
     def failed?
-      executed? && !success?
+      triggered? && !success?
     end
 
     def reverted?

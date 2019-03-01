@@ -29,26 +29,26 @@ RSpec.describe Flow::Status, type: :module do
     subject(:failed?) { example_flow.failed? }
 
     before do
-      allow(example_flow).to receive(:executed?).and_return(executed?)
+      allow(example_flow).to receive(:triggered?).and_return(executed?)
       allow(example_flow).to receive(:success?).and_return(success?)
     end
 
-    context "when neither executed? nor success?" do
-      let(:executed?) { false }
+    context "when neither triggered? nor success?" do
+      let(:triggered?) { false }
       let(:success?) { false }
 
       it { is_expected.to be false }
     end
 
-    context "when executed? but not success?" do
-      let(:executed?) { true }
+    context "when triggered? but not success?" do
+      let(:triggered?) { true }
       let(:success?) { false }
 
       it { is_expected.to be true }
     end
 
-    context "when executed? and success?" do
-      let(:executed?) { true }
+    context "when triggered? and success?" do
+      let(:triggered?) { true }
       let(:success?) { true }
 
       it { is_expected.to be false }
