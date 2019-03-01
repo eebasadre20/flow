@@ -14,6 +14,7 @@ RSpec.describe FlowBase, type: :flow do
 
   it { is_expected.to include_module ShortCircuIt }
   it { is_expected.to include_module Technologic }
+  it { is_expected.to include_module TransactionWrapper }
   it { is_expected.to include_module Flow::Callbacks }
   it { is_expected.to include_module Flow::Core }
   it { is_expected.to include_module Flow::Ebb }

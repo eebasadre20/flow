@@ -15,7 +15,7 @@ module TransactionWrapper
       whitelist = Array.wrap(only).map(&:to_sym)
       blacklist = Array.wrap(except).map(&:to_sym)
 
-      callbacks_to_wrap = self::CALLBACKS_FOR_TRANSACTIONS
+      callbacks_to_wrap = callbacks_for_transaction
       callbacks_to_wrap &= whitelist if whitelist.present?
       callbacks_to_wrap -= blacklist if blacklist.present?
 

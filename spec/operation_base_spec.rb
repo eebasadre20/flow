@@ -3,7 +3,9 @@
 RSpec.describe OperationBase, type: :operation do
   subject { described_class }
 
+  it { is_expected.to include_module ShortCircuIt }
   it { is_expected.to include_module Technologic }
+  it { is_expected.to include_module TransactionWrapper }
   it { is_expected.to include_module Operation::Callbacks }
   it { is_expected.to include_module Operation::Core }
   it { is_expected.to include_module Operation::Execute }
@@ -11,5 +13,5 @@ RSpec.describe OperationBase, type: :operation do
   it { is_expected.to include_module Operation::ErrorHandler }
   it { is_expected.to include_module Operation::Rewind }
   it { is_expected.to include_module Operation::Status }
-  it { is_expected.to include_module TransactionWrapper }
+  it { is_expected.to include_module Operation::Transactions }
 end

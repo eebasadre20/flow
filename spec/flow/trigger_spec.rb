@@ -33,7 +33,7 @@ RSpec.describe Flow::Trigger, type: :module do
 
       let(:state_valid?) { true }
 
-      it { is_expected.to eq state }
+      it { is_expected.to eq example_flow }
 
       it "is surveiled" do
         trigger!
@@ -58,15 +58,15 @@ RSpec.describe Flow::Trigger, type: :module do
     context "with valid state" do
       let(:state) { instance_double(example_state_class) }
 
-      before { allow(example_flow).to receive(:trigger!).and_return(state) }
+      before { allow(example_flow).to receive(:trigger!).and_return(example_flow) }
 
-      it { is_expected.to eq state }
+      it { is_expected.to eq example_flow }
     end
 
     context "with invalid state" do
       before { allow(example_flow).to receive(:trigger!).and_raise(Flow::Errors::StateInvalid) }
 
-      it { is_expected.to be_nil }
+      it { is_expected.to eq example_flow }
     end
   end
 end

@@ -4,7 +4,7 @@ RSpec.shared_examples_for "a transaction wrapper" do
   it { is_expected.to include_module TransactionWrapper }
 
   describe "CALLBACKS_FOR_TRANSACTIONS" do
-    subject { described_class::CALLBACKS_FOR_TRANSACTIONS }
+    subject { example_class.callbacks_for_transaction }
 
     it { is_expected.to all(be_a(Symbol)) }
   end
@@ -37,7 +37,7 @@ RSpec.shared_examples_for "a transaction wrapper" do
         it_behaves_like "methods are wrapped in a transaction with a variety of input" do
           let(:expected_wrapped_methods) { [ test_value ] }
           let(:listing_type) { :only }
-          let(:test_value) { described_class::CALLBACKS_FOR_TRANSACTIONS.sample }
+          let(:test_value) { example_class.callbacks_for_transaction.sample }
         end
       end
     end
@@ -52,9 +52,9 @@ RSpec.shared_examples_for "a transaction wrapper" do
 
       context "with valid method" do
         it_behaves_like "methods are wrapped in a transaction with a variety of input" do
-          let(:expected_wrapped_methods) { described_class::CALLBACKS_FOR_TRANSACTIONS.without(test_value) }
+          let(:expected_wrapped_methods) { example_class.callbacks_for_transaction.without(test_value) }
           let(:listing_type) { :except }
-          let(:test_value) { described_class::CALLBACKS_FOR_TRANSACTIONS.sample }
+          let(:test_value) { example_class.callbacks_for_transaction.sample }
         end
       end
     end

@@ -34,6 +34,13 @@ RSpec.describe Flow::Flux, type: :module do
   describe "#flux" do
     subject(:flux) { example_flow.flux }
 
+    let(:expected_state) { instance_of(example_state_class) }
+
+    before do
+      allow(example_flow).to receive(:error).and_call_original
+      allow(example_flow).to receive(:revert)
+    end
+
     context "when successful" do
       before { allow(example_flow).to receive(:flux!) }
 
@@ -43,15 +50,40 @@ RSpec.describe Flow::Flux, type: :module do
       end
     end
 
-    shared_examples_for "the error is logged and the flow reverted" do |example_error|
-      let(:expected_state) { instance_of(example_state_class) }
+    context "with error" do
       let(:expected_exception) { instance_of(example_error) }
 
-      before do
-        allow(example_flow).to receive(:flux!).and_raise example_error
-        allow(example_flow).to receive(:error).and_call_original
-        allow(example_flow).to receive(:revert)
+      before { allow(example_flow).to receive(:flux!).and_raise example_error }
+
+      context "when Flow::Flux::Failure" do
+        let(:example_error) { Flow::Flux::Failure }
+
+        it "calls revert and logs the exception without raising" do
+          flux
+          expect(example_flow).to have_received(:revert)
+          expect(example_flow).
+            to have_received(:error).
+            with(:error_executing_operation, state: expected_state, exception: expected_exception)
+        end
       end
+
+      context "when a descendant StandardError" do
+        let(:example_error) { Class.new(StandardError) }
+
+        it "calls revert and logs the exception and raises" do
+          expect { flux }.to raise_error example_error
+          expect(example_flow).to have_received(:revert)
+          expect(example_flow).
+            to have_received(:error).
+            with(:error_executing_operation, state: expected_state, exception: expected_exception)
+        end
+      end
+    end
+
+    context "when a failure occurs" do
+      let(:expected_exception) { instance_of(Flow::Flux::Failure) }
+
+      before { allow(example_flow).to receive(:flux!).and_raise Flow::Flux::Failure }
 
       it "calls revert" do
         flux
@@ -64,14 +96,6 @@ RSpec.describe Flow::Flux, type: :module do
           to have_received(:error).
           with(:error_executing_operation, state: expected_state, exception: expected_exception)
       end
-    end
-
-    context "when an error is raised" do
-      it_behaves_like "the error is logged and the flow reverted", Class.new(StandardError)
-    end
-
-    context "when a failure occurs" do
-      it_behaves_like "the error is logged and the flow reverted", Flow::Flux::Failure
     end
   end
 

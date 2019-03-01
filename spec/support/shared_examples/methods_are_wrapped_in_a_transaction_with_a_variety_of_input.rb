@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples_for "methods are wrapped in a transaction with a variety of input" do
-  let(:methods_to_transaction_wrap) { described_class::CALLBACKS_FOR_TRANSACTIONS }
-  let(:expected_wrapped_methods) { described_class::CALLBACKS_FOR_TRANSACTIONS }
+  let(:methods_to_transaction_wrap) { example_class.callbacks_for_transaction }
+  let(:expected_wrapped_methods) { example_class.callbacks_for_transaction }
 
   let(:listing_type) { nil }
   let(:test_value) { nil }

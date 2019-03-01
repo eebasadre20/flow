@@ -9,7 +9,9 @@ module State
       class_attribute :_options, instance_writer: false, default: {}
 
       set_callback :initialize, :after do
-        _options.each { |option, info| __send__("#{option}=".to_sym, info.default_value) if public_send(option).nil? }
+        _options.each do |option, info|
+          __send__("#{option}=".to_sym, info.default_value.dup) if public_send(option).nil?
+        end
       end
     end
 

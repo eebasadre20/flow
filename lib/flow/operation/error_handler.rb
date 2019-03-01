@@ -11,7 +11,7 @@ module Operation
       def handle_error(error_class, problem: error_class.name.demodulize.underscore, with: nil, &block)
         failure problem
 
-        rescue_from(error_class) { |exception| fail!(problem, exception: exception) }
+        rescue_from(error_class) { |exception| fail!(problem.to_sym, exception: exception) }
 
         if with.present?
           rescue_from(error_class, with: with)

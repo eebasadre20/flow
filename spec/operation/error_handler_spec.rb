@@ -58,7 +58,7 @@ RSpec.describe Operation::ErrorHandler, type: :module do
         allow(example_operation).to receive(:behavior).and_raise(example_error)
         allow(Operation::Failures::OperationFailure).
           to receive(:new).
-          with(problem, exception: instance_of(example_error)).
+          with(problem.to_sym, exception: instance_of(example_error)).
           and_return(example_failure)
       end
 

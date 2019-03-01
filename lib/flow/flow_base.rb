@@ -16,6 +16,7 @@ require_relative "flow/trigger"
 class FlowBase
   include ShortCircuIt
   include Technologic
+  include TransactionWrapper
   include Flow::Callbacks
   include Flow::Core
   include Flow::Ebb

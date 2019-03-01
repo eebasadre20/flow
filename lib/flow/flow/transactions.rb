@@ -5,8 +5,10 @@ module Flow
   module Transactions
     extend ActiveSupport::Concern
 
-    CALLBACKS_FOR_TRANSACTIONS = %i[flux ebb].freeze
-
-    included { include TransactionWrapper }
+    class_methods do
+      def callbacks_for_transaction
+        %i[flux ebb].freeze
+      end
+    end
   end
 end
