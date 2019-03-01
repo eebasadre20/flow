@@ -43,6 +43,10 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.to be_success }
     it { is_expected.not_to be_failed }
     it { is_expected.not_to be_reverted }
+
+    it "produces expected stanza" do
+      expect(flow.state.stanza).to eq expected_stanza
+    end
   end
 
   shared_examples_for "a failed flow" do |failed_operation_class, failure_problem|
@@ -91,31 +95,16 @@ RSpec.describe Flow, type: :integration do
 
   context "with defaults" do
     let(:expected_string) { raw_string.delete("\n") }
-    let(:raw_string) do
-      <<~STRING.chomp
-        #<BottlesOnTheWallState
-         bottles_of="beer"
-         starting_bottles=nil
-         number_to_take_down=1
-         output=[
-        "99 bottles of beer on the wall, 99 bottles of beer.",
-         "You take one down.",
-         "You pass it around.",
-         "98 bottles of beer on the wall."
-        ]
-        >
-      STRING
-    end
 
-    it_behaves_like "a successful flow"
-
-    it "produces expected stanza" do
-      expect(flow.state.stanza).to eq <<~STANZA.chomp
-        99 bottles of beer on the wall, 99 bottles of beer.
-        You take one down.
-        You pass it around.
-        98 bottles of beer on the wall.
-      STANZA
+    it_behaves_like "a successful flow" do
+      let(:expected_stanza) do
+        <<~STANZA.chomp
+          99 bottles of beer on the wall, 99 bottles of beer.
+          You take one down.
+          You pass it around.
+          98 bottles of beer on the wall.
+        STANZA
+      end
     end
 
     describe "#state#to_s" do
@@ -123,17 +112,12 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<BottlesOnTheWallState
-           bottles_of=beer
-           starting_bottles=
-           number_to_take_down=1
-           output=[
+          #<BottlesOnTheWallState bottles_of=beer starting_bottles= number_to_take_down=1 output=[
           "99 bottles of beer on the wall, 99 bottles of beer.",
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]
-          >
+          ]>
         STRING
       end
 
@@ -145,17 +129,12 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<BottlesOnTheWallState
-           bottles_of="beer"
-           starting_bottles=nil
-           number_to_take_down=1
-           output=[
+          #<BottlesOnTheWallState bottles_of="beer" starting_bottles=nil number_to_take_down=1 output=[
           "99 bottles of beer on the wall, 99 bottles of beer.",
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]
-          >
+          ]>
         STRING
       end
 
@@ -176,30 +155,30 @@ RSpec.describe Flow, type: :integration do
     context "when one" do
       let(:starting_bottles) { 1 }
 
-      it_behaves_like "a successful flow"
-
-      it "produces expected stanza" do
-        expect(flow.state.stanza).to eq <<~STANZA.chomp
-          1 bottle of beer on the wall, 1 bottle of beer.
-          You take it down.
-          You pass it around.
-          No more bottles of beer on the wall.
-        STANZA
+      it_behaves_like "a successful flow" do
+        let(:expected_stanza) do
+          <<~STANZA.chomp
+            1 bottle of beer on the wall, 1 bottle of beer.
+            You take it down.
+            You pass it around.
+            No more bottles of beer on the wall.
+          STANZA
+        end
       end
     end
 
     context "when one million" do
       let(:starting_bottles) { 1_000_000 }
 
-      it_behaves_like "a successful flow"
-
-      it "produces expected stanza" do
-        expect(flow.state.stanza).to eq <<~STANZA.chomp
-          1000000 bottles of beer on the wall, 1000000 bottles of beer.
-          You take one down.
-          You pass it around.
-          999999 bottles of beer on the wall.
-        STANZA
+      it_behaves_like "a successful flow" do
+        let(:expected_stanza) do
+          <<~STANZA.chomp
+            1000000 bottles of beer on the wall, 1000000 bottles of beer.
+            You take one down.
+            You pass it around.
+            999999 bottles of beer on the wall.
+          STANZA
+        end
       end
     end
   end
@@ -231,45 +210,45 @@ RSpec.describe Flow, type: :integration do
     context "when none" do
       let(:number_to_take_down) { 0 }
 
-      it_behaves_like "a successful flow"
-
-      it "produces expected stanza" do
-        expect(flow.state.stanza).to eq <<~STANZA.chomp
-          99 bottles of beer on the wall, 99 bottles of beer.
-          You took nothing down.
-          You pass nothing around.
-          99 bottles of beer on the wall.
-        STANZA
+      it_behaves_like "a successful flow" do
+        let(:expected_stanza) do
+          <<~STANZA.chomp
+            99 bottles of beer on the wall, 99 bottles of beer.
+            You took nothing down.
+            You pass nothing around.
+            99 bottles of beer on the wall.
+          STANZA
+        end
       end
     end
 
     context "when many" do
       let(:number_to_take_down) { 3 }
 
-      it_behaves_like "a successful flow"
-
-      it "produces expected stanza" do
-        expect(flow.state.stanza).to eq <<~STANZA.chomp
-          99 bottles of beer on the wall, 99 bottles of beer.
-          You take 3 down.
-          You pass them around.
-          96 bottles of beer on the wall.
-        STANZA
+      it_behaves_like "a successful flow" do
+        let(:expected_stanza) do
+          <<~STANZA.chomp
+            99 bottles of beer on the wall, 99 bottles of beer.
+            You take 3 down.
+            You pass them around.
+            96 bottles of beer on the wall.
+          STANZA
+        end
       end
     end
 
     context "when one million" do
       let(:starting_bottles) { 1_000_000 }
 
-      it_behaves_like "a successful flow"
-
-      it "produces expected stanza" do
-        expect(flow.state.stanza).to eq <<~STANZA.chomp
-          1000000 bottles of beer on the wall, 1000000 bottles of beer.
-          You take one down.
-          You pass it around.
-          999999 bottles of beer on the wall.
-        STANZA
+      it_behaves_like "a successful flow" do
+        let(:expected_stanza) do
+          <<~STANZA.chomp
+            1000000 bottles of beer on the wall, 1000000 bottles of beer.
+            You take one down.
+            You pass it around.
+            999999 bottles of beer on the wall.
+          STANZA
+        end
       end
     end
   end
