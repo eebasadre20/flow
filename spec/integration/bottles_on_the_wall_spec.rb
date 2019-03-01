@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+require_relative "../support/test_classes/bottle"
+require_relative "../support/test_classes/count_out_current_bottles"
+require_relative "../support/test_classes/pass_bottles_around"
+require_relative "../support/test_classes/take_bottles_down"
+require_relative "../support/test_classes/bottles_on_the_wall_state"
+require_relative "../support/test_classes/bottles_on_the_wall_flow"
+
 RSpec.describe Flow, type: :integration do
   before(:all) do # rubocop:disable RSpec/BeforeAfterAll
     ActiveRecord::Base.connection.create_table :bottles do |t|
@@ -11,135 +18,9 @@ RSpec.describe Flow, type: :integration do
 
   after(:all) { ActiveRecord::Base.connection.drop_table :bottles } # rubocop:disable RSpec/BeforeAfterAll
 
-  after { RSpec::ExampleGroups::Flow::Bottle.destroy_all }
+  after { Bottle.destroy_all }
 
-  class self::Bottle < ActiveRecord::Base
-    validates :of, uniqueness: true
-    validates :number_on_the_wall,
-              :number_passed_around,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-    validates :number_passed_around, numericality: { less_than_or_equal_to: 100 }
-
-    def to_s
-      return "No more bottles of #{of}" if number_on_the_wall == 0
-
-      "#{number_on_the_wall} #{"bottle".pluralize(number_on_the_wall)} of #{of}"
-    end
-  end
-
-  class self::BottlesOnTheWallState < StateBase
-    argument :bottles_of
-
-    option :starting_bottles
-    option :number_to_take_down, default: 1
-    option :output, default: []
-
-    validates :number_to_take_down, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-
-    def stanza
-      output.join("\n")
-    end
-
-    def taking_down_one?
-      number_to_take_down == 1
-    end
-
-    def bottles
-      RSpec::ExampleGroups::Flow::Bottle.find_or_create_by(of: bottles_of) do |bottles|
-        bottles.number_on_the_wall = starting_bottles if starting_bottles
-      end
-    end
-    memoize :bottles
-  end
-
-  class self::CountOutCurrentBottles < OperationBase
-    def behavior
-      state.output.push "#{state.bottles} on the wall#{", #{state.bottles}" if state.output.empty?}."
-    end
-  end
-
-  class self::TakeBottlesDown < OperationBase
-    wrap_in_transaction except: :undo
-
-    class NonTakedownError < StandardError; end
-
-    failure :too_greedy
-    handle_error NonTakedownError do
-      state.output.push "You took nothing down."
-    end
-
-    on_failure do
-      state.output.push "Something went wrong! It's the end of the song, and there's #{state.bottles} on the wall."
-    end
-
-    set_callback(:execute, :before) { bottle_count_term }
-    set_callback(:execute, :after) { state.output.push "You take #{bottle_count_term} down." }
-
-    def behavior
-      too_greedy_failure! if state.number_to_take_down >= 5
-      raise NonTakedownError if state.number_to_take_down == 0
-
-      state.bottles.update!(number_on_the_wall: state.bottles.number_on_the_wall - state.number_to_take_down)
-    end
-
-    def undo
-      state.bottles.reload.update!(number_on_the_wall: state.bottles.number_on_the_wall + state.number_to_take_down)
-    end
-
-    private
-
-    def bottle_count_term
-      return "it" if state.bottles.number_on_the_wall == 1
-      return "one" if state.taking_down_one?
-
-      state.number_to_take_down
-    end
-    memoize :bottle_count_term
-  end
-
-  class self::PassBottlesAround < OperationBase
-    wrap_in_transaction only: :behavior
-
-    class NonTakedownError < StandardError; end
-
-    failure :too_generous
-    handle_error ActiveRecord::RecordInvalid
-    handle_error NonTakedownError, with: :non_takedown_handler
-
-    on_record_invalid_failure do
-      state.output.push "Passing the bottles wasn't as sound, now there's #{state.number_to_take_down} on the ground!"
-    end
-
-    set_callback(:execute, :after) { state.output.push "You pass #{state.taking_down_one? ? "it" : "them"} around." }
-
-    def behavior
-      too_generous_failure! if state.number_to_take_down >= 4
-      raise NonTakedownError if state.number_to_take_down == 0
-
-      state.bottles.update!(number_passed_around: state.bottles.number_passed_around + state.number_to_take_down)
-    end
-
-    def undo
-      state.bottles.update!(number_passed_around: state.bottles.number_passed_around - state.number_to_take_down)
-    end
-
-    private
-
-    def non_takedown_handler
-      state.output.push "You pass nothing around."
-    end
-  end
-
-  class self::BottlesOnTheWallFlow < FlowBase
-    wrap_in_transaction only: :revert
-
-    operations RSpec::ExampleGroups::Flow::CountOutCurrentBottles,
-               RSpec::ExampleGroups::Flow::TakeBottlesDown,
-               RSpec::ExampleGroups::Flow::PassBottlesAround,
-               RSpec::ExampleGroups::Flow::CountOutCurrentBottles
-  end
-
-  subject(:flow) { RSpec::ExampleGroups::Flow::BottlesOnTheWallFlow.trigger(**input) }
+  subject(:flow) { BottlesOnTheWallFlow.trigger(**input) }
 
   let(:bottles_of) { "beer" }
   let(:number_to_take_down) { nil }
@@ -155,32 +36,27 @@ RSpec.describe Flow, type: :integration do
   end
 
   shared_examples_for "a successful flow" do
-    it { is_expected.to be_an_instance_of RSpec::ExampleGroups::Flow::BottlesOnTheWallFlow }
-
-    it "has expected status" do
-      expect(flow).to be_state_valid
-      expect(flow).not_to be_pending
-      expect(flow).to be_triggered
-      expect(flow).to be_success
-      expect(flow).not_to be_failed
-      expect(flow).not_to be_reverted
-    end
+    it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
+    it { is_expected.to be_state_valid }
+    it { is_expected.not_to be_pending }
+    it { is_expected.to be_triggered }
+    it { is_expected.to be_success }
+    it { is_expected.not_to be_failed }
+    it { is_expected.not_to be_reverted }
   end
 
   shared_examples_for "a failed flow" do
-    it { is_expected.to be_an_instance_of RSpec::ExampleGroups::Flow::BottlesOnTheWallFlow }
+    it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
 
-    it "has expected status" do
-      expect(flow).to be_state_valid
-      expect(flow).not_to be_pending
-      expect(flow).to be_triggered
-      expect(flow).not_to be_success
-      expect(flow).to be_failed
-      expect(flow).to be_reverted
-    end
+    it { is_expected.to be_state_valid }
+    it { is_expected.not_to be_pending }
+    it { is_expected.to be_triggered }
+    it { is_expected.not_to be_success }
+    it { is_expected.to be_failed }
+    it { is_expected.to be_reverted }
+    it { is_expected.to be_failed_operation }
 
     it "has a failed operation" do
-      expect(flow).to be_failed_operation
       expect(flow.failed_operation.operation_failure).to be_an_instance_of Operation::Failures::OperationFailure
       expect(flow.failed_operation).to be_executed
       expect(flow.failed_operation).not_to be_success
@@ -199,7 +75,7 @@ RSpec.describe Flow, type: :integration do
     let(:expected_string) { raw_string.delete("\n") }
     let(:raw_string) do
       <<~STRING.chomp
-        #<RSpec::ExampleGroups::Flow::BottlesOnTheWallState
+        #<BottlesOnTheWallState
          bottles_of="beer"
          starting_bottles=nil
          number_to_take_down=1
@@ -229,7 +105,7 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<RSpec::ExampleGroups::Flow::BottlesOnTheWallState
+          #<BottlesOnTheWallState
            bottles_of=beer
            starting_bottles=
            number_to_take_down=1
@@ -251,7 +127,7 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<RSpec::ExampleGroups::Flow::BottlesOnTheWallState
+          #<BottlesOnTheWallState
            bottles_of="beer"
            starting_bottles=nil
            number_to_take_down=1
@@ -315,20 +191,18 @@ RSpec.describe Flow, type: :integration do
       let(:number_to_take_down) { -1 }
 
       it "does not run" do
-        expect { flow }.not_to change { RSpec::ExampleGroups::Flow::Bottle.count }
+        expect { flow }.not_to change { Bottle.count }
       end
 
-      it "has expected status" do
-        expect(flow).not_to be_state_valid
-        expect(flow).to be_pending
-        expect(flow).not_to be_triggered
-        expect(flow).not_to be_success
-        expect(flow).not_to be_failed
-        expect(flow).not_to be_reverted
-      end
+      it { is_expected.not_to be_state_valid }
+      it { is_expected.to be_pending }
+      it { is_expected.not_to be_triggered }
+      it { is_expected.not_to be_success }
+      it { is_expected.not_to be_failed }
+      it { is_expected.not_to be_reverted }
 
       context "with trigger!" do
-        subject(:trigger!) { RSpec::ExampleGroups::Flow::BottlesOnTheWallFlow.trigger!(**input) }
+        subject(:trigger!) { BottlesOnTheWallFlow.trigger!(**input) }
 
         it "raises" do
           expect { trigger! }.to raise_error Flow::Errors::StateInvalid
@@ -393,7 +267,7 @@ RSpec.describe Flow, type: :integration do
   end
 
   context "when the second operation fails by a known error" do
-    let(:bottles) { RSpec::ExampleGroups::Flow::Bottle.create(of: bottles_of, number_on_the_wall: starting_bottles) }
+    let(:bottles) { Bottle.create(of: bottles_of, number_on_the_wall: starting_bottles) }
     let(:starting_bottles) { 4 }
     let(:number_to_take_down) { 3 }
 
@@ -402,7 +276,7 @@ RSpec.describe Flow, type: :integration do
     it_behaves_like "a failed flow"
 
     it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of RSpec::ExampleGroups::Flow::PassBottlesAround
+      expect(flow.failed_operation).to be_an_instance_of PassBottlesAround
       expect(flow.failed_operation.operation_failure.problem).to eq :record_invalid
     end
 
@@ -421,7 +295,7 @@ RSpec.describe Flow, type: :integration do
     it_behaves_like "a failed flow"
 
     it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of RSpec::ExampleGroups::Flow::TakeBottlesDown
+      expect(flow.failed_operation).to be_an_instance_of TakeBottlesDown
       expect(flow.failed_operation.operation_failure.problem).to eq :too_greedy
     end
 
@@ -439,7 +313,7 @@ RSpec.describe Flow, type: :integration do
     it_behaves_like "a failed flow"
 
     it "has a failed operation" do
-      expect(flow.failed_operation).to be_an_instance_of RSpec::ExampleGroups::Flow::PassBottlesAround
+      expect(flow.failed_operation).to be_an_instance_of PassBottlesAround
       expect(flow.failed_operation.operation_failure.problem).to eq :too_generous
     end
 
