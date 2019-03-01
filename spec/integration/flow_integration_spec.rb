@@ -8,17 +8,7 @@ require_relative "../support/test_classes/bottles_on_the_wall_state"
 require_relative "../support/test_classes/bottles_on_the_wall_flow"
 
 RSpec.describe Flow, type: :integration do
-  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
-    ActiveRecord::Base.connection.create_table :bottles do |t|
-      t.string :of, unique: true
-      t.integer :number_on_the_wall, default: 99
-      t.integer :number_passed_around, default: 0
-    end
-  end
-
-  after(:all) { ActiveRecord::Base.connection.drop_table :bottles } # rubocop:disable RSpec/BeforeAfterAll
-
-  after { Bottle.destroy_all }
+  include_context "with a bottles active record"
 
   subject(:flow) { BottlesOnTheWallFlow.trigger(**input) }
 

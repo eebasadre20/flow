@@ -7,7 +7,7 @@ exclude_patterns:
   - "**/bin/"
   - "**.gemspec"
   - "**/test_classes/"
-  - "spec_helper.rb"
+  - "spec/spec_helper.rb"
 
 ratings:
   paths:
