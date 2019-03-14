@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 class <%= class_name %> < ApplicationOperation
-  def execute
-    # state.foo.blah!
+  def behavior
+    # Define what this operation does here
+  end
+
+  def undo
+    # If your operation can be undone, define how here.
+    # Otherwise you can delete this method.
   end
 end
