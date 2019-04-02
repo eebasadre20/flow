@@ -12,7 +12,7 @@ require_relative "flow/status"
 require_relative "flow/transactions"
 require_relative "flow/trigger"
 
-# A flow is a collection of procedurally executed operations sharing a common state.
+# A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
 class FlowBase
   include ShortCircuIt
   include Technologic

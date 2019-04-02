@@ -7,7 +7,7 @@ require_relative "state/options"
 require_relative "state/core"
 require_relative "state/string"
 
-# A flow state is the immutable structure of relevant data.
+# A **State** is an aggregation of input and derived data.
 class StateBase
   include ShortCircuIt
   include Technologic
