@@ -5,33 +5,73 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/maintainability)](https://codeclimate.com/github/Freshly/flow/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/test_coverage)](https://codeclimate.com/github/Freshly/flow/test_coverage)
 
-Business logic is like nuclear fuel. 
-
-Managed properly, it's incredibly powerful and can do a lot of good.
-
-Managed improperly, and it turns your application into a superfund site.
-
-Complexity is an endless river, and `flow` is how you harness it safely.
-
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'flow'
+gem "flow"
 ```
 
-And then execute:
+Then, in your project directory:
 
-    $ bundle
+```bash
+$ bundle install
+$ rails generate flow:install
+```
 
-Or install it yourself as:
+## What is Flow?
 
-    $ gem install flow
+Flow is a [SOLID](https://en.wikipedia.org/wiki/SOLID) implementation of the [Command Pattern](https://en.wikipedia.org/wiki/Command_pattern) for Ruby on Rails.
+
+Flows allow you to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic) in using a set of discrete, extensible, and reusable objects.
+
+### How it Works
+
+TODO: Put in a pretty picture.
 
 ## Usage
 
-TODO: Coming soon...
+TODO...
+
+## Testing
+
+If you plan on writing `RSpec` tests `Flow` comes packaged with some custom matchers.
+
+Add the following to your `spec/rails_helper.rb` file:
+
+```ruby
+require "flow/spec_helper"
+```
+
+Flow works best with [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and [rspice](https://github.com/Freshly/spicerack/tree/develop/rspice).
+
+Add those to the `development` and `test` group of your Gemfile:
+
+```ruby
+group :development, :test do 
+  gem "shoulda-matchers", git: "https://github.com/thoughtbot/shoulda-matchers.git", branch: "rails-5"
+  gem "rspice"
+end
+```
+
+Then run `bundle install` and add the following into `spec/rails_helper.rb`:
+
+```ruby
+require "rspec/rails"
+require "rspice"
+require "flow/spec_helper"
+
+# Configuration for the shoulda-matchers gem
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+```
+
+This will allow you to use the [define_argument](lib/flow/custom_matchers/define_argument.rb), [define_option](lib/flow/custom_matchers/define_option.rb), and [use_operations](lib/flow/custom_matchers/use_operations.rb) helpers.
 
 ## Development
 
