@@ -70,7 +70,25 @@ There are three important concepts to distinguish here: [Flows](#Flows), [Operat
 
 A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
 
-TODO...
+```ruby
+# frozen_string_literal: true
+
+class CalculateTimetablesFlow < ApplicationFlow
+  operations ClearExistingTimetables, CalculateTimetables, SummarizeTimetables, DestroyEmptyTimetableCells
+end
+```
+
+The `operations` are an ordered list of the behaviors which are executed with (and possibly change) the Flow's state.
+
+Flows accept input representing the arguments and options which define the initial state.
+
+```ruby
+CalculateTimetablesFlow.trigger(timeframe: Day.today)
+```
+
+When `#trigger` is called on a Flow, `#execute` is called on Operations sequentially in their given order. 
+
+Triggering a Flow executes all its operations in sequential order if **and only if** it has a valid state.
 
 ### Operations
 

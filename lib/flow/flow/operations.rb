@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Operations are an ordered list of the behaviors which should are executed with and possibly change the Flow's state.
+# Operations are an ordered list of the behaviors which are executed with (and possibly change) the Flow's state.
 module Flow
   module Operations
     extend ActiveSupport::Concern
