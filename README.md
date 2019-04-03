@@ -14,7 +14,6 @@
 * [Errors](#errors)
    * [Exceptions](#exceptions)
    * [Failures](#failures)
-   * [Statuses](#statuses)
 * [Reverting a Flow](#reverting-a-flow)
    * [Undoing Operations](#undoing-operations)
 * [Transactions](#transactions)
@@ -28,6 +27,7 @@
    * [Callbacks](#callbacks)
    * [Memoization](#memoization)
    * [Logging](#logging)
+* [Statuses](#statuses)
 * [Testing](#testing)
    * [Testing Setup](#testing-setup)
    * [Testing Flows](#testing-flows)
@@ -58,7 +58,7 @@ $ rails generate flow:install
 
 Flow is a [SOLID](https://en.wikipedia.org/wiki/SOLID) implementation of the [Command Pattern](https://en.wikipedia.org/wiki/Command_pattern) for Ruby on Rails.
 
-Flows allow you to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic) in using a set of discrete, extensible, and reusable objects.
+Flows allow you to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic) into a set of extensible and reusable objects.
 
 ## How it Works
 
@@ -72,7 +72,10 @@ A **Flow** is a collection of procedurally executed **Operations** sharing a com
 
 ```ruby
 class CalculateTimetablesFlow < ApplicationFlow
-  operations ClearExistingTimetables, CalculateTimetables, SummarizeTimetables, DestroyEmptyTimetableCells
+  operations ClearExistingTimetables, 
+             CalculateTimetables, 
+             SummarizeTimetables, 
+             DestroyEmptyTimetableCells
 end
 ```
 
@@ -106,7 +109,9 @@ class CalculateTimetables < ApplicationOperation
     state.minutes_by_project_employee.each do |project_employee, total_minutes|
       project_id, employee_id = project_employee
       timetable = state.timeframe.timetables.find_or_create_by!(project_id: project_id)
-      timetable.cells.find_or_create_by!(employee_id: employee_id).update!(total_minutes: total_minutes)
+      cell = timetable.cells.find_or_create_by!(employee_id: employee_id)
+      
+      cell.update!(total_minutes: total_minutes)
     end
   end
 end
@@ -115,7 +120,9 @@ end
 ```ruby
 class SummarizeTimetables < ApplicationOperation
   def behavior
-    state.timetables.each { |timetable| timetable.update!(total_minutes: timetable.cells.sum(:total_minutes)) }
+    state.timetables.each do |timetable| 
+      timetable.update!(total_minutes: timetable.cells.sum(:total_minutes))
+    end
   end
 end
 ```
@@ -143,7 +150,9 @@ class CalculateTimetablesState < ApplicationState
   end
 
   def minutes_by_project_employee
-    @minutes_by_project_employee ||= data_by_employee_project.transform_values { |values| values.sum(&:total_minutes) }
+    @minutes_by_project_employee ||= data_by_employee_project.transform_values do |values| 
+      values.sum(&:total_minutes)
+    end
   end
 
   def timetables
@@ -151,7 +160,9 @@ class CalculateTimetablesState < ApplicationState
   end
 
   def empty_cells
-    @empty_cells ||= TimetableCell.joins(:timetable).where(total_minutes: 0, timetables: { project_id: project_ids })
+    @empty_cells ||= TimetableCell.
+      joins(:timetable).
+      where(total_minutes: 0, timetables: { project_id: project_ids })
   end
 
   private
@@ -167,7 +178,9 @@ class CalculateTimetablesState < ApplicationState
   end
 
   def data_by_employee_project
-    @data_by_employee_project ||= timesheet_data.group_by { |data| [ data.project_id, data.employee_id ] }
+    @data_by_employee_project ||= timesheet_data.group_by do |data| 
+      [ data.project_id, data.employee_id ]
+    end
   end
 
   def timesheet_data
@@ -228,17 +241,84 @@ state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 
 ## Errors
 
-TODO...
+When `#execute` is unsuccessful, expected problems are **failures** and unexpected problems are **Exceptions**.
 
 ### Exceptions
 
-TODO...
+When an exception is raised during during execution, but a handler can rescue, it causes a failure instead.
+
+Otherwise, an unhandled exception will raise through both the Operation and Flow.
+`
+```ruby
+class ExampleState < ApplicationState
+  argument :number
+end
+
+class ExampleOperation < ApplicationOperation
+  handle_error RuntimeError
+  
+  def behavior
+    raise (state.number % 2 == 0 ? StandardError : RuntimeError)
+  end
+end
+
+class ExampleFlow < ApplicationFlow
+  operations ExampleOperation
+end
+
+ExampleFlow.trigger(number: 0) # => raises StandardError
+result = ExampleFlow.trigger(number: 1)
+result.failed? # => true
+
+operation_failure = result.failed_operation.operation_failure
+operation_failure.problem # => :runtime_error
+operation_failure.details.exception # => #<RuntimeError: RuntimeError>
+```
+
+Handlers are inherited. They are searched from right to left, from bottom to top, and up the hierarchy. The handler of the first class for which exception.is_a?(klass) holds true is the one invoked, if any.
+
+If no problem is specified explicitly, a demodulized underscored version of the error is used.
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  handle_error RuntimeError, problem: :something_bad_happened
+  handle_error ActiveRecord::RecordInvalid
+  
+  def behavior
+    raise (state.number % 2 == 0 ? ActiveRecord::RecordInvalid : RuntimeError)
+  end
+end
+
+result0 = ExampleFlow.trigger(number: 0)
+result0.failed_operation.operation_failure.problem # => :record_invalid
+operation_failure.details.exception # => #<ActiveRecord::RecordInvalid: Record invalid>
+
+result1 = ExampleFlow.trigger(number: 1)
+result1.failed_operation.operation_failure.problem # => :something_bad_happened
+```
+
+You can also provide handlers in the form of either a block or a method name:
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  handle_error RuntimeError, with: :handle_some_error
+  handle_error ActiveRecord::RecordInvalid do
+    # Do something here
+  end
+  
+  def behavior
+    raise (state.number % 2 == 0 ? ActiveRecord::RecordInvalid : RuntimeError)
+  end
+  
+  private
+  
+  def handle_some_error
+    # Do something different here
+  end
+end
+```
 
 ### Failures
-
-TODO...
-
-### Statuses
 
 TODO...
 
@@ -291,6 +371,10 @@ TODO...
 TODO...
 
 ### Logging
+
+TODO...
+
+## Statuses
 
 TODO...
 

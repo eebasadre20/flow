@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# When `#execute` is unsuccessful, expected problems are *failures* and unexpected problems are *Exceptions*.
+# When `#execute` is unsuccessful, expected problems are **failures** and unexpected problems are **Exceptions**.
 module Operation
   module Failures
     extend ActiveSupport::Concern
