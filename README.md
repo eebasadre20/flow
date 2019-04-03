@@ -11,24 +11,27 @@
    * [Flows](#flows)
    * [Operations](#operations)
    * [States](#states)
+      * [Input](#input)
+      * [Mutable Data](#mutable-data)
+      * [Derivative Data](#derivative-data)
+      * [State Concerns](#state-concerns)
+      * [Validations](#validations)
 * [Errors](#errors)
    * [Exceptions](#exceptions)
    * [Failures](#failures)
+   * [Callback Events](#callback-events)
 * [Reverting a Flow](#reverting-a-flow)
    * [Undoing Operations](#undoing-operations)
    * [Manual Revert](#manual-revert)
 * [Transactions](#transactions)
    * [Around a Flow](#around-a-flow)
    * [Around an Operation](#around-an-operation)
-   * [Input](#input)
-   * [Validations](#validations)
-   * [Derivative Data](#derivative-data)
-   * [Mutable Data](#mutable-data)
+* [Statuses](#statuses)
 * [Utilities](#utilities)
    * [Callbacks](#callbacks)
    * [Memoization](#memoization)
    * [Logging](#logging)
-* [Statuses](#statuses)
+* [Inheritance](#inheritance)
 * [Testing](#testing)
    * [Testing Setup](#testing-setup)
    * [Testing Flows](#testing-flows)
@@ -208,7 +211,7 @@ class CalculateTimetablesState < ApplicationState
 end
 ```
 
-### Input
+#### Input
 
 A state accepts input represented by **arguments** and **options** which initialize it.
  
@@ -256,7 +259,7 @@ state.favorite_color # => "1a1f1e"
 state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 ```
 
-### Mutable Data
+#### Mutable Data
     
 States can define objects specifically to be populated by operations as they run.
 
@@ -292,7 +295,7 @@ result.state.string_buffer.join("\n")
 # Yes sir, yes sir! Three bags full! 
 ```
 
-### Derivative Data
+#### Derivative Data
 
 States provide you with a clear place to put any logic related to pre-processing of data.
 
@@ -314,7 +317,7 @@ class ExampleState < ApplicationState
 end
 ```
 
-### State Concerns
+#### State Concerns
 
 The architecture of each Flow having it's own state introduces a code reuse constraint.
 
@@ -394,7 +397,7 @@ class MyOtherExampleState < ApplicationState
 end
 ```
 
-### Validations
+#### Validations
 
 States are ActiveModels which means they have access to [ActiveModel::Validations](https://api.rubyonrails.org/classes/ActiveModel/Validations.html).
 
@@ -777,6 +780,10 @@ class ExampleOperation < ApplicationOperation
 end
 ```
 
+## Statuses
+
+TODO...
+
 ## Utilities
 
 Flow offers a number of utilities which allow you to tap into and extend it's functionality.
@@ -877,39 +884,11 @@ I, [2019-03-06T12:31:07.402005 #25951]  INFO -- : {:event=>"execute_finished.Ass
 I, [2019-03-06T12:31:07.402217 #25951]  INFO -- : {:event=>"execute_started.AssignCommentsToWorksheet"}
 I, [2019-03-06T12:31:07.438144 #25951]  INFO -- : {:event=>"execute_finished.AssignCommentsToWorksheet"}
 I, [2019-03-06T12:31:07.438235 #25951]  INFO -- : {:event=>"trigger_finished.CalculateWorksheetsFlow", :duration=>1.429788}
-I, [2019-03-06T12:31:07.464198 #25951]  INFO -- : {:event=>"trigger_started.CalculateWorkbooksFlow"}
-I, [2019-03-06T12:31:07.464547 #25951]  INFO -- : {:event=>"execute_started.SummarizeWorkbooks"}
-I, [2019-03-06T12:31:07.924145 #25951]  INFO -- : {:event=>"execute_finished.SummarizeWorkbooks"}
-I, [2019-03-06T12:31:07.924272 #25951]  INFO -- : {:event=>"trigger_finished.CalculateWorkbooksFlow"}
-I, [2019-03-06T12:31:07.952009 #25951]  INFO -- : {:event=>"trigger_started.CalculateTimesheetsFlow"}
-I, [2019-03-06T12:31:07.952207 #25951]  INFO -- : {:event=>"execute_started.CalculateTimesheets"}
-I, [2019-03-06T12:31:08.552638 #25951]  INFO -- : {:event=>"execute_finished.CalculateTimesheets", :duration=>0.600312}
-I, [2019-03-06T12:31:08.552789 #25951]  INFO -- : {:event=>"trigger_finished.CalculateTimesheetsFlow", :duration=>0.600653}
-I, [2019-03-06T12:31:08.581539 #25951]  INFO -- : {:event=>"trigger_started.CalculateTimeclocksFlow"}
-I, [2019-03-06T12:31:08.581866 #25951]  INFO -- : {:event=>"execute_started.SummarizeTimeclocks"}
-I, [2019-03-06T12:31:08.985480 #25951]  INFO -- : {:event=>"execute_finished.SummarizeTimeclocks"}
-I, [2019-03-06T12:31:08.985577 #25951]  INFO -- : {:event=>"trigger_finished.CalculateTimeclocksFlow"}
-I, [2019-03-06T12:31:09.012305 #25951]  INFO -- : {:event=>"trigger_started.FinishCalculationsFlow"}
-I, [2019-03-06T12:31:09.012612 #25951]  INFO -- : {:event=>"execute_started.FinishCalculations"}
-I, [2019-03-06T12:31:09.387052 #25951]  INFO -- : {:event=>"execute_finished.FinishCalculations"}
-I, [2019-03-06T12:31:09.387186 #25951]  INFO -- : {:event=>"trigger_finished.FinishCalculationsFlow"}
 ```
 
 Consult the documentation for `Technologic` for more info on how to use it.
 
 ## Inheritance
-
-TODO...
-
-### Operations
-
-TODO...
-
-### States
-
-TODO...
-
-## Statuses
 
 TODO...
 
