@@ -243,6 +243,12 @@ state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 
 When `#execute` is unsuccessful, expected problems are **failures** and unexpected problems are **Exceptions**.
 
+Errors handling can be either either **proactive** or **reactive**; ideally all errors that can be are *proactive*.
+
+**Proactive** error handling is a form of defensive programming. Instead of letting an error occur, you fail with a very clear signal as to why. Explicit failures are more desirable than  than letting unexpected behavior dictate the program flow.
+
+**Reactive** error handling should be used to handle areas of the code where you do not control the underlying behaviors, such as integrations with third party gems. When you know something you can't prevent could happen, you can define a reactive error handler to cleanly translate an *exception* into a *failure*.
+
 ### Exceptions
 
 When an exception is raised during during execution, but a handler can rescue, it causes a failure instead.
@@ -290,7 +296,8 @@ class ExampleOperation < ApplicationOperation
 end
 
 result0 = ExampleFlow.trigger(number: 0)
-result0.failed_operation.operation_failure.problem # => :record_invalid
+operation_failure = result0.failed_operation.operation_failure
+operation_failure.problem # => :record_invalid
 operation_failure.details.exception # => #<ActiveRecord::RecordInvalid: Record invalid>
 
 result1 = ExampleFlow.trigger(number: 1)
@@ -320,7 +327,58 @@ end
 
 ### Failures
 
-TODO...
+In theory, failures should *never* occur in your Flows. Any guard clause you can put inside of an Operation to proactively fail you should be able to put inside of the state as a validation.
+
+In practice, failures will *always* occur in your Flows. Any sufficiently large organization will receive contributions from developers of all skill and business-specific knowledge levels. The suggested use of one State class per Flow means that if every state is responsible for proactive validation, you will eventually have a misstep and forget to include it.
+
+Having your Operation proactively fail is an example of [contract programming](https://en.wikipedia.org/wiki/Design_by_contract) and provides developers with a clear and non-brittle expectation of how it should be used.
+
+From a conceptual standpoint, you should consider your Operations as the most atomic expression of your business logic. Flows, and (by extension) the States that support them, are most effective when built up around a well defined set of Operations.
+
+When your system has multiple consistent ways to defend against corrupt data or prevent   executions that generate exceptions, it's robust not redundant.
+
+`</rant>`
+
+Failures are part of the class definition of your Operation.
+
+```ruby
+class PassBottlesAround < ApplicationOperation
+  failure :too_generous
+
+  def behavior
+    too_generous_failure! if state.number_to_take_down >= 4
+  end
+end
+```
+
+When you define a failure a `#{failure_name}_failure!` method is defined for you.
+
+Calling this `_failure!` method will raise an exception which Flow handles by default, meaning it will not be raised as an exception from the Flow.
+
+An unstructured hash of data can be provided to the `_failure!` method and will be available in the `operation_failure` object:
+
+```ruby
+class PassBottlesAround < ApplicationOperation
+  failure :too_generous
+
+  def behavior
+    if state.number_to_take_down >= 4
+      disappointment_level = state.number_to_take_down >= 10 ? :wow_very_disappoint : :am_disappoint
+      too_generous_failure!(disappointment_level: disappointment_level) 
+    end
+  end
+end
+
+result5 = ExampleFlow.trigger(number_to_take_down: 5)
+operation_failure5 = result5.failed_operation.operation_failure
+operation_failure5.problem # => :too_generous
+operation_failure5.details.disappointment_level # => :am_disappoint
+
+result11 = ExampleFlow.trigger(number_to_take_down: 11)
+operation_failure11 = result11.failed_operation.operation_failure
+operation_failure11.problem # => :too_generous
+operation_failure11.details.disappointment_level # => :wow_very_disappoint
+```
 
 ## Reverting a Flow
 
