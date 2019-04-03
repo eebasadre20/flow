@@ -6,6 +6,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/test_coverage)](https://codeclimate.com/github/Freshly/flow/test_coverage)
 
 * [Installation](#installation)
+* [Getting Started](getting-started)
 * [What is Flow?](#what-is-flow)
 * [How it Works](#how-it-works)
    * [Flows](#flows)
@@ -42,7 +43,6 @@
    * [Development](#development)
 * [License](#license)
 
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -56,6 +56,29 @@ Then, in your project directory:
 ```bash
 $ bundle install
 $ rails generate flow:install
+```
+
+## Getting Started
+
+Flow comes with some nice rails generators. You are encouraged to use them!
+
+```bash
+$ rails generate flow Foo
+  invoke  state
+  invoke    rspec
+  create      spec/states/foo_state_spec.rb
+  create    app/states/foo_state.rb
+  invoke  rspec
+  create    spec/flows/foo_flow_spec.rb
+  create  app/flows/foo_flow.rb
+$ rails generate flow:state Bar
+  invoke  rspec
+  create    spec/states/bar_state_spec.rb
+  create  app/states/bar_state.rb
+$ rails generate flow:operation MakeTheThingDoTheStuff
+  invoke  rspec
+  create    spec/operations/make_the_thing_do_the_stuff_spec.rb
+  create  app/operations/make_the_thing_do_the_stuff.rb
 ```
 
 ## What is Flow?
@@ -73,6 +96,8 @@ There are three important concepts to distinguish here: [Flows](#Flows), [Operat
 ### Flows
 
 A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
+
+All Flows should be named with the `Flow` suffix (ex: `FooFlow`).
 
 ```ruby
 class CalculateTimetablesFlow < ApplicationFlow
@@ -112,6 +137,8 @@ end
 ### Operations
 
 An **Operation** is a service object which is executed with a **State**.
+
+Operations should **not** be named with the `Operation` suffix; name them what they do!
 
 ```ruby
 class ClearExistingTimetables < ApplicationOperation
@@ -155,9 +182,26 @@ end
 
 Operations take a state as input and define a `#behavior` that occurs when `#execute` is called.
 
+💁‍ *Pro Tip*: Operations are just objects! They can be used outside of Flows. Just give them a State (or a State-like object) and you can use them in isolation!
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  def behavior
+    puts "Hello, #{state.first_name}"
+  end
+end
+
+operation = ExampleOperation.new(OpenStruct.new(first_name: "Eric"))
+operation.execute 
+# Hello, Eric
+operation.executed? # => true 
+```
+
 ### States
 
 A **State** is an aggregation of input and derived data.
+
+All States should be named with the `State` suffix (ex: `FooState`).
 
 ```ruby
 class CalculateTimetablesState < ApplicationState
@@ -782,7 +826,18 @@ end
 
 ## Statuses
 
-TODO...
+Flows and Operations each have a set of predicate methods to describe their current status.
+
+| Object    | Status       | Description               |
+| --------- | ------------ | ------------------------- |
+| Operation | `executed?`  | `#execute` was called.    |
+| Operation | `failed?`    | Execution failed.         |
+| Operation | `success?`   | Execution succeeded.      |
+| Flow      | `pending?`   | `#trigger` not called.    |
+| Flow      | `triggered?` | `#trigger` was called.    |
+| Flow      | `failed?`    | Some operation failed.    |
+| Flow      | `success?`   | All operations succeeded. |
+| Flow      | `reverted?`  | `#revert` was called.     |
 
 ## Utilities
 
@@ -975,19 +1030,113 @@ This will allow you to use the [define_argument](lib/flow/custom_matchers/define
 
 ### Testing Flows
 
-TODO...
+The best way to test a Flow is with an integration test.
+
+The easiest way to test a Flow is with a unit test.
+
+Flow are generated with the following RSPec template:
+
+```ruby
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe FooFlow, type: :flow do
+  subject(:flow) { described_class.new(**input) }
+
+  let(:input) do
+    {}
+  end
+
+  it { is_expected.to inherit_from ApplicationFlow }
+  # it { is_expected.to use_operations ExampleOperation }
+end
+```
 
 ### Testing Operations
 
-TODO...
+The easiest and best way to test an Operation is with a unit test.
+
+Operations are generated with the following RSPec template:
+
+```ruby
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe MakeTheThingDoTheStuff, type: :operation do
+  subject(:operation) { described_class.new(state) }
+
+  let(:state) { example_state_class.new(**state_input) }
+  let(:example_state_class) do
+    Class.new(ApplicationState) do
+      # argument :foo
+      # option :bar
+    end
+  end
+  let(:state_input) do
+    {}
+  end
+
+  it { is_expected.to inherit_from ApplicationOperation }
+
+  describe "#execute" do
+    pending "add some examples to (or delete) #{__FILE__}"
+  end
+end
+```
 
 ### Testing States
 
-TODO...
+The easiest and best way to test a State is with a unit test.
+
+States are generated with the following RSPec template:
+
+```ruby
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe FooState, type: :state do
+  subject(:state) { described_class.new(**input) }
+
+  let(:input) do
+    {}
+  end
+
+  it { is_expected.to inherit_from ApplicationState }
+  # it { is_expected.to define_argument :foo }
+  # it { is_expected.to define_option(:foo) }
+  # it { is_expected.to define_option(:foo).with_default_value(:bar) }
+  # it { is_expected.to define_option(:foo).with_default_value_block }
+  # it { is_expected.to validate_presence_of ... }
+end
+```
+
+💡 **Reminder**: You need to install `shoulda-matchers` to use things like `.to validate_presence_of ...`, `rspice` for `.to inherit_from ...`, and the `flow/spec_helper.rb` for `define_argument` and the like.
 
 ### Integration Testing
 
-TODO...
+The best integration tests are the simplest! 
+
+Create a state of the universe and confirm your flow changes it.
+
+```ruby
+describe "integration test" do
+  subject(:flow) { ChangePreferencesFlow.trigger(user: user, favorite_food: new_favorite_food) }
+  
+  let(:user) { create :user, favorite_food: original_favorite_food }
+  let(:original_favorite_food) { Faker::Lorem.unique.word }
+  let(:new_favorite_food) { Faker::Lorem.unique.word }
+  
+  it "changes User#favorite_food" do
+    expect { flow }.
+      to change { user.favorite_food }.
+      from(original_favorite_food).
+      to(new_favorite_food)
+  end
+end
+```
 
 ## Contributing
 
