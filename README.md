@@ -564,6 +564,46 @@ operation_failure11.problem # => :too_generous
 operation_failure11.details.disappointment_level # => :wow_very_disappoint
 ```
 
+### Callback Events
+
+Operations feature error events which are triggered when a problem occurs.
+
+This works for explictly defined failures:
+
+```ruby
+class OperationOne < ApplicationOperation
+  failure :too_greedy
+  
+  on_too_greedy_failure do
+    SlackClient.send_message(:engineering, "Someones trying to give away too much stuff!")
+  end
+end
+```
+
+As well as manually handled errors (using the demodulized underscored name of the error):
+
+```ruby
+class OperationTwo < ApplicationOperation
+  handle_error ActiveRecord::RecordInvalid
+  
+  on_record_invalid_failure do
+    Redis.incr("operation_two:invalid_records")
+  end
+end
+```
+
+You can also listen for any problems using the generic failure event:
+
+```ruby
+class OperationThree < ApplicationOperation
+  handle_error RuntimeError
+  
+  on_failure do
+    EngineeringMailer.on_runtime_error(self.class.name)
+  end
+end
+```
+
 ## Reverting a Flow
 
 ![Flow Revert](docs/images/revert.png)
@@ -574,6 +614,8 @@ This calls `#rewind` on Operations to `#undo` their behavior.
 
 Reverting a Flow rewinds all its executed operations in reverse order (referred to as an **ebb**).
 
+Reverting is automatic and happens by default. You cannot opt out of the revert process, but you can choose to not define any `#undo` methods on your Operations.
+ 
 ```ruby
 class ExampleState < ApplicationState; end
 
@@ -737,19 +779,123 @@ end
 
 ## Utilities
 
-TODO...
+Flow offers a number of utilities which allow you to tap into and extend it's functionality.
 
 ### Callbacks
 
-TODO...
+Flows, Operations, and States all make use of [ActiveSupport::Callbacks](https://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html) to compose advanced functionality.
+
+```ruby
+class TakeBottlesDown < OperationBase
+  set_callback(:execute, :before) { bottle_count_term }
+  set_callback(:execute, :after) { state.output.push("You take #{bottle_count_term} down.") }
+  
+  def bottle_count_term
+    return "it" if state.bottles.number_on_the_wall == 1
+    return "one" if state.taking_down_one?
+
+    state.number_to_take_down
+  end
+end
+```
+
+Please consult the `ActiveSupport::Callbacks` documentation for guidance on how to use them.
+
+The callbacks which are available on each class are:
+
+| Class Name    | Callbacks     | Fired When...                          |
+| ------------- | ------------- | -------------------------------------- |
+| Flow          | `:initialize` | When a new flow is being constructed.  |
+| Flow          | `:trigger`    | When `#trigger` is called on a flow.   |
+| Flow          | `:flux`       | When `#trigger` is called on a flow.   |
+| Flow          | `:revert`     | When `#revert` is called on a flow.    |
+| Flow          | `:ebb`        | When `#revert` is called on a flow.    |
+| State         | `:initialize` | When a new state is being constructed. |
+| Operation     | `:execute`    | When `#execute` is called.             |
+| Operation     | `:behavior`   | When `#execute` is called.             |
+| Operation     | `:rewind`     | When `#rewind` is called.              |
+| Operation     | `:undo`       | When `#rewind` is called.              |
+| Operation     | `:failure`    | When any type of error occurs.         |
+| Operation     | `$problem`    | When an error of type $problem occurs. |
 
 ### Memoization
 
-TODO...
+Flow includes the very awesome [ShortCircuIt](https://github.com/Freshly/spicerack/tree/develop/short_circu_it) gem.
+
+To leverage it, just add `memoize :method_name` to your Flows, Operations, or States.
+
+```ruby
+class TakeBottlesDown < OperationBase
+  def bottle_count_term
+    return "it" if state.bottles.number_on_the_wall == 1
+    return "one" if state.taking_down_one?
+
+    state.number_to_take_down
+  end
+  memoize :bottle_count_term
+end
+```
+
+Consult the documentation for `ShorCircuIt` for more info on how to use it.
 
 ### Logging
 
-TODO...
+Flow includes the [Technologic](https://github.com/Freshly/spicerack/tree/develop/technologic) gem.
+
+The gems adds methods to Flows, Operations, and States which share names with log levels.
+
+| Level   | Used For                               |
+| ------- | -------------------------------------- |
+| `debug` | Extra data; usually off in production. |
+| `info`  | Standard data you always want to have. |
+| `warn`  | Unexpected (but not exceptional) data. |
+| `error` | Exceptional cases representing issues. |
+| `fatal` | Highly actionable and critical issues. |
+
+```ruby
+class ExampleOperation < OperationBase
+  def behavior
+    warn(:nothing_to_do, { empty_object: obj }) and return if obj.empty? 
+    
+    debug(:doing_a_thing)
+    
+    results = do_thing
+    
+    log(:did_a_thing, results: results)
+  end
+end
+```
+
+Flows and States come with automated out-of-the-box logging.
+
+The following is an example of what is logged without any extra log lines:
+
+```text
+I, [2019-03-06T12:31:06.008329 #25951]  INFO -- : {:event=>"trigger_started.CalculateWorksheetsFlow"}
+I, [2019-03-06T12:31:06.008551 #25951]  INFO -- : {:event=>"execute_started.AssignCommitsToWorksheet"}
+I, [2019-03-06T12:31:07.402005 #25951]  INFO -- : {:event=>"execute_finished.AssignCommitsToWorksheet", :duration=>1.393346}
+I, [2019-03-06T12:31:07.402217 #25951]  INFO -- : {:event=>"execute_started.AssignCommentsToWorksheet"}
+I, [2019-03-06T12:31:07.438144 #25951]  INFO -- : {:event=>"execute_finished.AssignCommentsToWorksheet"}
+I, [2019-03-06T12:31:07.438235 #25951]  INFO -- : {:event=>"trigger_finished.CalculateWorksheetsFlow", :duration=>1.429788}
+I, [2019-03-06T12:31:07.464198 #25951]  INFO -- : {:event=>"trigger_started.CalculateWorkbooksFlow"}
+I, [2019-03-06T12:31:07.464547 #25951]  INFO -- : {:event=>"execute_started.SummarizeWorkbooks"}
+I, [2019-03-06T12:31:07.924145 #25951]  INFO -- : {:event=>"execute_finished.SummarizeWorkbooks"}
+I, [2019-03-06T12:31:07.924272 #25951]  INFO -- : {:event=>"trigger_finished.CalculateWorkbooksFlow"}
+I, [2019-03-06T12:31:07.952009 #25951]  INFO -- : {:event=>"trigger_started.CalculateTimesheetsFlow"}
+I, [2019-03-06T12:31:07.952207 #25951]  INFO -- : {:event=>"execute_started.CalculateTimesheets"}
+I, [2019-03-06T12:31:08.552638 #25951]  INFO -- : {:event=>"execute_finished.CalculateTimesheets", :duration=>0.600312}
+I, [2019-03-06T12:31:08.552789 #25951]  INFO -- : {:event=>"trigger_finished.CalculateTimesheetsFlow", :duration=>0.600653}
+I, [2019-03-06T12:31:08.581539 #25951]  INFO -- : {:event=>"trigger_started.CalculateTimeclocksFlow"}
+I, [2019-03-06T12:31:08.581866 #25951]  INFO -- : {:event=>"execute_started.SummarizeTimeclocks"}
+I, [2019-03-06T12:31:08.985480 #25951]  INFO -- : {:event=>"execute_finished.SummarizeTimeclocks"}
+I, [2019-03-06T12:31:08.985577 #25951]  INFO -- : {:event=>"trigger_finished.CalculateTimeclocksFlow"}
+I, [2019-03-06T12:31:09.012305 #25951]  INFO -- : {:event=>"trigger_started.FinishCalculationsFlow"}
+I, [2019-03-06T12:31:09.012612 #25951]  INFO -- : {:event=>"execute_started.FinishCalculations"}
+I, [2019-03-06T12:31:09.387052 #25951]  INFO -- : {:event=>"execute_finished.FinishCalculations"}
+I, [2019-03-06T12:31:09.387186 #25951]  INFO -- : {:event=>"trigger_finished.FinishCalculationsFlow"}
+```
+
+Consult the documentation for `Technologic` for more info on how to use it.
 
 ## Inheritance
 
