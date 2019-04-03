@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# It's best practice to have Flows in which nothing should be done unless everything is successful to use a transaction.
+# Flows where no operation should be persisted unless all are successful should use a transaction.
 module Flow
   module Transactions
     extend ActiveSupport::Concern

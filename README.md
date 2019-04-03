@@ -88,9 +88,23 @@ Flows accept input representing the arguments and options which define the initi
 CalculateTimetablesFlow.trigger(timeframe: Day.today)
 ```
 
-When `#trigger` is called on a Flow, `#execute` is called on Operations sequentially in their given order. 
-
 Triggering a Flow executes all its operations in sequential order if **and only if** it has a valid state.
+
+When `#trigger` is called on a Flow, `#execute` is called on Operations sequentially in their given order (referred to as a **flux**).
+
+Unless otherwise specified a **Flow** assumes its state class shares a common name.
+
+Ex: `FooBarBazFlow` assumes there is a defined `FooBarBazState`.
+
+If you want to customize this behavior, define the state class explicitly:
+
+```ruby
+class ExampleFlow < ApplicationState
+  def self.state_class
+    MyCoolState
+  end
+end
+```
 
 ### Operations
 
@@ -194,6 +208,8 @@ class CalculateTimetablesState < ApplicationState
 end
 ```
 
+### Input
+
 A state accepts input represented by **arguments** and **options** which initialize it.
  
 **Arguments** describe input required to define the initial state.
@@ -239,6 +255,148 @@ state.attribution_source # => nil
 state.favorite_color # => "1a1f1e"
 state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 ```
+
+### Mutable Data
+    
+States can define objects specifically to be populated by operations as they run.
+
+Mutable operation data is not conceptually distinct from other operation data, not technically.
+
+This section is really just a heads up that you can do things like this:
+
+```ruby
+class ExampleState < ApplicationState
+  option :string_buffer, default: []
+end
+
+class AskAQuestion < ApplicationOperation
+  def behavior
+    state.string_buffer << "Bah Bah, Black Sheep. Have you any wool?"
+  end
+end
+
+class GiveAnAnswer < ApplicationOperation
+  def behavior
+    state.string_buffer << "Yes sir, yes sir! Three bags full!"
+  end
+end
+
+class ExampleFlow < ApplicationFlow
+  operations AskAQuestion, GiveAnAnswer
+end
+
+result = ExampleFlow.trigger(string_buffer: ["A conversation, for your consideration:"])
+result.state.string_buffer.join("\n")
+# A conversation, for your consideration:
+# Bah Bah, Black Sheep. Have you any wool?
+# Yes sir, yes sir! Three bags full! 
+```
+
+### Derivative Data
+
+States provide you with a clear place to put any logic related to pre-processing of data.
+
+They also can help give developers a clear picture of how your data fits together:
+
+```ruby
+class ExampleState < ApplicationState
+  argument :user
+
+  def most_actionable_order
+    editable_orders.order(ship_date: :desc).first
+  end
+  
+  private
+
+  def editable_orders
+    user.orders.unshipped.paid
+  end
+end
+```
+
+### State Concerns
+
+The architecture of each Flow having it's own state introduces a code reuse constraint.
+
+Consider the following example:
+
+```ruby
+class MyExampleState < ApplicationState
+  argument :user
+  
+  def most_actionable_order
+    editable_orders.order(ship_date: :desc).first
+  end
+  
+  private
+  
+  def editable_orders
+    user.orders.unshipped.paid
+  end
+end
+
+class MyOtherExampleState < ApplicationState
+  argument :user
+  
+  def least_actionable_order
+    editable_orders.order(ship_date: :desc).last
+  end
+  
+  private
+  
+  def editable_orders
+    user.orders.unshipped.paid
+  end
+end
+```
+
+The recommended way to share common code between your states is by using concerns.
+
+For example, we could create `app/states/concerns/actionable_user_orders.rb`:
+
+```ruby
+module ActionableUserOrders
+  extend ActiveSupport::Concern
+  
+  included do
+    argument :user
+  end
+  
+  private
+
+  def orders_by_ship_data
+    editable_orders.order(ship_date: :desc)
+  end
+  
+  def editable_orders
+    user.orders.unshipped.paid
+  end
+end
+```
+
+Then your states become nice and clean:
+
+```ruby
+class MyExampleState < ApplicationState
+  include ActionableUserOrders
+  
+  def most_actionable_order
+    orders_by_ship_data.first
+  end
+end
+
+class MyOtherExampleState < ApplicationState
+  include ActionableUserOrders
+  
+  def least_actionable_order
+    orders_by_ship_data.last
+  end
+end
+```
+
+### Validations
+
+TODO...
 
 ## Errors
 
@@ -391,7 +549,7 @@ When something goes wrong in Flow `#revert` is called.
 
 This calls `#rewind` on Operations to `#undo` their behavior.
 
-Reverting a Flow rewinds all its executed operations in reverse order.
+Reverting a Flow rewinds all its executed operations in reverse order (referred to as an **ebb**).
 
 ```ruby
 class ExampleState < ApplicationState; end
@@ -487,40 +645,72 @@ flow = SomeExampleFlow.trigger
 #  OperationFour#behavior
 flow.success? # => true
 flow.revert
-#  OperationOne#behavior
-#  OperationTwo#behavior
-#  OperationThree#behavior
-#  OperationFour#behavior
+#  OperationFour#undo
+#  OperationThree#undo
+#  OperationTwo#undo
+#  OperationOne#undo
 flow.reverted? # => true
 ```
 
 ## Transactions
 
-TODO...
+![Flow Transactions](docs/images/transaction.png)
 
+Flow features a callback driven approach to wrap business logic within database transaction.
+
+Both **Flows** and **Operations** can be wrapped with a transaction.
+
+🚨 *Be Aware*: Unless otherwise specified, transactions apply to **both** success **and** failure cases. You can pass `only:` or `except:` options to `wrap_in_transaction` to alter this behavior.
+ 
 ### Around a Flow
 
-TODO...
+Flows where no operation should be persisted unless all are successful should use a transaction.
+
+```ruby
+class ExampleFlow < ApplicationFlow
+  wrap_in_transaction
+  
+  operations OperationOne, OperationTwo, OperationThree
+end
+```
+
+Flows can transaction wrap `:flux` (caused by `#trigger`) or `:ebb` (caused by `#revert`).
+
+```ruby
+class ExampleFlow < ApplicationFlow
+  wrap_in_transaction only: :flux
+end
+
+class ExampleFlow < ApplicationFlow
+  wrap_in_transaction except: :ebb
+end
+```
 
 ### Around an Operation
 
-TODO...
+Operations which modify several persisted objects together should use a transaction.
 
-### Input
+```ruby
+class OperationTwo < ApplicationFlow
+  wrap_in_transaction
+ 
+  def behavior
+    # do a thing
+  end
+end
+```
 
-TODO...
+Operations can transaction wrap `:behavior` or `:undo`.
 
-### Validations
+```ruby
+class ExampleOperation < ApplicationOperation
+  wrap_in_transaction only: :behavior
+end
 
-TODO...
-
-### Derivative Data
-
-TODO...
-
-### Mutable Data
-
-TODO...
+class ExampleOperation < ApplicationOperation
+  wrap_in_transaction except: :undo
+end
+```
 
 ## Utilities
 
