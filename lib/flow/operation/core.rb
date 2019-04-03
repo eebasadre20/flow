@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Accepts input representing the state.
+# Operations take a state as input.
 module Operation
   module Core
     extend ActiveSupport::Concern

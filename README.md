@@ -71,8 +71,6 @@ There are three important concepts to distinguish here: [Flows](#Flows), [Operat
 A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
 
 ```ruby
-# frozen_string_literal: true
-
 class CalculateTimetablesFlow < ApplicationFlow
   operations ClearExistingTimetables, CalculateTimetables, SummarizeTimetables, DestroyEmptyTimetableCells
 end
@@ -94,13 +92,139 @@ Triggering a Flow executes all its operations in sequential order if **and only 
 
 An **Operation** is a service object which is executed with a **State**.
 
-TODO...
+```ruby
+class ClearExistingTimetables < ApplicationOperation
+  def behavior
+    state.existing_timetable_cells.update_all(total_minutes: 0)
+  end
+end
+```
+
+```ruby
+class CalculateTimetables < ApplicationOperation
+  def behavior
+    state.minutes_by_project_employee.each do |project_employee, total_minutes|
+      project_id, employee_id = project_employee
+      timetable = state.timeframe.timetables.find_or_create_by!(project_id: project_id)
+      timetable.cells.find_or_create_by!(employee_id: employee_id).update!(total_minutes: total_minutes)
+    end
+  end
+end
+```
+
+```ruby
+class SummarizeTimetables < ApplicationOperation
+  def behavior
+    state.timetables.each { |timetable| timetable.update!(total_minutes: timetable.cells.sum(:total_minutes)) }
+  end
+end
+```
+
+```ruby
+class DestroyEmptyTimetableCells < ApplicationOperation
+  def behavior
+    state.empty_cells.destroy_all
+  end
+end
+```
+
+Operations take a state as input and define a `#behavior` that occurs when `#execute` is called.
 
 ### States
 
 A **State** is an aggregation of input and derived data.
 
-TODO...
+```ruby
+class CalculateTimetablesState < ApplicationState
+  argument :timeframe
+
+  def existing_timetable_cells
+    @existing_timetable_cells ||= TimetableCell.where(timetable: existing_timetables)
+  end
+
+  def minutes_by_project_employee
+    @minutes_by_project_employee ||= data_by_employee_project.transform_values { |values| values.sum(&:total_minutes) }
+  end
+
+  def timetables
+    @timetables ||= Timetable.where(project_id: project_ids)
+  end
+
+  def empty_cells
+    @empty_cells ||= TimetableCell.joins(:timetable).where(total_minutes: 0, timetables: { project_id: project_ids })
+  end
+
+  private
+
+  delegate :timesheets, to: :timeframe
+
+  def existing_timetables
+    @existing_timetables ||= timeframe.timetables.where(project_id: project_ids)
+  end
+
+  def project_ids
+    @project_ids ||= timesheet_data.map(&:project_id).uniq
+  end
+
+  def data_by_employee_project
+    @data_by_employee_project ||= timesheet_data.group_by { |data| [ data.project_id, data.employee_id ] }
+  end
+
+  def timesheet_data
+    @timesheet_data ||= timesheets.
+      reportable.
+      summarizable.
+      joins(:timeclock).
+      select("timeclocks.project_id, timeclocks.employee_id, timesheets.total_minutes")
+  end
+end
+```
+
+A state accepts input represented by **arguments** and **options** which initialize it.
+ 
+**Arguments** describe input required to define the initial state.
+
+If any arguments are missing, an `ArgumentError` is raised.
+
+```ruby
+class ExampleFlow < ApplicationFlow; end
+class ExampleState < ApplicationState
+  argument :foo
+  argument :bar
+end
+
+ExampleFlow.trigger # => ArgumentError (Missing arguments: foo, bar)
+ExampleFlow.trigger(foo: :foo) # => ArgumentError (Missing argument: bar)
+ExampleFlow.trigger(foo: :foo, bar: :bar) # => #<ExampleFlow:0x00007ff7b7d92ae0 ...>
+```
+
+**Options** describe input which may be provided to define or override the initial state.
+
+Options can optionally define a default value. 
+
+If no default is specified, the value will be `nil`.
+
+If the default value is static, it can be specified in the class definition.
+
+If the default value is dynamic, you may provide a block to compute the default value.
+
+⚠️‍ *Heads Up*: The default value blocks **DO NOT** provide access to the state or it's other variables!
+
+```ruby
+class ExampleFlow < ApplicationFlow; end
+class ExampleState < ApplicationState
+  option :attribution_source
+  option :favorite_foods, default: %w[pizza ice_cream gluten]
+  option(:favorite_color) { SecureRandom.hex(3) }
+end
+
+result = ExampleFlow.trigger(favorite_foods: %w[avocado hummus nutritional_yeast])
+state = result.state
+
+state.attribution_source # => nil
+state.favorite_color # => "1a1f1e"
+state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
+```
 
 ## Errors
 
