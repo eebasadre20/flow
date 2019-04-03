@@ -221,7 +221,7 @@ If the default value is static, it can be specified in the class definition.
 
 If the default value is dynamic, you may provide a block to compute the default value.
 
-⚠️‍ *Heads Up*: The default value blocks **DO NOT** provide access to the state or it's other variables!
+⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or it's other variables!
 
 ```ruby
 class ExampleFlow < ApplicationFlow; end
@@ -240,6 +240,8 @@ state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 ```
 
 ## Errors
+
+![Flow Errors](docs/images/error.png)
 
 When `#execute` is unsuccessful, expected problems are **failures** and unexpected problems are **Exceptions**.
 
@@ -382,11 +384,89 @@ operation_failure11.details.disappointment_level # => :wow_very_disappoint
 
 ## Reverting a Flow
 
-TODO...
+![Flow Revert](docs/images/revert.png)
+
+When something goes wrong in Flow `#revert` is called. 
+
+This calls `#rewind` on Operations to `#undo` their behavior.
+
+Reverting a Flow rewinds all its executed operations in reverse order.
+
+```ruby
+class ExampleState < ApplicationState; end
+
+class GenericOperation < ApplicationOperation
+  def behavior
+    puts "#{self.class.name}#behavior"
+  end
+  
+  def undo
+    puts "#{self.class.name}#undo"
+  end
+end
+
+class ExampleFlow < ApplicationFlow
+  operations OperationOne, OperationTwo, OperationThree, OperationFour
+end
+
+class OperationOne < GenericOperation; end
+class OperationTwo < GenericOperation; end
+class OperationThree < GenericOperation
+  failure :bad_stuff
+  
+  def behavior
+    super
+    bad_stuff_failure!
+  end
+end
+class OperationFour < GenericOperation; end
+
+ExampleFlow.trigger
+
+# Prints:
+#  OperationOne#behavior
+#  OperationTwo#behavior
+#  OperationThree#behavior
+#  OperationTwo#undo
+#  OperationOne#undo
+```
+
+⚠️ **Heads Up**: For the Operation that failed, `#undo` is **NOT** called. Only operations which execute successfully can be undone.
 
 ### Undoing Operations
 
-TODO...
+```ruby
+class ReserveQuantity < ApplicationOperation
+  delegate :product, :quantity, to: :state
+  delegate :available_inventory_count, to: :product
+  
+  def behavior
+    product.update!(available_inventory_count: available_inventory_count - quantity)
+  end
+  
+  def undo
+    product.update!(available_inventory_count: available_inventory_count + quantity)
+  end
+end
+```
+
+💁‍ *Note*: If you omit the `#undo`, a revert will essentially pass over that Operation. 
+
+If your Operation should not be undone and you want it to halt reverting, call a defined failure in `#undo`.
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  failure :irreversible_behavior
+  
+  def behavior
+    PurchaseService.charge_customer(state.customer)
+  end
+  
+  def undo
+    irreversible_behavior_failure!
+  end
+end
+```
 
 ## Transactions
 
