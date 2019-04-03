@@ -890,7 +890,47 @@ Consult the documentation for `Technologic` for more info on how to use it.
 
 ## Inheritance
 
-TODO...
+Flows, Operations, and States all support inheritance of class definitions.
+
+```ruby
+class ParentState < ApplicationState
+  argument :foo
+end
+
+class ChildState < ParentState
+  argument :bar
+end
+
+class ChildFlow < ApplicationFlow; end
+ChildFlow.trigger(bar: :bar) # => ArgumentError (Missing argument: foo)
+```
+
+A common pattern in Flow is to use inheritance to DRY and conceptually related flows.
+
+Take for example the case of `Calculation` and `Recalculation`
+
+```ruby
+class CalculateFooFlow < ApplicationFlow
+  operations ClearOldFooCalculations, CaclulcateFoo, EmailFooReport
+end
+
+class CalculateFooState < ApplicationState
+  def foos
+    Foo.where(calculated_at: nil)
+  end
+end
+
+# =================
+
+class RecalculateFooFlow < CalculateFooFlow; end
+class RecalculateFooState < ApplicationState
+  def foos
+    Foo.all
+  end
+end
+```
+
+There communicates that there is no difference between the Flows other than their States!
 
 ## Testing
 
