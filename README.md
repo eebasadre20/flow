@@ -6,7 +6,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/02131658005b10c289e0/test_coverage)](https://codeclimate.com/github/Freshly/flow/test_coverage)
 
 * [Installation](#installation)
-* [Getting Started](getting-started)
+* [Getting Started](#getting-started)
 * [What is Flow?](#what-is-flow)
 * [How it Works](#how-it-works)
    * [Flows](#flows)
