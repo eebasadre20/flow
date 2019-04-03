@@ -396,7 +396,30 @@ end
 
 ### Validations
 
-TODO...
+States are ActiveModels which means they have access to [ActiveModel::Validations](https://api.rubyonrails.org/classes/ActiveModel/Validations.html).
+
+It is considered a best practice to write validations in your states.
+
+Flows which have an invalid state will NOT execute any Operations, so it is inherently the safest and clearest way to proactively communicate about missed expectations.
+
+💁‍ **Pro Tip**: There is a `trigger!` method on Flows that will raise certain errors that are normally silenced. Invalid states are one such example!
+
+```ruby
+class ExampleFlow < ApplicationFlow; end
+class ExampleState < ApplicationState
+  argument :first_name
+  
+  validates :first_name, length: { minimum: 2 }
+end
+
+ExampleFlow.trigger!(first_name: "a") # => raises Flow::Errors::StateInvalid
+
+result = ExampleFlow.trigger(first_name: "a")
+result.success? # => false
+result.failed? # => false
+result.triggered? # => false
+result.state.errors.messages # => {:first_name=>["is too short (minimum is 2 characters)"]}
+```
 
 ## Errors
 
