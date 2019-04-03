@@ -16,6 +16,7 @@
    * [Failures](#failures)
 * [Reverting a Flow](#reverting-a-flow)
    * [Undoing Operations](#undoing-operations)
+   * [Manual Revert](#manual-revert)
 * [Transactions](#transactions)
    * [Around a Flow](#around-a-flow)
    * [Around an Operation](#around-an-operation)
@@ -466,6 +467,31 @@ class ExampleOperation < ApplicationOperation
     irreversible_behavior_failure!
   end
 end
+```
+
+### Manual Revert
+
+Flows in which an error occur are reverted automatically.
+
+You can also manually revert a completed flow, even if it was fully successful.
+
+```ruby
+class ExampleFlow < ApplicationFlow
+  operations OperationOne, OperationTwo, OperationThree, OperationFour
+end
+
+flow = SomeExampleFlow.trigger
+#  OperationOne#behavior
+#  OperationTwo#behavior
+#  OperationThree#behavior
+#  OperationFour#behavior
+flow.success? # => true
+flow.revert
+#  OperationOne#behavior
+#  OperationTwo#behavior
+#  OperationThree#behavior
+#  OperationFour#behavior
+flow.reverted? # => true
 ```
 
 ## Transactions
