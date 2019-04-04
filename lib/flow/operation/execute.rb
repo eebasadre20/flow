@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Operations *must* define the `#behavior` that occurs when `#execute` is called.
+# Operations define a `#behavior` that occurs when `#execute` is called.
 module Operation
   module Execute
     extend ActiveSupport::Concern

@@ -11,7 +11,7 @@ require_relative "operation/rewind"
 require_relative "operation/status"
 require_relative "operation/transactions"
 
-# Operations are service objects which are executed with a state.
+# An **Operation** is a service object which is executed with a **State**.
 class OperationBase
   include ShortCircuIt
   include Technologic

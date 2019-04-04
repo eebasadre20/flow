@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Defines the immutable structure by defining attribute accessors for the state data.
+# A state's attributes provide accessors to the input data it was initialized with.
 module State
   module Attributes
     extend ActiveSupport::Concern

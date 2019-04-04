@@ -10,7 +10,7 @@ module Flow
     end
 
     def triggered?
-      executed_operations.any?
+      executed_operations.any? || failed_operation?
     end
 
     def success?

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A callback driven approach to wrap some business logic within a transaction.
+# A callback driven approach to wrap business logic within database transaction.
 module TransactionWrapper
   extend ActiveSupport::Concern
 

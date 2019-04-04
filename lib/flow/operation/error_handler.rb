@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# An unhandled error during execution is exceptional, and handlers unable to rescue an error cause a failure instead.
+# When an exception is raised during during execution, but a handler can rescue, it causes a failure instead.
 module Operation
   module ErrorHandler
     extend ActiveSupport::Concern
