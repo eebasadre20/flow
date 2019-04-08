@@ -1026,7 +1026,11 @@ Shoulda::Matchers.configure do |config|
 end
 ```
 
-This will allow you to use the [define_argument](lib/flow/custom_matchers/define_argument.rb), [define_option](lib/flow/custom_matchers/define_option.rb), and [use_operations](lib/flow/custom_matchers/use_operations.rb) helpers.
+This will allow you to use the following custom matchers:
+ * [define_argument](lib/flow/custom_matchers/define_argument.rb)
+ * [define_attribute](lib/flow/custom_matchers/define_attribute.rb)
+ * [define_option](lib/flow/custom_matchers/define_option.rb)
+ * [use_operations](lib/flow/custom_matchers/use_operations.rb)
 
 ### Testing Flows
 
