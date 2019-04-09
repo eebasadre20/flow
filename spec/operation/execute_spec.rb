@@ -5,7 +5,7 @@ RSpec.describe Operation::Execute, type: :module do
 
   it { is_expected.to include_module ActiveSupport::Rescuable }
 
-  include_context "with an example operation", Operation::Execute
+  include_context "with an example operation", [ described_class, Operation::Status ]
 
   describe "#execute!" do
     subject(:execute!) { example_operation.execute! }
@@ -16,6 +16,8 @@ RSpec.describe Operation::Execute, type: :module do
 
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
+
+    it_behaves_like "operation double runs are prevented", :execute!, :behavior, Operation::Errors::AlreadyExecuted
 
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :execute

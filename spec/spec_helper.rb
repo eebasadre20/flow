@@ -21,6 +21,7 @@ require_relative "support/shared_examples/an_inherited_property"
 require_relative "support/shared_examples/method_is_wrapped_in_a_transaction"
 require_relative "support/shared_examples/methods_are_wrapped_in_a_transaction"
 require_relative "support/shared_examples/methods_are_wrapped_in_a_transaction_with_a_variety_of_input"
+require_relative "support/shared_examples/operation_double_runs_are_prevented"
 
 SimpleCov.start do
   add_filter "/spec/"

@@ -7,6 +7,7 @@ module Operation
 
     included do
       set_callback :rewind, :around, ->(_, block) { surveil(:rewind) { block.call } }
+      set_callback :rewind, :before, -> { raise Operation::Errors::AlreadyRewound }, if: :rewound?
     end
 
     def rewind

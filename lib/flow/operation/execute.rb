@@ -11,6 +11,7 @@ module Operation
       attr_reader :operation_failure
 
       set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
+      set_callback :execute, :before, -> { raise Operation::Errors::AlreadyExecuted }, if: :executed?
     end
 
     def execute!

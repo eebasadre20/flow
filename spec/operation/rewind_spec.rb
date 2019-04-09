@@ -3,7 +3,7 @@
 RSpec.describe Operation::Rewind, type: :module do
   subject(:example_class) { Class.new.include described_class }
 
-  include_context "with an example operation", Operation::Rewind
+  include_context "with an example operation", [ described_class, Operation::Status ]
 
   describe "#rewind" do
     subject(:rewind) { example_operation.rewind }
@@ -14,6 +14,8 @@ RSpec.describe Operation::Rewind, type: :module do
     end
 
     it { is_expected.to eq example_operation }
+
+    it_behaves_like "operation double runs are prevented", :rewind, :undo, Operation::Errors::AlreadyRewound
 
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :rewind

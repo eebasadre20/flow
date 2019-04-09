@@ -3,18 +3,24 @@
 RSpec.describe Operation::Status, type: :module do
   include_context "with an example operation", [ Operation::Execute, described_class ]
 
-  describe "#executed?" do
-    subject(:executed?) { example_operation.executed? }
+  shared_examples_for "a callback tracking predicate" do |callback, predicate|
+    subject { example_operation.public_send(predicate) }
 
     it { is_expected.to be false }
 
-    context "when execute callbacks run" do
-      subject(:run_execute_callback) { example_operation.run_callbacks(:execute) }
+    context "when callbacks run" do
+      subject { -> { example_operation.run_callbacks(callback) } }
 
-      it "changes" do
-        expect { run_execute_callback }.to change { example_operation.executed? }.from(false).to(true)
-      end
+      it { is_expected.to change { example_operation.public_send(predicate) }.from(false).to(true) }
     end
+  end
+
+  describe "#executed?" do
+    it_behaves_like "a callback tracking predicate", :execute, :executed?
+  end
+
+  describe "#rewound?" do
+    it_behaves_like "a callback tracking predicate", :rewind, :rewound?
   end
 
   describe "#failed?" do
