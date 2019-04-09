@@ -381,7 +381,7 @@ end
 
 Use whatever method seems more readable to you or appropriate to your use case!
 
-💁‍ *Pro Tip*: You don't need to use `attribute` for mutable data, but you are highly encouraged to! If you do not use it, and opt instead of a simple `attr_reader`, the value of your state will not be bubble up when logging.
+💁‍ *Pro Tip*: You don't need to use `attribute` for mutable data, but you are highly encouraged to! If you do not use it, and opt instead of a simple `attr_accessor`, the value will not be output in the string.
 
 ```ruby
 class AccessorState < ApplicationState
