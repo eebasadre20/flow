@@ -15,6 +15,8 @@ RSpec.describe Operation::Rewind, type: :module do
 
     it { is_expected.to eq example_operation }
 
+    it_behaves_like "operation double runs are prevented", :rewind, :undo, Operation::Errors::AlreadyRewound
+
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :rewind
 
@@ -39,18 +41,6 @@ RSpec.describe Operation::Rewind, type: :module do
     it "is surveiled" do
       rewind
       expect(example_operation).to have_received(:surveil).with(:rewind)
-    end
-
-    context "when called twice" do
-      before do
-        allow(example_operation).to receive(:undo).and_call_original
-        example_operation.rewind
-      end
-
-      it "raises" do
-        expect { rewind }.to raise_error Operation::Errors::AlreadyRewound
-        expect(example_operation).to have_received(:undo).once
-      end
     end
   end
 

@@ -17,6 +17,8 @@ RSpec.describe Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
+    it_behaves_like "operation double runs are prevented", :execute!, :behavior, Operation::Errors::AlreadyExecuted
+
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :execute
 
@@ -90,18 +92,6 @@ RSpec.describe Operation::Execute, type: :module do
             expect { execute! }.not_to raise_error
           end
         end
-      end
-    end
-
-    context "when called twice" do
-      before do
-        allow(example_operation).to receive(:behavior).and_call_original
-        example_operation.execute!
-      end
-
-      it "raises" do
-        expect { execute! }.to raise_error Operation::Errors::AlreadyExecuted
-        expect(example_operation).to have_received(:behavior).once
       end
     end
   end
