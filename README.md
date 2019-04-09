@@ -307,7 +307,7 @@ state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
     
 States can define objects specifically to be populated by operations as they run.
 
-Mutable operation data is not conceptually distinct from other operation data, not technically.
+Mutable operation data is not technically distinct from other operation data.
 
 This section is really just a heads up that you can do things like this:
 
@@ -337,6 +337,70 @@ result.state.string_buffer.join("\n")
 # A conversation, for your consideration:
 # Bah Bah, Black Sheep. Have you any wool?
 # Yes sir, yes sir! Three bags full! 
+```
+
+If you are planning to create some object during your operation at runtime, use `attribute`:
+
+```ruby
+class ExampleState < ApplicationState
+  attribute :the_foo
+end
+
+class CreateFoo < ApplicationOperation
+  def behavior
+    state.the_foo = Foo.create!
+  end
+  
+  def undo
+    state.the_foo.destroy!
+    state.the_foo = nil
+  end
+end
+```
+
+If your attribute should have a default value, you can use a hook to define that default:
+
+```ruby
+class ExampleState < ApplicationState
+  attribute :the_foo
+  set_callback(:initialize, :after) { self.the_foo = [] }
+end
+```
+
+Under the hood `attribute` uses `attr_accessor` so you could override the default reader instead:
+
+```ruby
+class ExampleState < ApplicationState
+  attribute :the_foo
+  
+  def the_foo
+    @the_foo ||= []
+  end
+end
+```
+
+Use whatever method seems more readable to you or appropriate to your use case!
+
+💁‍ *Pro Tip*: You don't need to use `attribute` for mutable data, but you are highly encouraged to! If you do not use it, and opt instead of a simple `attr_accessor`, the value will not be output in the string.
+
+```ruby
+class AccessorState < ApplicationState
+  attr_accessor :foo
+end
+
+class AttributeState < ApplicationState
+  attribute :foo
+end
+
+accr_state = AccessorState.new
+accr_state.foo = "some value!"
+accr_state.to_s # => #<AccessorState >
+accr_state.foo # => "some value!"
+
+attr_state = AttributeState.new
+attr_state.foo = "some value!"
+attr_state.to_s # => #<AttributeState foo="some value!">
+attr_state.foo # => "some value!"
 ```
 
 #### Derivative Data
@@ -1054,12 +1118,28 @@ RSpec.describe FooFlow, type: :flow do
 
   it { is_expected.to inherit_from ApplicationFlow }
   # it { is_expected.to use_operations ExampleOperation }
+ 
+  describe "#trigger" do
+    subject(:trigger) { flow.trigger! }
+ 
+    pending "describe the effects of a successful `Flow#flux` (or delete) #{__FILE__}"
+  end
+ 
+  describe "#revert" do
+    before { flow.trigger! }
+ 
+    subject(:revert) { flow.revert }
+ 
+    pending "describe the effects of a successful `Flow#ebb` (or delete) #{__FILE__}"
+  end 
 end
 ```
 
 ### Testing Operations
 
 The easiest and best way to test an Operation is with a unit test.
+
+Operation unit tests work best when you treat them like integration tests! (Read: **No Mocking!**)
 
 Operations are generated with the following RSPec template:
 
@@ -1084,11 +1164,63 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
 
   it { is_expected.to inherit_from ApplicationOperation }
 
-  describe "#execute" do
-    pending "add some examples to (or delete) #{__FILE__}"
+  describe "#execute!" do
+    subject(:execute!) { operation.execute! }
+  
+    pending "describe `Operation#behavior` (or delete) #{__FILE__}"
+  end
+  
+  describe "#rewind" do
+    before { operation.execute! }
+  
+    subject(:execute!) { operation.rewind }
+  
+    pending "describe `Operation#undo` (or delete) #{__FILE__}"
   end
 end
 ```
+
+⚠️ *Warning*: You have to do a little work to write a good test state!
+
+In the boilerplate from the generator, there is the following snippet:
+
+```ruby
+let(:example_state_class) do
+  Class.new(ApplicationState) do
+    # argument :foo
+    # option :bar
+  end
+end
+```
+
+By default, your operation specs are broken! The reason for this is to encourage resilient test writing.
+
+Let's say that you have an Operation in your system called `CreateFoo` which is part of the `CreateFooFlow` and therefore is only ever called with a `CreateFooState`. You may be tempted to write something like: 
+
+```ruby
+let(:example_state_class) { CreateFooState }
+```
+
+You are heavily encouraged *not* to do that. If your Operation is used by several different Flows, you don't want to have your test arbitrarily using some state for the test.
+
+Instead, use the spec as a way to communicate the contract of the Operation with the next developer. By boiling out a very clean example state that only includes what is necessary for the operation, you provide clear guidance on what the Operation's minimum requirements for a state are in a very transparent way.
+
+```ruby
+let(:example_state_class) do
+  Class.new(ApplicationState) do
+    argument :foo
+    option :bar
+    attribute :baz
+  end
+  
+  let(:state_input) do
+    { foo: foo, bar: bar }
+  end
+  
+  let(:foo) { ... }
+  let(:bar) { ... }
+end
+``` 
 
 ### Testing States
 
@@ -1114,6 +1246,7 @@ RSpec.describe FooState, type: :state do
   # it { is_expected.to define_option(:foo).with_default_value(:bar) }
   # it { is_expected.to define_option(:foo).with_default_value_block }
   # it { is_expected.to validate_presence_of ... }
+  # it { is_expected.to define_attribute :foo }
 end
 ```
 
@@ -1141,6 +1274,10 @@ describe "integration test" do
   end
 end
 ```
+
+💡 *Note*: It's considered a best practice to put your integration test in the same file as the unit test. 
+
+And always remember: **Good integration tests don't use mocking**!
 
 ## Contributing
 

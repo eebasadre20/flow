@@ -25,6 +25,12 @@ RSpec.describe State::Attributes, type: :module do
     end
   end
 
+  describe ".attribute" do
+    subject { example_state_class }
+
+    it { is_expected.to alias_method :attribute, :define_attribute }
+  end
+
   describe ".inherited" do
     it_behaves_like "an inherited property", :define_attribute, :_attributes do
       let(:root_class) { example_state_class }
