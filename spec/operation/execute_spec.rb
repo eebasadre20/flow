@@ -5,7 +5,7 @@ RSpec.describe Operation::Execute, type: :module do
 
   it { is_expected.to include_module ActiveSupport::Rescuable }
 
-  include_context "with an example operation", Operation::Execute
+  include_context "with an example operation", [ described_class, Operation::Status ]
 
   describe "#execute!" do
     subject(:execute!) { example_operation.execute! }
@@ -90,6 +90,14 @@ RSpec.describe Operation::Execute, type: :module do
             expect { execute! }.not_to raise_error
           end
         end
+      end
+    end
+
+    context "when called twice" do
+      before { example_operation.execute! }
+
+      it "raises" do
+        expect { execute! }.to raise_error Operation::Errors::AlreadyExecuted
       end
     end
   end

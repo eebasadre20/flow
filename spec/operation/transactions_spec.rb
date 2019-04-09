@@ -5,6 +5,7 @@ RSpec.describe Operation::Transactions, type: :module do
     TransactionWrapper,
     Operation::Execute,
     Operation::Rewind,
+    Operation::Status,
     described_class,
   ]
 
