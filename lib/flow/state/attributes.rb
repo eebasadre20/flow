@@ -25,6 +25,7 @@ module State
         attr_accessor attribute
         define_attribute_methods attribute
       end
+      alias_method :attribute, :define_attribute
     end
   end
 end

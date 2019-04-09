@@ -18,7 +18,17 @@ RSpec.describe <%= class_name %>, type: :operation do
 
   it { is_expected.to inherit_from ApplicationOperation }
 
-  describe "#execute" do
-    pending "add some examples to (or delete) #{__FILE__}"
+  describe "#execute!" do
+    subject(:execute!) { operation.execute! }
+
+    pending "describe `Operation#behavior` (or delete) #{__FILE__}"
+  end
+
+  describe "#rewind" do
+    before { operation.execute! }
+
+    subject(:execute!) { operation.rewind }
+
+    pending "describe `Operation#undo` (or delete) #{__FILE__}"
   end
 end
