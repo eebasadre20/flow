@@ -17,6 +17,20 @@ RSpec.describe Operation::Status, type: :module do
     end
   end
 
+  describe "#rewound?" do
+    subject(:rewound?) { example_operation.rewound? }
+
+    it { is_expected.to be false }
+
+    context "when execute callbacks run" do
+      subject(:run_execute_callback) { example_operation.run_callbacks(:rewind) }
+
+      it "changes" do
+        expect { run_execute_callback }.to change { example_operation.rewound? }.from(false).to(true)
+      end
+    end
+  end
+
   describe "#failed?" do
     subject(:failed?) { example_operation.failed? }
 

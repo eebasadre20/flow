@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "operation/errors/already_executed"
+require_relative "operation/errors/already_rewound"
 
 require_relative "operation/callbacks"
 require_relative "operation/core"

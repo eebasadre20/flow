@@ -94,10 +94,14 @@ RSpec.describe Operation::Execute, type: :module do
     end
 
     context "when called twice" do
-      before { example_operation.execute! }
+      before do
+        allow(example_operation).to receive(:behavior).and_call_original
+        example_operation.execute!
+      end
 
       it "raises" do
         expect { execute! }.to raise_error Operation::Errors::AlreadyExecuted
+        expect(example_operation).to have_received(:behavior).once
       end
     end
   end
