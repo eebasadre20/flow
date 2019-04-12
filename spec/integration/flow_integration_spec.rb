@@ -107,7 +107,9 @@ RSpec.describe Flow, type: :integration do
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]>
+          ]
+           unused=
+          >
         STRING
       end
 
@@ -124,7 +126,9 @@ RSpec.describe Flow, type: :integration do
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]>
+          ]
+           unused=nil
+          >
         STRING
       end
 

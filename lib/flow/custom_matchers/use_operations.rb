@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
-# RSpec matcher for flow operations.
+# RSpec matcher that tests usage of `ApplicationFlow.operations`
 #
-# Usage:
+#     class ExampleFlow
+#       operations OperationOne, OperationTwo
+#     end
 #
-# RSpec.describe ExampleFlow, type: :flow do
-#   subject { described_class.new(**input) }
+#     RSpec.describe ExampleFlow, type: :flow do
+#       subject { described_class.new(**input) }
 #
-#   let(:input) { {} }
+#       let(:input) { {} }
 #
-#   it { is_expected.to use_operations [ OperationOne, OperationTwo ] }
-# end
+#       it { is_expected.to use_operations OperationOne, OperationTwo }
+#     end
 
-RSpec::Matchers.define :use_operations do |operations|
-  match { |flow| expect(flow._operations).to eq Array.wrap(operations) }
+RSpec::Matchers.define :use_operations do |*operations|
+  match { |flow| expect(flow._operations).to eq operations.flatten }
   description { "uses operations #{display_operations(operations)}" }
   failure_message { |flow| "expected #{flow.class.name}# to use operations #{display_operations(operations)}" }
 
   def display_operations(operations)
-    Array.wrap(operations).join(", ")
+    operations.flatten.join(", ")
   end
 end

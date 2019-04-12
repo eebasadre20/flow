@@ -7,6 +7,8 @@ class BottlesOnTheWallState < StateBase
   option :number_to_take_down, default: 1
   option :output, default: []
 
+  attribute :unused
+
   validates :number_to_take_down, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   def stanza
