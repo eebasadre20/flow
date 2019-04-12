@@ -1097,8 +1097,6 @@ This will allow you to use the following custom matchers:
  * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
  * [wrap_in_transaction](lib/flow/custom_matchers/wrap_in_transaction.rb) tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `Operation`
 
-TakeBottlesDown
-
 ### Testing Flows
 
 The best way to test a Flow is with an integration test.
