@@ -1093,7 +1093,9 @@ end
 This will allow you to use the following custom matchers:
  * [define_argument](lib/flow/custom_matchers/define_argument.rb) tests usage of `ApplicationState.argument`
  * [define_attribute](lib/flow/custom_matchers/define_attribute.rb) tests usage of `ApplicationState.attribute`
+ * [define_failure](lib/flow/custom_matchers/define_failure.rb) tests usage of `ApplicationOperation.failure`
  * [define_option](lib/flow/custom_matchers/define_option.rb) tests usage of `ApplicationState.option`
+ * [handle_error](lib/flow/custom_matchers/handle_error.rb) tests usage of `ApplicationOperation.handle_error`
  * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
  * [wrap_in_transaction](lib/flow/custom_matchers/wrap_in_transaction.rb) tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `ApplicationOperation`
 
