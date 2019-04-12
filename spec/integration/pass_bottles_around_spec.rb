@@ -7,4 +7,3 @@ RSpec.describe PassBottlesAround, type: :operation do
 
   it { is_expected.to wrap_in_transaction(only: :behavior) }
 end
-

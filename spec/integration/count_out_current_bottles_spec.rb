@@ -7,4 +7,3 @@ RSpec.describe CountOutCurrentBottles, type: :operation do
 
   it { is_expected.not_to wrap_in_transaction }
 end
-
