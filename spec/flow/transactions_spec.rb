@@ -2,7 +2,7 @@
 
 RSpec.describe Flow::Transactions, type: :module do
   include_context "with example flow having state", [
-    TransactionWrapper,
+    Flow::TransactionWrapper,
     Flow::Operations,
     Flow::Flux,
     Flow::Ebb,

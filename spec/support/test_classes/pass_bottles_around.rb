@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PassBottlesAround < OperationBase
+class PassBottlesAround < Flow::OperationBase
   wrap_in_transaction only: :behavior
 
   class NonTakedownError < StandardError; end

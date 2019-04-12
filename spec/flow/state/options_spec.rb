@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Options, type: :module do
-  include_context "with an example state", State::Options
+RSpec.describe Flow::State::Options, type: :module do
+  include_context "with an example state", Flow::State::Options
 
   describe ".option" do
     subject(:define_option) { example_state_class.__send__(:option, option) }
@@ -12,7 +12,7 @@ RSpec.describe State::Options, type: :module do
 
     describe "defines option" do
       let(:default) { Faker::Lorem.word }
-      let(:instance) { instance_double(State::Options::Option) }
+      let(:instance) { instance_double(Flow::State::Options::Option) }
       let(:expected_options) { Hash[option, instance] }
 
       shared_examples_for "an option is defined" do
@@ -24,7 +24,7 @@ RSpec.describe State::Options, type: :module do
       context "when no block is given" do
         subject(:define_option) { example_state_class.__send__(:option, option, default: default) }
 
-        before { allow(State::Options::Option).to receive(:new).with(default: default).and_return(instance) }
+        before { allow(Flow::State::Options::Option).to receive(:new).with(default: default).and_return(instance) }
 
         it_behaves_like "an option is defined"
       end
@@ -36,7 +36,9 @@ RSpec.describe State::Options, type: :module do
           ->(_) { :block }
         end
 
-        before { allow(State::Options::Option).to receive(:new).with(default: default, &block).and_return(instance) }
+        before do
+          allow(Flow::State::Options::Option).to receive(:new).with(default: default, &block).and_return(instance)
+        end
 
         it_behaves_like "an option is defined"
       end
@@ -53,7 +55,7 @@ RSpec.describe State::Options, type: :module do
       let(:root_class) { example_state_class }
       let(:expected_attribute_value) do
         expected_property_value.each_with_object({}) do |option, hash|
-          hash[option] = instance_of(State::Options::Option)
+          hash[option] = instance_of(Flow::State::Options::Option)
         end
       end
     end
@@ -64,10 +66,10 @@ RSpec.describe State::Options, type: :module do
 
     let(:example_class) do
       Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Core
-        include State::Options
+        include Flow::State::Callbacks
+        include Flow::State::Attributes
+        include Flow::State::Core
+        include Flow::State::Options
 
         option :test_option1, default: :default_value1
         option(:test_option2) { :default_value2 }

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Transactions, type: :module do
+RSpec.describe Flow::Operation::Transactions, type: :module do
   include_context "with an example operation", [
-    TransactionWrapper,
-    Operation::Execute,
-    Operation::Rewind,
-    Operation::Status,
+    Flow::TransactionWrapper,
+    Flow::Operation::Execute,
+    Flow::Operation::Rewind,
+    Flow::Operation::Status,
     described_class,
   ]
 

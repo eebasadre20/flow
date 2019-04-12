@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-class ApplicationFlow < FlowBase; end
+class ApplicationFlow < Flow::FlowBase; end

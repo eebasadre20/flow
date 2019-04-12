@@ -23,7 +23,7 @@ RSpec.describe Flow::Flux, type: :module do
     end
 
     context "with a #failed_operation" do
-      let(:failed_operation) { instance_double(OperationBase) }
+      let(:failed_operation) { instance_double(Flow::OperationBase) }
 
       before { allow(example_flow).to receive(:failed_operation).and_return(failed_operation) }
 
@@ -112,7 +112,7 @@ RSpec.describe Flow::Flux, type: :module do
       let(:example) { example_flow }
     end
 
-    let(:operation_failure) { instance_double(Operation::Failures::OperationFailure) }
+    let(:operation_failure) { instance_double(Flow::Operation::Failures::OperationFailure) }
     let(:operations) { example_flow.__send__(:operation_instances) }
 
     before do

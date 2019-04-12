@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Rewind, type: :module do
+RSpec.describe Flow::Operation::Rewind, type: :module do
   subject(:example_class) { Class.new.include described_class }
 
-  include_context "with an example operation", [ described_class, Operation::Status ]
+  include_context "with an example operation", [ described_class, Flow::Operation::Status ]
 
   describe "#rewind" do
     subject(:rewind) { example_operation.rewind }
@@ -15,7 +15,7 @@ RSpec.describe Operation::Rewind, type: :module do
 
     it { is_expected.to eq example_operation }
 
-    it_behaves_like "operation double runs are prevented", :rewind, :undo, Operation::Errors::AlreadyRewound
+    it_behaves_like "operation double runs are prevented", :rewind, :undo, Flow::Operation::Errors::AlreadyRewound
 
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :rewind

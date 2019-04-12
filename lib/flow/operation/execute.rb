@@ -1,41 +1,43 @@
 # frozen_string_literal: true
 
 # Operations define a `#behavior` that occurs when `#execute` is called.
-module Operation
-  module Execute
-    extend ActiveSupport::Concern
+module Flow
+  module Operation
+    module Execute
+      extend ActiveSupport::Concern
 
-    included do
-      include ActiveSupport::Rescuable
+      included do
+        include ActiveSupport::Rescuable
 
-      attr_reader :operation_failure
+        attr_reader :operation_failure
 
-      set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
-      set_callback :execute, :before, -> { raise Operation::Errors::AlreadyExecuted }, if: :executed?
-    end
-
-    def execute!
-      run_callbacks(:execute) do
-        run_callbacks(:behavior) { behavior }
+        set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
+        set_callback :execute, :before, -> { raise Operation::Errors::AlreadyExecuted }, if: :executed?
       end
 
-      self
-    rescue StandardError => exception
-      rescue_with_handler(exception) || raise
+      def execute!
+        run_callbacks(:execute) do
+          run_callbacks(:behavior) { behavior }
+        end
 
-      self
-    end
+        self
+      rescue StandardError => exception
+        rescue_with_handler(exception) || raise
 
-    def execute
-      execute!
-    rescue Operation::Failures::OperationFailure => exception
-      @operation_failure = exception
+        self
+      end
 
-      self
-    end
+      def execute
+        execute!
+      rescue Operation::Failures::OperationFailure => exception
+        @operation_failure = exception
 
-    def behavior
-      # abstract method which should be defined by descendants with the functionality of the given operation
+        self
+      end
+
+      def behavior
+        # abstract method which should be defined by descendants with the functionality of the given operation
+      end
     end
   end
 end

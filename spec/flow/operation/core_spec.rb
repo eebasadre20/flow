@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Core, type: :module do
+RSpec.describe Flow::Operation::Core, type: :module do
   include_context "with an example operation"
 
   describe "#initialize" do

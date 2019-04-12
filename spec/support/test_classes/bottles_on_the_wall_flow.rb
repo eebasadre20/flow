@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BottlesOnTheWallFlow < FlowBase
+class BottlesOnTheWallFlow < Flow::FlowBase
   wrap_in_transaction only: :ebb
 
   operations CountOutCurrentBottles, TakeBottlesDown, PassBottlesAround, CountOutCurrentBottles

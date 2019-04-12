@@ -13,16 +13,18 @@ require_relative "operation/status"
 require_relative "operation/transactions"
 
 # An **Operation** is a service object which is executed with a **State**.
-class OperationBase
-  include ShortCircuIt
-  include Technologic
-  include TransactionWrapper
-  include Operation::Callbacks
-  include Operation::Core
-  include Operation::ErrorHandler
-  include Operation::Execute
-  include Operation::Failures
-  include Operation::Rewind
-  include Operation::Status
-  include Operation::Transactions
+module Flow
+  class OperationBase
+    include ShortCircuIt
+    include Technologic
+    include Flow::TransactionWrapper
+    include Flow::Operation::Callbacks
+    include Flow::Operation::Core
+    include Flow::Operation::ErrorHandler
+    include Flow::Operation::Execute
+    include Flow::Operation::Failures
+    include Flow::Operation::Rewind
+    include Flow::Operation::Status
+    include Flow::Operation::Transactions
+  end
 end

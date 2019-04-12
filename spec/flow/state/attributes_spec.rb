@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Attributes, type: :module do
-  include_context "with an example state", State::Options
+RSpec.describe Flow::State::Attributes, type: :module do
+  include_context "with an example state", Flow::State::Options
 
   describe ".define_attribute" do
     subject(:define_attribute) { example_state_class.__send__(:define_attribute, attribute) }

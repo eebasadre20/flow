@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Options::Option, type: :subclass do
+RSpec.describe Flow::State::Options::Option, type: :subclass do
   describe "#initialize" do
     subject { instance.instance_variable_get(:@default_value) }
 
