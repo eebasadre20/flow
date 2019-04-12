@@ -25,6 +25,20 @@ RSpec.describe Flow, type: :integration do
     }.compact
   end
 
+  describe BottlesOnTheWallFlow, type: :flow do
+    it { is_expected.to use_operations CountOutCurrentBottles, TakeBottlesDown, PassBottlesAround, CountOutCurrentBottles }
+  end
+
+  describe BottlesOnTheWallState, type: :state do
+    subject { BottlesOnTheWallState.new(bottles_of: :test_fluid) }
+
+    it { is_expected.to define_argument :bottles_of }
+    it { is_expected.to define_option :number_to_take_down, 1 }
+    it { is_expected.to define_option :output, [] }
+    it { is_expected.to define_attribute :unused }
+    it { is_expected.to validate_numericality_of(:number_to_take_down).is_greater_than_or_equal_to(0).only_integer }
+  end
+
   shared_examples_for "a successful flow" do
     it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
     it { is_expected.to be_state_valid }
@@ -107,7 +121,9 @@ RSpec.describe Flow, type: :integration do
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]>
+          ]
+           unused=
+          >
         STRING
       end
 
@@ -124,7 +140,9 @@ RSpec.describe Flow, type: :integration do
            "You take one down.",
            "You pass it around.",
            "98 bottles of beer on the wall."
-          ]>
+          ]
+           unused=nil
+          >
         STRING
       end
 

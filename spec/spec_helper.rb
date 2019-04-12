@@ -4,6 +4,8 @@ require "simplecov"
 require "rspice"
 require "shoulda-matchers"
 
+require_relative "../lib/flow/spec_helper"
+
 require_relative "support/shared_context/with_a_bottles_active_record"
 require_relative "support/shared_context/with_an_example_state"
 require_relative "support/shared_context/with_an_example_operation"

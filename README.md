@@ -1091,10 +1091,10 @@ end
 ```
 
 This will allow you to use the following custom matchers:
- * [define_argument](lib/flow/custom_matchers/define_argument.rb)
- * [define_attribute](lib/flow/custom_matchers/define_attribute.rb)
- * [define_option](lib/flow/custom_matchers/define_option.rb)
- * [use_operations](lib/flow/custom_matchers/use_operations.rb)
+ * [define_argument](lib/flow/custom_matchers/define_argument.rb) tests usage of `ApplicationState.argument`
+ * [define_attribute](lib/flow/custom_matchers/define_attribute.rb) tests usage of `ApplicationState.attribute`
+ * [define_option](lib/flow/custom_matchers/define_option.rb) tests usage of `ApplicationState.option`
+ * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
 
 ### Testing Flows
 
