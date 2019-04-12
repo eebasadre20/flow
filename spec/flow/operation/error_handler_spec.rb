@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::ErrorHandler, type: :module do
+RSpec.describe Flow::Operation::ErrorHandler, type: :module do
   include_context "with an example operation", [
-    Operation::Failures,
-    Operation::Execute,
-    Operation::Status,
+    Flow::Operation::Failures,
+    Flow::Operation::Execute,
+    Flow::Operation::Status,
     described_class,
   ]
 
@@ -57,11 +57,11 @@ RSpec.describe Operation::ErrorHandler, type: :module do
       subject(:execute!) { example_operation.execute! }
 
       let(:problem) { Faker::Internet.domain_word.underscore }
-      let(:example_failure) { Operation::Failures::OperationFailure.new(problem, exception: example_error.new) }
+      let(:example_failure) { Flow::Operation::Failures::OperationFailure.new(problem, exception: example_error.new) }
 
       before do
         allow(example_operation).to receive(:behavior).and_raise(example_error)
-        allow(Operation::Failures::OperationFailure).
+        allow(Flow::Operation::Failures::OperationFailure).
           to receive(:new).
           with(problem.to_sym, exception: instance_of(example_error)).
           and_return(example_failure)

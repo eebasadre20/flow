@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BottlesOnTheWallState < StateBase
+class BottlesOnTheWallState < Flow::StateBase
   argument :bottles_of
 
   option :starting_bottles

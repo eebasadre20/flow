@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples_for "a transaction wrapper" do
-  it { is_expected.to include_module TransactionWrapper }
+  it { is_expected.to include_module Flow::TransactionWrapper }
 
   describe "CALLBACKS_FOR_TRANSACTIONS" do
     subject { example_class.callbacks_for_transaction }

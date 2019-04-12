@@ -13,17 +13,19 @@ require_relative "flow/transactions"
 require_relative "flow/trigger"
 
 # A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
-class FlowBase
-  include ShortCircuIt
-  include Technologic
-  include TransactionWrapper
-  include Flow::Callbacks
-  include Flow::Core
-  include Flow::Ebb
-  include Flow::Flux
-  include Flow::Operations
-  include Flow::Revert
-  include Flow::Status
-  include Flow::Transactions
-  include Flow::Trigger
+module Flow
+  class FlowBase
+    include ShortCircuIt
+    include Technologic
+    include Flow::TransactionWrapper
+    include Flow::Callbacks
+    include Flow::Core
+    include Flow::Ebb
+    include Flow::Flux
+    include Flow::Operations
+    include Flow::Revert
+    include Flow::Status
+    include Flow::Transactions
+    include Flow::Trigger
+  end
 end

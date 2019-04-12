@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Execute, type: :module do
+RSpec.describe Flow::Operation::Execute, type: :module do
   subject(:example_class) { Class.new.include described_class }
 
   it { is_expected.to include_module ActiveSupport::Rescuable }
 
-  include_context "with an example operation", [ described_class, Operation::Status ]
+  include_context "with an example operation", [ described_class, Flow::Operation::Status ]
 
   describe "#execute!" do
     subject(:execute!) { example_operation.execute! }
@@ -17,7 +17,10 @@ RSpec.describe Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
-    it_behaves_like "operation double runs are prevented", :execute!, :behavior, Operation::Errors::AlreadyExecuted
+    it_behaves_like "operation double runs are prevented",
+                    :execute!,
+                    :behavior,
+                    Flow::Operation::Errors::AlreadyExecuted
 
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :execute
@@ -104,7 +107,7 @@ RSpec.describe Operation::Execute, type: :module do
     end
 
     context "when a failure occurs" do
-      before { allow(example_operation).to receive(:execute!).and_raise(Operation::Failures::OperationFailure) }
+      before { allow(example_operation).to receive(:execute!).and_raise(Flow::Operation::Failures::OperationFailure) }
 
       it { is_expected.to eq example_operation }
 
@@ -112,7 +115,7 @@ RSpec.describe Operation::Execute, type: :module do
         expect { execute }.
           to change { example_operation.__send__(:operation_failure) }.
           from(nil).
-          to(instance_of(Operation::Failures::OperationFailure))
+          to(instance_of(Flow::Operation::Failures::OperationFailure))
       end
     end
 

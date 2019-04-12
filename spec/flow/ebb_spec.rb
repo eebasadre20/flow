@@ -14,7 +14,7 @@ RSpec.describe Flow::Ebb, type: :module do
 
     subject(:ebb) { example_flow.ebb }
 
-    let(:state) { instance_double(Class.new(StateBase)) }
+    let(:state) { instance_double(Class.new(Flow::StateBase)) }
 
     it_behaves_like "a class with callback" do
       include_context "with flow callbacks", :ebb

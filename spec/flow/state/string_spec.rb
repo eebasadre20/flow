@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe State::String, type: :module do
-  include_context "with an example state", State::String
+RSpec.describe Flow::State::String, type: :module do
+  include_context "with an example state", Flow::State::String
 
   let(:instance) { example_state_class.new }
 
@@ -69,8 +69,8 @@ RSpec.describe State::String, type: :module do
 
     let(:example_state_class) do
       Class.new do
-        include State::Attributes
-        include State::String
+        include Flow::State::Attributes
+        include Flow::State::String
 
         define_attribute :test_attribute1
         define_attribute :test_attribute2

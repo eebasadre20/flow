@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Arguments, type: :module do
-  include_context "with an example state", State::Arguments
+RSpec.describe Flow::State::Arguments, type: :module do
+  include_context "with an example state", Flow::State::Arguments
 
   describe ".argument" do
     subject(:define_argument) { example_state_class.__send__(:argument, argument) }
@@ -31,11 +31,11 @@ RSpec.describe State::Arguments, type: :module do
 
     let(:example_class) do
       Class.new do
-        include State::Callbacks
-        include State::Attributes
-        include State::Core
+        include Flow::State::Callbacks
+        include Flow::State::Attributes
+        include Flow::State::Core
 
-        include State::Arguments
+        include Flow::State::Arguments
 
         argument :test_argument1
         argument :test_argument2

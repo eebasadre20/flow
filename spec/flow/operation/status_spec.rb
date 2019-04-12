@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Status, type: :module do
-  include_context "with an example operation", [ Operation::Execute, described_class ]
+RSpec.describe Flow::Operation::Status, type: :module do
+  include_context "with an example operation", [ Flow::Operation::Execute, described_class ]
 
   shared_examples_for "a callback tracking predicate" do |callback, predicate|
     subject { example_operation.public_send(predicate) }
@@ -29,7 +29,9 @@ RSpec.describe Operation::Status, type: :module do
     it { is_expected.to be false }
 
     context "when there is an operation failure" do
-      before { example_operation.instance_variable_set(:@operation_failure, Operation::Failures::OperationFailure.new) }
+      before do
+        example_operation.instance_variable_set(:@operation_failure, Flow::Operation::Failures::OperationFailure.new)
+      end
 
       it { is_expected.to eq true }
     end

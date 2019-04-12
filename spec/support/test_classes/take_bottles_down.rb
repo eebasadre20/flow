@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TakeBottlesDown < OperationBase
+class TakeBottlesDown < Flow::OperationBase
   wrap_in_transaction except: :undo
 
   class NonTakedownError < StandardError; end

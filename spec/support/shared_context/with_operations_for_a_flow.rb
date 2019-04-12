@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.shared_context "with operations for a flow" do
-  let(:operation0_class) { Class.new(OperationBase) }
-  let(:operation1_class) { Class.new(OperationBase) }
-  let(:operation2_class) { Class.new(OperationBase) }
+  let(:operation0_class) { Class.new(Flow::OperationBase) }
+  let(:operation1_class) { Class.new(Flow::OperationBase) }
+  let(:operation2_class) { Class.new(Flow::OperationBase) }
   let(:operation0_name) { Faker::Internet.unique.domain_word.capitalize }
   let(:operation1_name) { Faker::Internet.unique.domain_word.capitalize }
   let(:operation2_name) { Faker::Internet.unique.domain_word.capitalize }

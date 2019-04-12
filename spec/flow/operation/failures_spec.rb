@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Failures, type: :module do
-  include_context "with an example operation", [ Operation::Execute, described_class ]
+RSpec.describe Flow::Operation::Failures, type: :module do
+  include_context "with an example operation", [ Flow::Operation::Execute, described_class ]
 
   let(:problem) { Faker::Lorem.word.to_sym }
 
@@ -86,17 +86,17 @@ RSpec.describe Operation::Failures, type: :module do
     end
 
     it "logs, raises, and runs callbacks" do
-      expect { fail! }.to raise_error(Operation::Failures::OperationFailure, problem.to_s).
+      expect { fail! }.to raise_error(Flow::Operation::Failures::OperationFailure, problem.to_s).
         and change { example_operation.before_failure_hook_run }.from(nil).to(true).
         and change { example_operation.before_problem_hook_run }.from(nil).to(true)
 
       expect(example_operation).
-        to have_received(:error!).with(instance_of(Operation::Failures::OperationFailure), **details)
+        to have_received(:error!).with(instance_of(Flow::Operation::Failures::OperationFailure), **details)
     end
 
     it "has the problem details" do
       fail!
-    rescue Operation::Failures::OperationFailure => operation_failure
+    rescue Flow::Operation::Failures::OperationFailure => operation_failure
       expect(operation_failure.problem).to eq problem
       expect(operation_failure.details).to eq OpenStruct.new(details)
     end

@@ -2,7 +2,7 @@ Description:
     Stub a Operation with test.
 
 Example:
-    `rails generate operation foo`
+    `rails generate flow:operation foo`
 
     Generates:
   Operation: app/operations/foo.rb

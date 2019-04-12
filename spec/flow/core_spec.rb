@@ -31,7 +31,7 @@ RSpec.describe Flow::Core, type: :module do
       let(:root_flow_modules) { [ Flow::Core ] }
 
       let(:example_state_class) do
-        Class.new(StateBase).tap do |state_class|
+        Class.new(Flow::StateBase).tap do |state_class|
           arguments.each_key { |argument| state_class.__send__(:argument, argument) }
         end
       end

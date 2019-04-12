@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-RSpec.describe State::Core, type: :module do
+RSpec.describe Flow::State::Core, type: :module do
   describe "#initialize" do
     include_context "with example class having callback", :initialize
 
     subject(:instance) { example_class.new(**arguments) }
 
     let(:arguments) { Hash[*Faker::Lorem.words(4)].symbolize_keys }
-    let(:example_class) { example_class_having_callback.include(State::Core) }
+    let(:example_class) { example_class_having_callback.include(Flow::State::Core) }
 
     context "when no writers are defined for the arguments" do
       it "raises" do

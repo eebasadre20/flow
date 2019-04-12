@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operation::Failures::OperationFailure, type: :subclass do
+RSpec.describe Flow::Operation::Failures::OperationFailure, type: :subclass do
   subject(:example_failure) { described_class.new(problem, **details) }
 
   let(:problem) { Faker::Internet.domain_word.downcase.to_sym }
