@@ -21,11 +21,7 @@ RSpec::Matchers.define :handle_error do |error_class, problem: error_class.name.
     expect(handlers).to be_present
 
     if with.present?
-      if with == :a_block
-        expect(handlers.find { |handler| handler[1].is_a?(Proc) }).to be_present if with.present?
-      else
-        expect(handlers.find { |handler| handler[1] == with }).to be_present if with.present?
-      end
+      expect(handlers.find { |handler| (with == :a_block) ? handler[1].is_a?(Proc) : handler[1] == with }).to be_present
     end
 
     expect(operation).to define_failure problem
