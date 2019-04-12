@@ -6,4 +6,5 @@ RSpec.describe PassBottlesAround, type: :operation do
   subject { described_class.new(double) }
 
   it { is_expected.to wrap_in_transaction(only: :behavior) }
+  it { is_expected.to define_failure :too_generous }
 end

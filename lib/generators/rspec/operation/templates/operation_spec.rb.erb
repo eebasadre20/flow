@@ -23,12 +23,4 @@ RSpec.describe <%= class_name %>, type: :operation do
 
     pending "describe `Operation#behavior` (or delete) #{__FILE__}"
   end
-
-  describe "#rewind" do
-    before { operation.execute! }
-
-    subject(:execute!) { operation.rewind }
-
-    pending "describe `Operation#undo` (or delete) #{__FILE__}"
-  end
 end
