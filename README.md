@@ -1095,6 +1095,7 @@ This will allow you to use the following custom matchers:
  * [define_attribute](lib/flow/custom_matchers/define_attribute.rb) tests usage of `ApplicationState.attribute`
  * [define_option](lib/flow/custom_matchers/define_option.rb) tests usage of `ApplicationState.option`
  * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
+ * [wrap_in_transaction](lib/flow/custom_matchers/wrap_in_transaction.rb) tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `ApplicationOperation`
 
 ### Testing Flows
 
