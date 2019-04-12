@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# RSpec matcher that tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `Operation`
+# RSpec matcher that tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `ApplicationOperation`
 #
 #     class ExampleFlow
 #       wrap_in_transaction
