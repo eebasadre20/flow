@@ -27,6 +27,7 @@
 #       it { is_expected.to wrap_in_transaction(except: :undo) }
 #     end
 
+# rubocop:disable Metrics/BlockLength
 RSpec::Matchers.define :wrap_in_transaction do |only: nil, except: nil|
   match do |instance|
     all_methods = instance.class.callbacks_for_transaction
@@ -69,3 +70,4 @@ RSpec::Matchers.define :wrap_in_transaction do |only: nil, except: nil|
     callbacks.join(", ")
   end
 end
+# rubocop:enable Metrics/BlockLength
