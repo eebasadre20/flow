@@ -15,7 +15,7 @@
 #     end
 
 RSpec::Matchers.define :define_failure do |problem|
-  match { |operation| expect(operation._failures).to include problem }
+  match { |operation| expect(operation._failures).to include problem.to_sym }
   description { "defines failure #{problem}" }
   failure_message { |operation| "expected #{operation.class.name} to define failure #{problem}" }
 end
