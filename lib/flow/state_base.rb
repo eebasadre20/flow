@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "state/callbacks"
+require_relative "state/defaults"
 require_relative "state/attributes"
 require_relative "state/arguments"
 require_relative "state/options"
@@ -14,6 +15,7 @@ module Flow
     include Technologic
     include ActiveModel::Model
     include Flow::State::Callbacks
+    include Flow::State::Defaults
     include Flow::State::Attributes
     include Flow::State::Arguments
     include Flow::State::Options
