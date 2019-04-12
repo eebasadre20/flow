@@ -72,7 +72,7 @@ RSpec.describe Flow::State::Options, type: :module do
   end
 
   describe ".after_initialize" do
-    subject(:instance) { example_class.new(**options) }
+    subject(:instance) { example_class.new(**key_values) }
 
     let(:example_class) do
       Class.new do
@@ -87,36 +87,6 @@ RSpec.describe Flow::State::Options, type: :module do
       end
     end
 
-    context "when all options are provided" do
-      let(:options) do
-        { test_option1: :test_value1, test_option2: :test_value2 }
-      end
-
-      it "uses provided data" do
-        options.each { |key, value| expect(instance.public_send(key)).to eq value }
-      end
-    end
-
-    context "when one option is omitted" do
-      let(:options) do
-        { test_option1: :test_value1 }
-      end
-
-      it "uses provided and default data" do
-        expect(instance.test_option1).to eq options[:test_option1]
-        expect(instance.test_option2).to eq :default_value2
-      end
-    end
-
-    context "when all options are omitted" do
-      let(:options) do
-        {}
-      end
-
-      it "uses default data" do
-        expect(instance.test_option1).to eq :default_value1
-        expect(instance.test_option2).to eq :default_value2
-      end
-    end
+    it_behaves_like "a class with attributes having default values"
   end
 end
