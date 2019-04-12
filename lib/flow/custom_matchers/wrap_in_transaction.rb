@@ -19,10 +19,14 @@
 #       it { is_expected.to wrap_in_transaction }
 #     end
 #
-#     RSpec.describe ExampleState, type: :state do
-#       subject { described_class.new(**input) }
+#     RSpec.describe Example, type: :operation do
+#       subject(:operation) { described_class.new(state) }
 #
-#       let(:input) { {} }
+#       let(:state) { example_state_class.new(**state_input) }
+#       let(:example_state_class) { Class.new(ApplicationState) }
+#       let(:state_input) do
+#         {}
+#       end
 #
 #       it { is_expected.to wrap_in_transaction(except: :undo) }
 #     end
