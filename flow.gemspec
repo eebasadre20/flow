@@ -33,5 +33,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
 
   spec.add_development_dependency "rspice", "~> 0.6.4"
+  spec.add_development_dependency "spicerack-styleguide", "~> 0.6.4"
   spec.add_development_dependency "shoulda-matchers", "4.0.0.rc1"
 end
