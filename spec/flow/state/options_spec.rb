@@ -1,32 +1,36 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Options, type: :module do
-  include_context "with an example state", Flow::State::Options
+  include_context "with an example state", [ Flow::State::Defaults, described_class ]
 
   describe ".option" do
     subject(:define_option) { example_state_class.__send__(:option, option) }
 
     let(:option) { Faker::Lorem.word.to_sym }
 
-    before { allow(example_state_class).to receive(:define_attribute).and_call_original }
+    before do
+      allow(example_state_class).to receive(:define_default).and_call_original
+      allow(example_state_class).to receive(:define_attribute).and_call_original
+    end
 
     describe "defines option" do
       let(:default) { Faker::Lorem.word }
-      let(:instance) { instance_double(Flow::State::Options::Option) }
-      let(:expected_options) { Hash[option, instance] }
 
       shared_examples_for "an option is defined" do
         it "adds to _options" do
-          expect { define_option }.to change { example_state_class._options }.from({}).to(expected_options)
+          expect { define_option }.to change { example_state_class._options }.from([]).to([ option ])
         end
       end
 
       context "when no block is given" do
         subject(:define_option) { example_state_class.__send__(:option, option, default: default) }
 
-        before { allow(Flow::State::Options::Option).to receive(:new).with(default: default).and_return(instance) }
-
         it_behaves_like "an option is defined"
+
+        it "defines an static default" do
+          define_option
+          expect(example_state_class).to have_received(:define_default).with(option, static: default)
+        end
       end
 
       context "when a block is given" do
@@ -36,11 +40,22 @@ RSpec.describe Flow::State::Options, type: :module do
           ->(_) { :block }
         end
 
-        before do
-          allow(Flow::State::Options::Option).to receive(:new).with(default: default, &block).and_return(instance)
+        shared_examples_for "values are handed off to define_default" do
+          it "calls define_default" do
+            define_option
+            expect(example_state_class).to have_received(:define_default).with(option, static: default, &block)
+          end
         end
 
-        it_behaves_like "an option is defined"
+        context "with a static default" do
+          it_behaves_like "values are handed off to define_default"
+        end
+
+        context "without a static default" do
+          let(:default) { nil }
+
+          it_behaves_like "values are handed off to define_default"
+        end
       end
     end
 
@@ -53,11 +68,6 @@ RSpec.describe Flow::State::Options, type: :module do
   describe ".inherited" do
     it_behaves_like "an inherited property", :option do
       let(:root_class) { example_state_class }
-      let(:expected_attribute_value) do
-        expected_property_value.each_with_object({}) do |option, hash|
-          hash[option] = instance_of(Flow::State::Options::Option)
-        end
-      end
     end
   end
 
@@ -67,6 +77,7 @@ RSpec.describe Flow::State::Options, type: :module do
     let(:example_class) do
       Class.new do
         include Flow::State::Callbacks
+        include Flow::State::Defaults
         include Flow::State::Attributes
         include Flow::State::Core
         include Flow::State::Options
