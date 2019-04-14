@@ -5,6 +5,7 @@ require_relative "state/defaults"
 require_relative "state/attributes"
 require_relative "state/arguments"
 require_relative "state/options"
+require_relative "state/output"
 require_relative "state/core"
 require_relative "state/string"
 
@@ -14,11 +15,13 @@ module Flow
     include ShortCircuIt
     include Technologic
     include ActiveModel::Model
+    include ActiveModel::Validations::Callbacks
     include Flow::State::Callbacks
     include Flow::State::Defaults
     include Flow::State::Attributes
     include Flow::State::Arguments
     include Flow::State::Options
+    include Flow::State::Output
     include Flow::State::Core
     include Flow::State::String
   end
