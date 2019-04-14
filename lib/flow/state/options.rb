@@ -8,6 +8,14 @@ module Flow
 
       included do
         class_attribute :_options, instance_writer: false, default: []
+
+        set_callback :initialize, :after do
+          _options.each do |option|
+            next unless _defaults.key?(option)
+
+            public_send("#{option}=".to_sym, _defaults[option].value) if public_send(option).nil?
+          end
+        end
       end
 
       class_methods do
