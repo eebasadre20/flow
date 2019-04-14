@@ -37,4 +37,25 @@ RSpec.describe Flow::State::Defaults::Value, type: :subclass do
       end
     end
   end
+
+  describe "#value" do
+    subject { instance.value }
+
+    context "without a block" do
+      let(:instance) { described_class.new(static: static) }
+      let(:duplicate) { double }
+      let(:static) { double(dup: duplicate) }
+
+      it { is_expected.to eq duplicate }
+    end
+
+    context "with a block" do
+      let(:instance) { described_class.new(&block) }
+      let(:block) do
+        proc { :duplicated_object_from_block }
+      end
+
+      it { is_expected.to eq :duplicated_object_from_block }
+    end
+  end
 end

@@ -51,24 +51,4 @@ RSpec.describe Flow::State::Defaults, type: :module do
       end
     end
   end
-
-  describe ".after_initialize" do
-    subject(:instance) { example_class.new }
-
-    let(:example_class) do
-      Class.new do
-        include Flow::State::Callbacks
-        include Flow::State::Defaults
-        include Flow::State::Core
-
-        attr_accessor :test_option1
-        attr_accessor :test_option2
-
-        define_default :test_option1, static: :default_value1
-        define_default(:test_option2) { :default_value2 }
-      end
-    end
-
-    it_behaves_like "a class with attributes having default values"
-  end
 end

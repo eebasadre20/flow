@@ -8,12 +8,6 @@ module Flow
 
       included do
         class_attribute :_defaults, instance_writer: false, default: {}
-
-        set_callback :initialize, :after do
-          _defaults.each do |attribute, info|
-            public_send("#{attribute}=".to_sym, info.value.dup) if public_send(attribute).nil?
-          end
-        end
       end
 
       class_methods do
@@ -31,14 +25,12 @@ module Flow
       end
 
       class Value
-        def initialize(static:, &block)
+        def initialize(static: nil, &block)
           @value = (static.nil? && block_given?) ? block : static
         end
 
         def value
-          return instance_eval(&@value) if @value.respond_to?(:call)
-
-          @value
+          (@value.respond_to?(:call) ? instance_eval(&@value) : @value).dup
         end
       end
     end
