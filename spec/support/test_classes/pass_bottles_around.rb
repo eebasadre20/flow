@@ -10,10 +10,10 @@ class PassBottlesAround < Flow::OperationBase
   handle_error NonTakedownError, with: :non_takedown_handler
 
   on_record_invalid_failure do
-    state.output.push "Passing the bottles wasn't as sound, now there's #{state.number_to_take_down} on the ground!"
+    state.stanza.push "Passing the bottles wasn't as sound, now there's #{state.number_to_take_down} on the ground!"
   end
 
-  set_callback(:execute, :after) { state.output.push "You pass #{state.taking_down_one? ? "it" : "them"} around." }
+  set_callback(:execute, :after) { state.stanza.push "You pass #{state.taking_down_one? ? "it" : "them"} around." }
 
   def behavior
     too_generous_failure! if state.number_to_take_down >= 4
@@ -29,6 +29,6 @@ class PassBottlesAround < Flow::OperationBase
   private
 
   def non_takedown_handler
-    state.output.push "You pass nothing around."
+    state.stanza.push "You pass nothing around."
   end
 end

@@ -110,7 +110,7 @@ RSpec.describe Flow::State::Output, type: :module do
 
         before { example_state.valid? }
 
-        it { is_expected.to eq expected_hash }
+        it { is_expected.to have_attributes(**expected_hash) }
       end
     end
   end

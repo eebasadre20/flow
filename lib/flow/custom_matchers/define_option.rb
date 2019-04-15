@@ -24,7 +24,7 @@ RSpec::Matchers.define :define_option do |option, default_value = nil|
     expect(state._defaults[option].value).to eq default_value unless default_value.nil?
   end
   description { "define option #{option}" }
-  failure_message { |state| "expected #{state.class.name} to define option #{option}, #{for_default(default_value)}" }
+  failure_message { |state| "expected #{state.class.name} to define option #{option} #{for_default(default_value)}" }
 
   def for_default(default_value)
     return "without a default value" if default_value.nil?

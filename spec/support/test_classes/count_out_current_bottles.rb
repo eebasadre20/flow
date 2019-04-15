@@ -2,6 +2,6 @@
 
 class CountOutCurrentBottles < Flow::OperationBase
   def behavior
-    state.output.push "#{state.bottles} on the wall#{", #{state.bottles}" if state.output.empty?}."
+    state.stanza.push "#{state.bottles} on the wall#{", #{state.bottles}" if state.stanza.empty?}."
   end
 end
