@@ -2,9 +2,11 @@
 
 RSpec.describe Flow::State::Output, type: :module do
   include_context "with an example state", [
-    ActiveModel,
+    ActiveModel::Model,
     ActiveModel::Validations::Callbacks,
+    Flow::State::Status,
     Flow::State::Defaults,
+    Flow::State::Attributes,
     described_class,
   ]
 
@@ -77,28 +79,65 @@ RSpec.describe Flow::State::Output, type: :module do
   end
 
   describe ".after_validation" do
-    subject(:valid?) { instance.valid? }
+    subject(:valid?) { example_state.valid? }
 
-    let(:instance) { example_class.new }
-
+    let(:example_state) { example_class.new }
     let(:example_class) do
-      Class.new do
-        include ActiveModel::Model
-        include ActiveModel::Validations::Callbacks
-        include Flow::State::Defaults
-        include Flow::State::Attributes
-        include Flow::State::Output
-
+      Class.new(example_state_class) do
         output :test_output0
         output :test_output1, default: :default_value1
         output(:test_output2) { :default_value2 }
       end
     end
 
-    it "sets default values" do
-      expect { valid? }.
-        to change { instance.try(:test_output1) }.from(nil).to(:default_value1).
-        and change { instance.try(:test_output2) }.from(nil).to(:default_value2)
+    before do
+      stub_const(Faker::Internet.unique.domain_word.capitalize, example_state_class)
+      stub_const(Faker::Internet.unique.domain_word.capitalize, example_class)
+    end
+
+    shared_examples_for "can't read or write output" do
+      it "raises on attempted write" do
+        expect { example_state.test_output0 = :test }.to raise_error Flow::State::Errors::NotValidated
+        expect { example_state.test_output1 = :test }.to raise_error Flow::State::Errors::NotValidated
+        expect { example_state.test_output2 = :test }.to raise_error Flow::State::Errors::NotValidated
+      end
+
+      it "raises on attempted read" do
+        expect { example_state.test_output0 }.to raise_error Flow::State::Errors::NotValidated
+        expect { example_state.test_output1 }.to raise_error Flow::State::Errors::NotValidated
+        expect { example_state.test_output2 }.to raise_error Flow::State::Errors::NotValidated
+      end
+    end
+
+    context "without running validations" do
+      it_behaves_like "can't read or write output"
+    end
+
+    context "with errors" do
+      before do
+        example_class.__send__(:define_attribute, :name)
+        example_class.validates :name, presence: true
+        valid?
+      end
+
+      it_behaves_like "can't read or write output"
+    end
+
+    context "without errors" do
+      it "sets default values" do
+        valid?
+
+        expect(example_state.test_output1).to eq :default_value1
+        expect(example_state.test_output2).to eq :default_value2
+      end
+
+      it "allows read/write of output" do
+        valid?
+
+        expect { example_state.test_output0 = :x }.to change { example_state.test_output0 }.from(nil).to(:x)
+        expect { example_state.test_output1 = :y }.to change { example_state.test_output1 }.from(:default_value1).to(:y)
+        expect { example_state.test_output2 = :z }.to change { example_state.test_output2 }.from(:default_value2).to(:z)
+      end
     end
   end
 end
