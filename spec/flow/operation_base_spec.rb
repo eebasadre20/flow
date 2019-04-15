@@ -6,6 +6,7 @@ RSpec.describe Flow::OperationBase, type: :operation do
   it { is_expected.to include_module ShortCircuIt }
   it { is_expected.to include_module Technologic }
   it { is_expected.to include_module Flow::TransactionWrapper }
+  it { is_expected.to include_module Flow::Operation::Accessors }
   it { is_expected.to include_module Flow::Operation::Callbacks }
   it { is_expected.to include_module Flow::Operation::Core }
   it { is_expected.to include_module Flow::Operation::Execute }
