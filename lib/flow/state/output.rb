@@ -10,8 +10,6 @@ module Flow
         class_attribute :_outputs, instance_writer: false, default: []
 
         after_validation do
-          self.class.define_outputs
-
           _outputs.each do |output|
             public_send("#{output}=".to_sym, _defaults[output].value) if _defaults.key?(output)
           end
@@ -24,15 +22,15 @@ module Flow
           super
         end
 
-        def define_outputs
-          _outputs.each { |output| define_attribute(output) unless method_defined?(output) }
-        end
-
         private
 
         def output(output, default: nil, &block)
           _outputs << output
+          define_attribute output
           define_default output, static: default, &block
+          around_method output do
+            raise Flow::State::Errors::NotValidated unless was_validated
+          end
         end
       end
     end

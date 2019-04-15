@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "state/errors/not_validated"
+
 require_relative "state/callbacks"
 require_relative "state/defaults"
 require_relative "state/attributes"

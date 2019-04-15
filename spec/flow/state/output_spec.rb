@@ -15,7 +15,7 @@ RSpec.describe Flow::State::Output, type: :module do
 
     before do
       allow(example_state_class).to receive(:define_default).and_call_original
-      # allow(example_state_class).to receive(:define_attribute).and_call_original
+      allow(example_state_class).to receive(:define_attribute).and_call_original
     end
 
     describe "defines output" do
@@ -63,33 +63,16 @@ RSpec.describe Flow::State::Output, type: :module do
         end
       end
     end
+
+    it "defines an attribute" do
+      define_output
+      expect(example_state_class).to have_received(:define_attribute).with(output)
+    end
   end
 
   describe ".inherited" do
     it_behaves_like "an inherited property", :output do
       let(:root_class) { example_state_class }
-    end
-  end
-
-  describe ".define_outputs" do
-    subject(:define_outputs) { example_state_class.define_outputs }
-
-    let(:instance) { example_state_class.new }
-
-    before do
-      example_state_class._outputs = %i[test_output0 test_output1 test_output2]
-      example_state_class.attr_accessor :test_output0
-      allow(example_state_class).to receive(:define_attribute).and_call_original
-    end
-
-    it "creates attributes" do
-      expect { define_outputs }.
-        to change { instance.respond_to?(:test_output1) }.from(false).to(true).
-        and change { instance.respond_to?(:test_output2) }.from(false).to(true)
-
-      expect(example_state_class).not_to have_received(:define_attribute).with(:test_output0)
-      expect(example_state_class).to have_received(:define_attribute).with(:test_output1)
-      expect(example_state_class).to have_received(:define_attribute).with(:test_output2)
     end
   end
 
