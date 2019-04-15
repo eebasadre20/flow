@@ -28,8 +28,8 @@ module Flow
 
         def option(option, default: nil, &block)
           _options << option
-          define_default option, static: default, &block
           define_attribute option
+          define_default option, static: default, &block
         end
       end
     end

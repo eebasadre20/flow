@@ -15,6 +15,7 @@ require_relative "support/shared_context/with_operation_callbacks"
 require_relative "support/shared_context/with_operations_for_a_flow"
 
 require_relative "support/shared_examples/a_class_with_attributes_having_default_values"
+require_relative "support/shared_examples/a_class_which_defines_into_a_class_collection"
 require_relative "support/shared_examples/a_transaction_wrapper"
 require_relative "support/shared_examples/method_is_wrapped_in_a_transaction"
 require_relative "support/shared_examples/methods_are_wrapped_in_a_transaction"

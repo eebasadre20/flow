@@ -1,16 +1,22 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::String, type: :module do
-  include_context "with an example state", Flow::State::String
-
-  let(:instance) { example_state_class.new }
+  include_context "with an example state", [
+    ActiveModel::Model,
+    ActiveModel::Validations::Callbacks,
+    Flow::State::Status,
+    Flow::State::Defaults,
+    Flow::State::Arguments,
+    Flow::State::Output,
+    described_class,
+  ]
 
   shared_examples_for "a stringable method" do |method|
-    subject { instance }
+    subject { example_state }
 
     before do
-      allow(instance).to receive(:string_for).and_call_original
-      instance.public_send(method)
+      allow(example_state).to receive(:string_for).and_call_original
+      example_state.public_send(method)
     end
 
     it { is_expected.to have_received(:string_for).with(method) }
@@ -25,7 +31,7 @@ RSpec.describe Flow::State::String, type: :module do
   end
 
   describe "#string_for" do
-    subject { instance.__send__(:string_for, method) }
+    subject { example_state.__send__(:string_for, method) }
 
     let(:method) { Faker::Lorem.word.to_sym }
     let(:class_name) { Faker::Internet.domain_word.capitalize }
@@ -33,14 +39,14 @@ RSpec.describe Flow::State::String, type: :module do
 
     before do
       stub_const(class_name, example_state_class)
-      allow(instance).to receive(:attribute_string).with(method).and_return(test_string)
+      allow(example_state).to receive(:attribute_string).with(method).and_return(test_string)
     end
 
     it { is_expected.to eq "#<#{class_name} #{test_string}>" }
   end
 
   describe "#attribute_string" do
-    subject { instance.__send__(:attribute_string, format) }
+    subject { example_state.__send__(:attribute_string, format) }
 
     let(:format) { Faker::Lorem.unique.word }
     let(:test_value1) { double }
@@ -52,7 +58,7 @@ RSpec.describe Flow::State::String, type: :module do
     end
 
     before do
-      allow(instance).to receive(:stringable_attribute_values).and_return(stringable_attribute_values)
+      allow(example_state).to receive(:stringable_attribute_values).and_return(stringable_attribute_values)
       allow(test_value1).to receive(format).and_return(fake_value1)
       allow(test_value2).to receive(format).and_return(fake_value2)
     end
@@ -60,37 +66,44 @@ RSpec.describe Flow::State::String, type: :module do
     it { is_expected.to eq "test_key1=#{fake_value1} test_key2=#{fake_value2}" }
   end
 
-  def attribute_string(method)
-    stringable_attribute_values.map { |attribute, value| "#{attribute}=#{value.public_send(method)}" }.join(" ")
-  end
-
   describe "#stringable_attribute_values" do
-    subject { instance.__send__(:stringable_attribute_values) }
+    subject { example_state.__send__(:stringable_attribute_values) }
 
-    let(:example_state_class) do
-      Class.new do
-        include Flow::State::Attributes
-        include Flow::State::String
+    let(:example_state) { example_class.new(**input) }
+    let(:input) do
+      { test_attribute1: :test_value1, test_attribute2: :test_value2 }
+    end
+    let(:example_class) do
+      Class.new(example_state_class) do
+        argument :test_attribute1
+        argument :test_attribute2
 
-        define_attribute :test_attribute1
-        define_attribute :test_attribute2
-
-        def initialize
-          self.test_attribute1 = :test_value1
-          self.test_attribute2 = :test_value2
-        end
+        output :test_output1
+        output :test_output2, default: :output2
       end
     end
 
-    let(:expected_value) do
+    let(:base_expected_value) do
       { test_attribute1: :test_value1, test_attribute2: :test_value2 }
     end
 
-    it { is_expected.to eq expected_value }
+    context "without running validations" do
+      let(:expected_value) { base_expected_value.merge(test_output1: nil, test_output2: nil) }
+
+      it { is_expected.to eq expected_value }
+    end
+
+    context "with run validations" do
+      let(:expected_value) { base_expected_value.merge(test_output1: nil, test_output2: :output2) }
+
+      before { example_state.valid? }
+
+      it { is_expected.to eq expected_value }
+    end
   end
 
   describe "#stringable_attributes" do
-    subject { instance.__send__(:stringable_attributes) }
+    subject { example_state.__send__(:stringable_attributes) }
 
     let(:attributes) { Faker::Lorem.words(rand(1..3)).map(&:to_sym) }
 
