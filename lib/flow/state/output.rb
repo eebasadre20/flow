@@ -9,6 +9,8 @@ module Flow
       included do
         class_attribute :_outputs, instance_writer: false, default: []
 
+        delegate :_outputs, to: :class
+
         after_validation do
           next unless validated?
 
@@ -41,6 +43,10 @@ module Flow
             super(*arguments)
           end
         end
+      end
+
+      def outputs
+        _outputs.each_with_object({}) { |output, hash| hash[output] = public_send(output) }
       end
     end
   end

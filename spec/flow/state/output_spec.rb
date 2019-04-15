@@ -20,9 +20,7 @@ RSpec.describe Flow::State::Output, type: :module do
     end
   end
 
-  describe ".after_validation" do
-    subject(:valid?) { example_state.valid? }
-
+  shared_context "with example state having output" do
     let(:example_state) { example_class.new }
     let(:example_class) do
       Class.new(example_state_class) do
@@ -36,6 +34,12 @@ RSpec.describe Flow::State::Output, type: :module do
       stub_const(Faker::Internet.unique.domain_word.capitalize, example_state_class)
       stub_const(Faker::Internet.unique.domain_word.capitalize, example_class)
     end
+  end
+
+  describe ".after_validation" do
+    include_context "with example state having output"
+
+    subject(:valid?) { example_state.valid? }
 
     shared_examples_for "can't read or write output" do
       it "raises on attempted write" do
@@ -55,7 +59,7 @@ RSpec.describe Flow::State::Output, type: :module do
       it_behaves_like "can't read or write output"
     end
 
-    context "with errors" do
+    context "with validation errors" do
       before do
         example_class.__send__(:define_attribute, :name)
         example_class.validates :name, presence: true
@@ -65,7 +69,7 @@ RSpec.describe Flow::State::Output, type: :module do
       it_behaves_like "can't read or write output"
     end
 
-    context "without errors" do
+    context "without validation errors" do
       it "sets default values" do
         valid?
 
@@ -79,6 +83,34 @@ RSpec.describe Flow::State::Output, type: :module do
         expect { example_state.test_output0 = :x }.to change { example_state.test_output0 }.from(nil).to(:x)
         expect { example_state.test_output1 = :y }.to change { example_state.test_output1 }.from(:default_value1).to(:y)
         expect { example_state.test_output2 = :z }.to change { example_state.test_output2 }.from(:default_value2).to(:z)
+      end
+    end
+  end
+
+  describe "#outputs" do
+    subject(:outputs) { example_state.outputs }
+
+    context "without any outputs" do
+      it { is_expected.to eq({}) }
+    end
+
+    context "with outputs" do
+      include_context "with example state having output"
+
+      context "without running validations" do
+        it "raises" do
+          expect { example_state.outputs }.to raise_error Flow::State::Errors::NotValidated
+        end
+      end
+
+      context "when valid" do
+        let(:expected_hash) do
+          { test_output0: nil, test_output1: :default_value1, test_output2: :default_value2 }
+        end
+
+        before { example_state.valid? }
+
+        it { is_expected.to eq expected_hash }
       end
     end
   end
