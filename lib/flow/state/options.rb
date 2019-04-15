@@ -7,39 +7,29 @@ module Flow
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_options, instance_writer: false, default: {}
+        class_attribute :_options, instance_writer: false, default: []
 
         set_callback :initialize, :after do
-          _options.each do |option, info|
-            __send__("#{option}=".to_sym, info.default_value.dup) if public_send(option).nil?
+          _options.each do |option|
+            next unless _defaults.key?(option)
+
+            public_send("#{option}=".to_sym, _defaults[option].value) if public_send(option).nil?
           end
         end
       end
 
       class_methods do
         def inherited(base)
-          dup = _options.dup
-          base._options = dup.each { |k, v| dup[k] = v.dup }
+          base._options = _options.dup
           super
         end
 
         private
 
         def option(option, default: nil, &block)
-          _options[option] = Option.new(default: default, &block)
+          _options << option
           define_attribute option
-        end
-      end
-
-      class Option
-        def initialize(default:, &block)
-          @default_value = (default.nil? && block_given?) ? block : default
-        end
-
-        def default_value
-          return instance_eval(&@default_value) if @default_value.respond_to?(:call)
-
-          @default_value
+          define_default option, static: default, &block
         end
       end
     end

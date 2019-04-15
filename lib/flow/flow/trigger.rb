@@ -16,7 +16,7 @@ module Flow
     end
 
     included do
-      delegate :valid?, to: :state, prefix: true
+      delegate :valid?, :validated?, to: :state, prefix: true
 
       set_callback :trigger, :around, ->(_, block) { surveil(:trigger) { block.call } }
     end

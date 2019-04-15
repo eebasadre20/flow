@@ -7,4 +7,5 @@ RSpec.describe TakeBottlesDown, type: :operation do
 
   it { is_expected.to wrap_in_transaction(except: :undo) }
   it { is_expected.to define_failure :too_greedy }
+  it { is_expected.to handle_error described_class::NonTakedownError, with: :a_block }
 end

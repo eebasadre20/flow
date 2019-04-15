@@ -7,15 +7,15 @@ class TakeBottlesDown < Flow::OperationBase
 
   failure :too_greedy
   handle_error NonTakedownError do
-    state.output.push "You took nothing down."
+    state.stanza.push "You took nothing down."
   end
 
   on_failure do
-    state.output.push "Something went wrong! It's the end of the song, and there's #{state.bottles} on the wall."
+    state.stanza.push "Something went wrong! It's the end of the song, and there's #{state.bottles} on the wall."
   end
 
   set_callback(:execute, :before) { bottle_count_term }
-  set_callback(:execute, :after) { state.output.push "You take #{bottle_count_term} down." }
+  set_callback(:execute, :after) { state.stanza.push "You take #{bottle_count_term} down." }
 
   def behavior
     too_greedy_failure! if state.number_to_take_down >= 5

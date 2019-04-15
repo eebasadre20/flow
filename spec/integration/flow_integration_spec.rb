@@ -15,19 +15,18 @@ RSpec.describe Flow, type: :integration do
   let(:bottles_of) { "beer" }
   let(:number_to_take_down) { nil }
   let(:starting_bottles) { nil }
-  let(:output) { nil }
   let(:input) do
     {
       bottles_of: bottles_of,
       starting_bottles: starting_bottles,
       number_to_take_down: number_to_take_down,
-      output: output,
     }.compact
   end
 
   shared_examples_for "a successful flow" do
     it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
     it { is_expected.to be_state_valid }
+    it { is_expected.to be_state_validated }
     it { is_expected.not_to be_pending }
     it { is_expected.to be_triggered }
     it { is_expected.to be_success }
@@ -35,7 +34,7 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.not_to be_reverted }
 
     it "produces expected stanza" do
-      expect(flow.state.stanza).to eq expected_stanza
+      expect(flow.outputs.stanza.join("\n")).to eq expected_stanza
     end
   end
 
@@ -43,6 +42,7 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.to be_an_instance_of BottlesOnTheWallFlow }
 
     it { is_expected.to be_state_valid }
+    it { is_expected.to be_state_validated }
     it { is_expected.not_to be_pending }
     it { is_expected.to be_triggered }
     it { is_expected.not_to be_success }
@@ -51,7 +51,7 @@ RSpec.describe Flow, type: :integration do
     it { is_expected.to be_failed_operation }
 
     it "produces expected stanza" do
-      expect(flow.state.stanza).to eq expected_stanza
+      expect(flow.state.stanza.join("\n")).to eq expected_stanza
     end
 
     describe "#failed_operation" do
@@ -102,7 +102,7 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<BottlesOnTheWallState bottles_of=beer starting_bottles= number_to_take_down=1 output=[
+          #<BottlesOnTheWallState bottles_of=beer starting_bottles= number_to_take_down=1 stanza=[
           "99 bottles of beer on the wall, 99 bottles of beer.",
            "You take one down.",
            "You pass it around.",
@@ -121,7 +121,7 @@ RSpec.describe Flow, type: :integration do
 
       let(:raw_string) do
         <<~STRING.chomp
-          #<BottlesOnTheWallState bottles_of="beer" starting_bottles=nil number_to_take_down=1 output=[
+          #<BottlesOnTheWallState bottles_of="beer" starting_bottles=nil number_to_take_down=1 stanza=[
           "99 bottles of beer on the wall, 99 bottles of beer.",
            "You take one down.",
            "You pass it around.",

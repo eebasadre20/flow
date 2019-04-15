@@ -4,6 +4,7 @@ RSpec.describe Flow::Core, type: :module do
   include_context "with example flow having state"
 
   it { is_expected.to delegate_method(:state_class).to(:class) }
+  it { is_expected.to delegate_method(:outputs).to(:state) }
 
   describe ".state_class" do
     subject { example_flow_class.state_class }
