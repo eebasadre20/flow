@@ -13,6 +13,7 @@ module Flow
 
     included do
       delegate :state_class, to: :class
+      delegate :outputs, to: :state
 
       attr_reader :state
     end

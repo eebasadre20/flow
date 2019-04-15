@@ -46,7 +46,9 @@ module Flow
       end
 
       def outputs
-        _outputs.each_with_object({}) { |output, hash| hash[output] = public_send(output) }
+        return {} if _outputs.empty?
+
+        Struct.new(*_outputs).new(*_outputs.map { |output| public_send(output) })
       end
     end
   end
