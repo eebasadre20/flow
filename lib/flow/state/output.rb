@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Output describe data which is created by operations during runtime and CANNOT be provided as part of the input.
+# Output data is created by Operations during runtime and CANNOT be validated or provided as part of the input.
 module Flow
   module State
     module Output
@@ -48,7 +48,11 @@ module Flow
       def outputs
         return {} if _outputs.empty?
 
-        Struct.new(*_outputs).new(*_outputs.map { |output| public_send(output) })
+        output_struct.new(*_outputs.map(&method(:public_send)))
+      end
+
+      def output_struct
+        Struct.new(*_outputs)
       end
     end
   end

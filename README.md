@@ -13,7 +13,7 @@
    * [Operations](#operations)
    * [States](#states)
       * [Input](#input)
-      * [Mutable Data](#mutable-data)
+      * [Output](#output)
       * [Derivative Data](#derivative-data)
       * [State Concerns](#state-concerns)
       * [Validations](#validations)
@@ -303,28 +303,57 @@ state.favorite_color # => "1a1f1e"
 state.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
 ```
 
-#### Mutable Data
-    
-States can define objects specifically to be populated by operations as they run.
+#### Output
 
-Mutable operation data is not technically distinct from other operation data.
-
-This section is really just a heads up that you can do things like this:
+Output data is created by Operations during runtime and CANNOT be validated or provided as part of the input. It can only be written once the state has been validated successfully, otherwise an error is raised.
 
 ```ruby
 class ExampleState < ApplicationState
-  option :string_buffer, default: []
+  argument :name
+  
+  validates :name, length: { minimum: 3 }
+  output :foo
+end
+
+state = ExampleState.new(name: "fe")
+state.foo # => raises Flow::State::Errors::NotValidated
+state.foo = :something # => raises Flow::State::Errors::NotValidated
+
+state.valid? # => false
+state.foo # => raises Flow::State::Errors::NotValidated
+state.foo = :something # => raises Flow::State::Errors::NotValidated
+
+state.name = "fefifofum"
+state.valid? # => true
+state.foo # => nil
+state.foo = :something # => :something
+state.outputs.foo # :something
+```
+
+Outputs can optionally define a default value. 
+
+If no default is specified, the value will be `nil`.
+
+If the default value is static, it can be specified in the class definition.
+
+If the default value is dynamic, you may provide a block to compute the default value.
+
+⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or it's other variables!
+
+```ruby
+class ExampleState < ApplicationState
+  output :story, default: []
 end
 
 class AskAQuestion < ApplicationOperation
   def behavior
-    state.string_buffer << "Bah Bah, Black Sheep. Have you any wool?"
+    state.story << "Bah Bah, Black Sheep. Have you any wool?"
   end
 end
 
 class GiveAnAnswer < ApplicationOperation
   def behavior
-    state.string_buffer << "Yes sir, yes sir! Three bags full!"
+    state.story << "Yes sir, yes sir! Three bags full!"
   end
 end
 
@@ -332,18 +361,19 @@ class ExampleFlow < ApplicationFlow
   operations AskAQuestion, GiveAnAnswer
 end
 
-result = ExampleFlow.trigger(string_buffer: ["A conversation, for your consideration:"])
-result.state.string_buffer.join("\n")
-# A conversation, for your consideration:
+result = ExampleFlow.trigger
+result.outputs.story.join("\n")
 # Bah Bah, Black Sheep. Have you any wool?
 # Yes sir, yes sir! Three bags full! 
 ```
 
-If you are planning to create some object during your operation at runtime, use `attribute`:
+If you are creating something in your operation it's usually best practice to destroy it on `#undo`.
+
+Alternatively, you can use [Transactions](#transactions) on either the Flow or Operation to do the same.
 
 ```ruby
 class ExampleState < ApplicationState
-  attribute :the_foo
+  output :the_foo
 end
 
 class CreateFoo < ApplicationOperation
@@ -358,49 +388,61 @@ class CreateFoo < ApplicationOperation
 end
 ```
 
-If your attribute should have a default value, you can use a hook to define that default:
+🙅‍ *Don't Make This Mistake*: Output is meant to capture data generated at runtime. Do not define data that COULD have been fetched in a standard state method into output:
 
 ```ruby
-class ExampleState < ApplicationState
-  attribute :the_foo
-  set_callback(:initialize, :after) { self.the_foo = [] }
+class BadState < ApplicationState
+  argument :foo
+  output :bar
 end
-```
 
-Under the hood `attribute` uses `attr_accessor` so you could override the default reader instead:
-
-```ruby
-class ExampleState < ApplicationState
-  attribute :the_foo
-  
-  def the_foo
-    @the_foo ||= []
+class BadOperation < ApplicationOperation
+  def behavior
+    state.foo = Bar.where(foo: foo)
   end
 end
 ```
 
-Use whatever method seems more readable to you or appropriate to your use case!
-
-💁‍ *Pro Tip*: You don't need to use `attribute` for mutable data, but you are highly encouraged to! If you do not use it, and opt instead of a simple `attr_accessor`, the value will not be output in the string.
+Instead, always define data retrieval within the state and use output for created / generated data:
 
 ```ruby
-class AccessorState < ApplicationState
-  attr_accessor :foo
+class GoodState < ApplicationState
+  argument :foo
+  
+  output :haz
+  
+  def bar
+    Bar.where(foo: foo)
+  end
+  memoize :bar
 end
 
-class AttributeState < ApplicationState
-  attribute :foo
+class GoodOperation < ApplicationOperation
+  def behavior
+    state.haz = Haz.create!(name: foo.name, count: bar.count)
+  end
+  
+  def undo
+    state.haz.destroy!
+    state.haz = nil
+  end
 end
+```
 
-accr_state = AccessorState.new
-accr_state.foo = "some value!"
-accr_state.to_s # => #<AccessorState >
-accr_state.foo # => "some value!"
+🚨 *Don't Make This Mistake Either*: You may feel you want to "combine" some of you input data so it shows up in the output hash. **Well don't!** Output narrowly refers to a specific type of runtime created data. It's **not** some kind "result" hash. (Technically, it's not even a hash at all, it's a [Struct](https://ruby-doc.org/core-2.6.2/Struct.html)!)
 
-attr_state = AttributeState.new
-attr_state.foo = "some value!"
-attr_state.to_s # => #<AttributeState foo="some value!">
-attr_state.foo # => "some value!"
+If you want to define an explicit results payload, do so explicitly:
+
+```ruby
+class GoodState < ApplicationState
+  argument :foo
+  option :bar, default: :nar
+  output :gaz
+  
+  def results
+    outputs.to_h.dup.merge(foo: foo, bar: bar)
+  end
+end
 ```
 
 #### Derivative Data
@@ -890,18 +932,31 @@ end
 
 ## Statuses
 
-Flows and Operations each have a set of predicate methods to describe their current status.
+Flows, Operations, and States all have a set of predicate methods to describe their current status.
 
-| Object    | Status       | Description               |
-| --------- | ------------ | ------------------------- |
-| Operation | `executed?`  | `#execute` was called.    |
-| Operation | `failed?`    | Execution failed.         |
-| Operation | `success?`   | Execution succeeded.      |
-| Flow      | `pending?`   | `#trigger` not called.    |
-| Flow      | `triggered?` | `#trigger` was called.    |
-| Flow      | `failed?`    | Some operation failed.    |
-| Flow      | `success?`   | All operations succeeded. |
-| Flow      | `reverted?`  | `#revert` was called.     |
+### Flows
+
+| Status       | Description               |
+| ------------ | ------------------------- |
+| `pending?`   | `#trigger` not called.    |
+| `triggered?` | `#trigger` was called.    |
+| `failed?`    | Some operation failed.    |
+| `success?`   | All operations succeeded. |
+| `reverted?`  | `#revert` was called.     |
+
+### Operations
+
+| Status       | Description               |
+| ------------ | ------------------------- |
+| `executed?`  | `#execute` was called.    |
+| `failed?`    | Execution failed.         |
+| `success?`   | Execution succeeded.      |
+
+### States
+
+| Status       | Description               |
+| ------------ | ------------------------- |
+| `validated?` | `#vaild?` returned true.  |
 
 ## Utilities
 
@@ -912,7 +967,7 @@ Flow offers a number of utilities which allow you to tap into and extend it's fu
 Flows, Operations, and States all make use of [ActiveSupport::Callbacks](https://api.rubyonrails.org/classes/ActiveSupport/Callbacks.html) to compose advanced functionality.
 
 ```ruby
-class TakeBottlesDown < OperationBase
+class TakeBottlesDown < ApplicationOperation
   set_callback(:execute, :before) { bottle_count_term }
   set_callback(:execute, :after) { state.output.push("You take #{bottle_count_term} down.") }
   
@@ -951,7 +1006,7 @@ Flow includes the very awesome [ShortCircuIt](https://github.com/Freshly/spicera
 To leverage it, just add `memoize :method_name` to your Flows, Operations, or States.
 
 ```ruby
-class TakeBottlesDown < OperationBase
+class TakeBottlesDown < ApplicationOperation
   def bottle_count_term
     return "it" if state.bottles.number_on_the_wall == 1
     return "one" if state.taking_down_one?
@@ -979,7 +1034,7 @@ The gems adds methods to Flows, Operations, and States which share names with lo
 | `fatal` | Highly actionable and critical issues. |
 
 ```ruby
-class ExampleOperation < OperationBase
+class ExampleOperation < ApplicationOperation
   def behavior
     warn(:nothing_to_do, { empty_object: obj }) and return if obj.empty? 
     
@@ -1095,6 +1150,7 @@ This will allow you to use the following custom matchers:
  * [define_attribute](lib/flow/custom_matchers/define_attribute.rb) tests usage of `ApplicationState.attribute`
  * [define_failure](lib/flow/custom_matchers/define_failure.rb) tests usage of `ApplicationOperation.failure`
  * [define_option](lib/flow/custom_matchers/define_option.rb) tests usage of `ApplicationState.option`
+ * [define_output](lib/flow/custom_matchers/define_output.rb) tests usage of `ApplicationState.output`
  * [handle_error](lib/flow/custom_matchers/handle_error.rb) tests usage of `ApplicationOperation.handle_error`
  * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
  * [wrap_in_transaction](lib/flow/custom_matchers/wrap_in_transaction.rb) tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `ApplicationOperation`
