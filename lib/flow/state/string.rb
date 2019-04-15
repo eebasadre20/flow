@@ -29,7 +29,13 @@ module Flow
       end
 
       def stringable_attribute_values
-        stringable_attributes.each_with_object({}) { |attribute, result| result[attribute] = public_send(attribute) }
+        stringable_attributes.each_with_object({}) { |attribute, result| result[attribute] = safe_send(attribute) }
+      end
+
+      def safe_send(method)
+        public_send(method)
+      rescue StandardError
+        nil
       end
     end
   end
