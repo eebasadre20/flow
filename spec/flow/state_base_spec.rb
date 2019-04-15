@@ -12,6 +12,7 @@ RSpec.describe Flow::StateBase, type: :state do
   it { is_expected.to include_module Flow::State::Attributes }
   it { is_expected.to include_module Flow::State::Arguments }
   it { is_expected.to include_module Flow::State::Options }
+  it { is_expected.to include_module Flow::State::Status }
   it { is_expected.to include_module Flow::State::Output }
   it { is_expected.to include_module Flow::State::Core }
   it { is_expected.to include_module Flow::State::String }
