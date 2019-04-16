@@ -24,6 +24,10 @@ RSpec.describe Flow::State::Core, type: :module do
         arguments.each { |argument, value| expect(instance.public_send(argument)).to eq value }
       end
 
+      it "stores the input" do
+        expect(instance.input).to eq arguments
+      end
+
       it_behaves_like "a class with callback" do
         subject(:callback_runner) { instance }
 
