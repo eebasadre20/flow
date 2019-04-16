@@ -20,7 +20,8 @@ module Flow
 
         private
 
-        def failure(problem)
+        # Takes if: or unless: as options
+        def failure(problem, **options)
           problem = problem.to_s.to_sym
           warn(:problem_already_defined) if _failures.include? problem
 
@@ -28,6 +29,9 @@ module Flow
           define_callbacks problem
           define_on_failure_for_problem(problem)
           define_fail_method_for_problem(problem)
+
+          conditional_options = options.slice(:if, :unless)
+          set_callback(:execute, :before, -> { fail!(problem) }, **conditional_options) if conditional_options.present?
         end
 
         def define_on_failure_for_problem(problem)
