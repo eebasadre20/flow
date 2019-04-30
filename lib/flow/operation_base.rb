@@ -8,7 +8,6 @@ require_relative "operation/core"
 require_relative "operation/error_handler"
 require_relative "operation/execute"
 require_relative "operation/failures"
-require_relative "operation/rewind"
 require_relative "operation/status"
 require_relative "operation/transactions"
 
@@ -23,7 +22,6 @@ module Flow
     include Flow::Operation::ErrorHandler
     include Flow::Operation::Execute
     include Flow::Operation::Failures
-    include Flow::Operation::Rewind
     include Flow::Operation::Status
     include Flow::Operation::Transactions
   end
