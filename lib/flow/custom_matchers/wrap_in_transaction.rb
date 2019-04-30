@@ -45,7 +45,7 @@ RSpec::Matchers.define :wrap_in_transaction do
     expect(instance).to have_received(callback_name)
   end
 
-  description do |instance|
+  description do
     "wrap in a transaction"
   end
 
