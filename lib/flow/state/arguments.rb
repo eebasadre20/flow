@@ -9,7 +9,7 @@ module Flow
       included do
         class_attribute :_arguments, instance_writer: false, default: []
         set_callback :initialize, :after do
-          missing = _arguments.select { |argument| public_send(argument).nil? }
+          missing = _arguments.reject { |argument| input.key?(argument) }
           raise ArgumentError, "Missing #{"argument".pluralize(missing.length)}: #{missing.join(", ")}" if missing.any?
         end
       end

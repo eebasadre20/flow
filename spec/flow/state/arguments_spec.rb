@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Arguments, type: :module do
-  include_context "with an example state", Flow::State::Arguments
+  include_context "with an example state", described_class
 
   describe ".argument" do
     subject(:define_argument) { example_state_class.__send__(:argument, argument) }
@@ -39,6 +39,16 @@ RSpec.describe Flow::State::Arguments, type: :module do
 
         argument :test_argument1
         argument :test_argument2
+      end
+    end
+
+    context "when nil arguments are provided" do
+      let(:arguments) do
+        { test_argument1: nil, test_argument2: nil }
+      end
+
+      it "does not raise" do
+        expect { init }.not_to raise_error
       end
     end
 
