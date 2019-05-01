@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PassBottlesAround < Flow::OperationBase
-  wrap_in_transaction only: :behavior
+  wrap_in_transaction
 
   class NonTakedownError < StandardError; end
 
@@ -23,10 +23,6 @@ class PassBottlesAround < Flow::OperationBase
     raise NonTakedownError if state.number_to_take_down == 0
 
     state.bottles.update!(number_passed_around: state.bottles.number_passed_around + state.number_to_take_down)
-  end
-
-  def undo
-    state.bottles.update!(number_passed_around: state.bottles.number_passed_around - state.number_to_take_down)
   end
 
   private
