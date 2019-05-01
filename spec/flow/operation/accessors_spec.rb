@@ -12,23 +12,23 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   end
 
   shared_examples_for "it has exactly one tracker variable of type" do |tracker_type|
+    subject { operation.public_send(tracker_name).count(state_attribute) }
+
     let(:tracker_name) { "_state_#{tracker_type}".pluralize }
 
-    it "sets a tracker variable" do
-      expect(subject.public_send(tracker_name).count(state_attribute)).to eq 1
-    end
+    it { is_expected.to eq 1 }
   end
 
-  shared_examples_for "it has no tracker variables of type" do |tracker_type, attribute|
+  shared_examples_for "it has no tracker variables of type" do |tracker_type|
+    subject { operation.public_send(tracker_name).count(state_attribute) }
+
     let(:tracker_name) { "_state_#{tracker_type}".pluralize }
 
-    it "doesn't set a tracker variable" do
-      expect(subject.public_send(tracker_name).count(state_attribute)).to eq 0
-    end
+    it { is_expected.to eq 0 }
   end
 
   describe ".state_reader" do
-    subject do
+    subject(:operation) do
       example_operation_class.__send__(:state_reader, state_attribute)
       example_operation_class.new(state)
     end
@@ -54,6 +54,11 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   end
 
   describe ".state_writer" do
+    subject(:operation) do
+      example_operation_class.__send__(:state_writer, state_attribute)
+      example_operation_class.new(state)
+    end
+
     before { example_operation_class.__send__(:state_writer, state_attribute) }
 
     it { is_expected.to delegate_method(state_attribute_writer).to(:state).with_arguments(state_attribute_value) }
@@ -77,6 +82,11 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   end
 
   describe ".state_accessor" do
+    subject(:operation) do
+      example_operation_class.__send__(:state_accessor, state_attribute)
+      example_operation_class.new(state)
+    end
+
     before { example_operation_class.__send__(:state_accessor, state_attribute) }
 
     it { is_expected.to delegate_method(state_attribute).to(:state) }
