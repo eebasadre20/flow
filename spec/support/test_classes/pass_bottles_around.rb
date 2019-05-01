@@ -9,7 +9,7 @@ class PassBottlesAround < Flow::OperationBase
 
   failure :too_generous
   failure :not_dangerous_enough, unless: :drink_not_boring?
-  handle_error ActiveRecord::RecordInvalid
+  handle_errors ActiveRecord::RecordInvalid
   handle_error NonTakedownError, with: :non_takedown_handler
 
   on_record_invalid_failure do
