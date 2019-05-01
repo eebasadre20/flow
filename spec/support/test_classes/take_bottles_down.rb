@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class TakeBottlesDown < Flow::OperationBase
-  wrap_in_transaction except: :undo
+  wrap_in_transaction
 
   class NonTakedownError < StandardError; end
 
   failure :too_greedy
+  failure :too_dangerous, if: -> { state.bottles_of == "tequila" }
   handle_error NonTakedownError do
     state.stanza.push "You took nothing down."
   end
@@ -22,10 +23,6 @@ class TakeBottlesDown < Flow::OperationBase
     raise NonTakedownError if state.number_to_take_down == 0
 
     state.bottles.update!(number_on_the_wall: state.bottles.number_on_the_wall - state.number_to_take_down)
-  end
-
-  def undo
-    state.bottles.reload.update!(number_on_the_wall: state.bottles.number_on_the_wall + state.number_to_take_down)
   end
 
   private

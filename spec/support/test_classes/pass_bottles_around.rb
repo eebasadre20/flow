@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 class PassBottlesAround < Flow::OperationBase
-  wrap_in_transaction only: :behavior
+  wrap_in_transaction
 
   class NonTakedownError < StandardError; end
 
+  BORING_DRINKS = %w[juice water soda pop]
+
   failure :too_generous
+  failure :not_dangerous_enough, unless: :drink_not_boring?
   handle_error ActiveRecord::RecordInvalid
   handle_error NonTakedownError, with: :non_takedown_handler
 
@@ -22,11 +25,11 @@ class PassBottlesAround < Flow::OperationBase
     state.bottles.update!(number_passed_around: state.bottles.number_passed_around + state.number_to_take_down)
   end
 
-  def undo
-    state.bottles.update!(number_passed_around: state.bottles.number_passed_around - state.number_to_take_down)
-  end
-
   private
+
+  def drink_not_boring?
+    BORING_DRINKS.exclude? state.bottles_of
+  end
 
   def non_takedown_handler
     state.stanza.push "You pass nothing around."
