@@ -11,20 +11,20 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
     state.attr_accessor(state_attribute)
   end
 
-  shared_examples_for "it has exactly one tracker variable of type" do |tracker_type|
+  shared_examples_for "it has exactly ? of type" do |count, tracker_type|
     subject { operation.public_send(tracker_name).count(state_attribute) }
 
     let(:tracker_name) { "_state_#{tracker_type}".pluralize }
 
-    it { is_expected.to eq 1 }
+    it { is_expected.to eq count }
+  end
+
+  shared_examples_for "it has exactly one tracker variable of type" do |tracker_type|
+    it_behaves_like "it has exactly ? of type", 1, tracker_type
   end
 
   shared_examples_for "it has no tracker variables of type" do |tracker_type|
-    subject { operation.public_send(tracker_name).count(state_attribute) }
-
-    let(:tracker_name) { "_state_#{tracker_type}".pluralize }
-
-    it { is_expected.to eq 0 }
+    it_behaves_like "it has exactly ? of type", 0, tracker_type
   end
 
   describe ".state_reader" do
