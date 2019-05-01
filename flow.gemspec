@@ -29,10 +29,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 0.58"
   spec.add_development_dependency "rubocop-rspec", "~> 1.27"
   spec.add_development_dependency "faker", "~> 1.8"
-  spec.add_development_dependency "pry", ">= 0.11.3"
+  spec.add_development_dependency "pry-byebug", ">= 3.7.0"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
 
   spec.add_development_dependency "rspice", "~> 0.7.1"
   spec.add_development_dependency "spicerack-styleguide", "~> 0.7.1"
-  spec.add_development_dependency "shoulda-matchers", "4.0.0.rc1"
+  spec.add_development_dependency "shoulda-matchers", "4.0.1"
 end

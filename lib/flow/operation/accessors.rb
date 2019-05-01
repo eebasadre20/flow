@@ -17,7 +17,7 @@ module Flow
         def state_reader(name)
           return unless _add_state_reader_tracker(name.to_sym)
 
-          delegate name.to_sym, to: :state
+          delegate name, to: :state
         end
 
         def state_writer(name)
