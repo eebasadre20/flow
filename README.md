@@ -1051,7 +1051,7 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
     Class.new(ApplicationState) do
       # argument :foo
       # option :bar
-      # argument :baz 
+      # attribute :baz 
       # output :gaz 
     end
   end
@@ -1078,8 +1078,8 @@ let(:example_state_class) do
   Class.new(ApplicationState) do
     # argument :foo
     # option :bar
-    # argument :baz 
-    # output :gaz 
+    # attribute :baz
+    # output :gaz
   end
 end
 ```
