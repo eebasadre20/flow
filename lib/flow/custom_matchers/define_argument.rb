@@ -17,7 +17,7 @@
 #     end
 
 RSpec::Matchers.define :define_argument do |argument, allow_nil: true|
-  match { |state| expect(state._arguments[argument]).to eq({ allow_nil: allow_nil }) }
+  match { |state| expect(state._arguments[argument]).to eq(allow_nil: allow_nil) }
   description { "define argument #{argument}" }
   failure_message { |state| "expected #{state.class.name} to define argument #{argument}" }
 end
