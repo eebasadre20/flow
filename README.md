@@ -387,7 +387,7 @@ Instead, always define data retrieval within the state and use output for create
 class GoodState < ApplicationState
   argument :foo
   
-  output :haz
+  output :gaz
   
   def bar
     Bar.where(foo: foo)
@@ -397,9 +397,8 @@ end
 
 class GoodOperation < ApplicationOperation
   def behavior
-    state.haz = Haz.create!(name: foo.name, count: bar.count)
+    state.gaz = Gaz.create!(name: foo.name, count: bar.count)
   end
- 
 end
 ```
 
@@ -1047,11 +1046,13 @@ require "rails_helper"
 RSpec.describe MakeTheThingDoTheStuff, type: :operation do
   subject(:operation) { described_class.new(state) }
 
-  let(:state) { example_state_class.new(**state_input) }
+  let(:state) { example_state_class.new(**state_input).tap(&:validate) }
   let(:example_state_class) do
     Class.new(ApplicationState) do
       # argument :foo
       # option :bar
+      # argument :baz 
+      # output :gaz 
     end
   end
   let(:state_input) do
@@ -1060,8 +1061,8 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
 
   it { is_expected.to inherit_from ApplicationOperation }
 
-  describe "#execute!" do
-    subject(:execute!) { operation.execute! }
+  describe "#execute" do
+    subject(:execute) { operation.execute }
   
     pending "describe `Operation#behavior` (or delete) #{__FILE__}"
   end
@@ -1077,6 +1078,8 @@ let(:example_state_class) do
   Class.new(ApplicationState) do
     # argument :foo
     # option :bar
+    # argument :baz 
+    # output :gaz 
   end
 end
 ```
@@ -1099,6 +1102,7 @@ let(:example_state_class) do
     argument :foo
     option :bar
     attribute :baz
+    output :gaz
   end
   
   let(:state_input) do
