@@ -1060,8 +1060,8 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
 
   it { is_expected.to inherit_from ApplicationOperation }
 
-  describe "#execute!" do
-    subject(:execute!) { operation.execute! }
+  describe "#execute" do
+    subject(:execute) { operation.execute }
   
     pending "describe `Operation#behavior` (or delete) #{__FILE__}"
   end
@@ -1108,7 +1108,31 @@ let(:example_state_class) do
   let(:foo) { ... }
   let(:bar) { ... }
 end
-``` 
+```
+
+You are encouraged to use `execute`, rather than `execute!` in testing. You can trust that if an `operation_failure` is present, the operation _would_ have raised an `Operation::Failures::OperationFailure` if you used `execute!`.
+
+Doing so will allow you to make assertions on the failure without having to expect errors:
+```ruby
+class SomeOperation < ApplicationOperation
+  failure :somethings_invalid
+
+  def behavior
+    somethings_invalid_failure! baz: "relevant data" if state.foo == "something invalid"
+  end
+end
+```
+
+```ruby
+let(:state_input) { foo: "something invalid" }
+
+before { operation.execute }
+
+it "fails with the expected data" do
+  expect(operation.operation_failure.problem).to eq :somethings_invalid
+  expect(operation.operation_failure.details.baz).to eq "relevant data"
+end
+```
 
 ### Testing States
 
