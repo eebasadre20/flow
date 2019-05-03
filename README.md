@@ -272,6 +272,23 @@ ExampleFlow.trigger(foo: :foo) # => ArgumentError (Missing argument: bar)
 ExampleFlow.trigger(foo: :foo, bar: :bar) # => #<ExampleFlow:0x00007ff7b7d92ae0 ...>
 ```
 
+By default, nil is a valid argument:
+
+```ruby
+ExampleFlow.trigger(foo: nil, bar: nil) # => #<ExampleFlow:0x10007ff7b7d92ae0 ...>
+```
+
+If you want to require a non-nil value for your argument, set the `allow_nil` option (`true` by default):
+
+```ruby
+class ExampleState < ApplicationState
+  argument :foo
+  argument :bar, allow_nil: false
+end
+
+ExampleFlow.trigger(foo: nil, bar: nil) # => ArgumentError (Missing argument: bar)
+```
+
 **Options** describe input which may be provided to define or override the initial state.
 
 Options can optionally define a default value. 
@@ -1157,12 +1174,13 @@ RSpec.describe FooState, type: :state do
   end
 
   it { is_expected.to inherit_from ApplicationState }
-  # it { is_expected.to define_argument :foo }
-  # it { is_expected.to define_option(:foo) }
-  # it { is_expected.to define_option(:foo).with_default_value(:bar) }
-  # it { is_expected.to define_option(:foo).with_default_value_block }
+  # it { is_expected.to define_argument :required_input }
+  # it { is_expected.to define_argument :necessary_input, allow_nil: false }
+  # it { is_expected.to define_option(:optional_input) }
+  # it { is_expected.to define_option(:option_with_default).with_default_value(:default_static_value) }
+  # it { is_expected.to define_option(:option_with_default_from_block).with_default_value(default_block_value) }
   # it { is_expected.to validate_presence_of ... }
-  # it { is_expected.to define_attribute :foo }
+  # it { is_expected.to define_output :foo }
 end
 ```
 
