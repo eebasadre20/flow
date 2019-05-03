@@ -5,6 +5,7 @@
 # class ExampleOperation
 #   def behavior
 #     state.foo = "some data"
+#     state.bar = "some other data"
 #   end
 # end
 # 
@@ -15,8 +16,9 @@
 # RSpec.describe ExampleOperation, type: :operation do
 #   subject { operation.execute }
 # 
-#   it { is_expected.to have_on_state(foo: "some data") }
-#   it { is_expected.to have_on_state(foo: instance_of(String)) }
+#   it { is_expected.to have_on_state foo: "some data" }
+#   it { is_expected.to have_on_state foo: instance_of(String) }
+#   it { is_expected.to have_on_state foo: "some data", bar: "some other data" }
 # end
 # 
 # RSpec.describe ExampleFlow, type: :operation do
@@ -24,6 +26,7 @@
 # 
 #   it { is_expected.to have_on_state(foo: "some data") }
 #   it { is_expected.to have_on_state(foo: instance_of(String)) }
+#   it { is_expected.to have_on_state foo: "some data", bar: "some other data" }
 # end
 
 module CustomMatchers
