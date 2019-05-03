@@ -24,7 +24,7 @@ RSpec::Matchers.define :define_output do |output, default: nil|
     expect(state._outputs).to include output
   end
   description { "define output" }
-  failure_message { |state| "expected #{described_class} to define output #{output} #{for_default(default)}" }
+  failure_message { "expected #{described_class} to define output #{output} #{for_default(default)}" }
 
   def for_default(default)
     return "without a default value" if default.nil?
