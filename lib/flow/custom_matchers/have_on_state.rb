@@ -24,8 +24,8 @@
 # RSpec.describe ExampleFlow, type: :operation do
 #   subject { flow.trigger }
 # 
-#   it { is_expected.to have_on_state(foo: "some data") }
-#   it { is_expected.to have_on_state(foo: instance_of(String)) }
+#   it { is_expected.to have_on_state foo: "some data" }
+#   it { is_expected.to have_on_state foo: instance_of(String) }
 #   it { is_expected.to have_on_state foo: "some data", bar: "some other data" }
 # end
 
