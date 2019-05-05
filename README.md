@@ -1167,20 +1167,17 @@ States are generated with the following RSPec template:
 require "rails_helper"
 
 RSpec.describe FooState, type: :state do
-  subject(:state) { described_class.new(**input) }
-
-  let(:input) do
-    {}
-  end
+  subject(:state) { described_class }
 
   it { is_expected.to inherit_from ApplicationState }
   # it { is_expected.to define_argument :required_input }
   # it { is_expected.to define_argument :necessary_input, allow_nil: false }
   # it { is_expected.to define_option(:optional_input) }
-  # it { is_expected.to define_option(:option_with_default).with_default_value(:default_static_value) }
-  # it { is_expected.to define_option(:option_with_default_from_block).with_default_value(default_block_value) }
+  # it { is_expected.to define_option(:option_with_default, default: :default_static_value) }
+  # it { is_expected.to define_option(:option_with_default_from_block, default: default_block_value) }
   # it { is_expected.to validate_presence_of ... }
   # it { is_expected.to define_output :foo }
+  # it { is_expected.to define_output :foo, default: :bar }
 end
 ```
 
