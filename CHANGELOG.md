@@ -1,12 +1,12 @@
 # Unreleased
 
 - Namespace all constants under `Flow`
-- Add new state attribute DSL (#58)
+- Add new state attribute DSL [#58](https://github.com/Freshly/flow/pull/58)
 - Add a bunch of new custom matchers 
-- `handle_errors` method for operations (#85)
-- Allow nil values for passed-in arguments (#68)
-- State accessors (#63)
-- Remove rewind functionality (#83)
+- `handle_errors` method for operations [#85](https://github.com/Freshly/flow/pull/85)
+- Allow nil values for passed-in arguments [#68](https://github.com/Freshly/flow/pull/68)
+- State accessors [#63](https://github.com/Freshly/flow/pull/63)
+- Remove rewind functionality [#83](https://github.com/Freshly/flow/pull/83)
 - Adopt `spicerack-styleguide` in favor of hand-rolled rubocop
 
 # 0.9.3
