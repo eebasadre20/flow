@@ -57,6 +57,8 @@ module Flow
           base._state_readers = _state_readers.dup
           base._state_writers = _state_writers.dup
           base._state_accessors = _state_accessors.dup
+
+          super
         end
       end
     end
