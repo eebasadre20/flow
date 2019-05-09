@@ -31,7 +31,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   shared_examples_for "it inherits correctly" do |method, accessor_types|
     subject(:operation) { operation_class.new(state) }
 
-    accessor_types.each do |accessor_type|
+    Array.wrap(accessor_types).each do |accessor_type|
       context "when a #{method} is defined in a child class" do
         let(:child_class) { Class.new(operation_class) }
 
@@ -41,7 +41,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
       end
     end
 
-    accessor_types.each do |accessor_type|
+    Array.wrap(accessor_types).each do |accessor_type|
       context "when a #{method} is defined in a sibling class" do
         let(:operation_class) { Class.new(example_operation_class) }
         let(:sibling_class) { Class.new(example_operation_class) }
@@ -52,7 +52,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
       end
     end
 
-    accessor_types.each do |accessor_type|
+    Array.wrap(accessor_types).each do |accessor_type|
       context "when a #{method} is defined in a parent class" do
         let(:operation_class) { Class.new(example_operation_class) }
 
@@ -69,7 +69,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
       operation_class.new(state)
     end
 
-    it_behaves_like "it inherits correctly", :state_reader, %i[reader]
+    it_behaves_like "it inherits correctly", :state_reader, :reader
 
     it { is_expected.to delegate_method(state_attribute).to(:state) }
 
@@ -97,7 +97,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
       operation_class.new(state)
     end
 
-    it_behaves_like "it inherits correctly", :state_writer, %i[writer]
+    it_behaves_like "it inherits correctly", :state_writer, :writer
 
     it { is_expected.to delegate_method(state_attribute_writer).to(:state).with_arguments(state_attribute_value) }
 
