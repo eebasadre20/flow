@@ -14,8 +14,8 @@ module Flow
         after_validation do
           next unless validated?
 
-          _outputs.each do |output|
-            public_send("#{output}=".to_sym, _defaults[output].value) if _defaults.key?(output)
+          _outputs.each do |key|
+            public_send("#{key}=".to_sym, _defaults[key].value) if _defaults.key?(key) && public_send(key).nil?
           end
         end
       end
