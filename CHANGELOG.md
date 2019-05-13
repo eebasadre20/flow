@@ -1,4 +1,8 @@
-# Unreleased
+# Changelog
+
+## 0.10.0
+
+*Release Date*: 2019/5/12
 
 - Namespace all constants under `Flow`
 - Add new state attribute DSL [#58](https://github.com/Freshly/flow/pull/58)
@@ -7,29 +11,32 @@
 - Allow nil values for passed-in arguments [#68](https://github.com/Freshly/flow/pull/68)
 - State accessors [#63](https://github.com/Freshly/flow/pull/63)
 - Remove rewind functionality [#83](https://github.com/Freshly/flow/pull/83)
+- Proactive failure guard clauses [#67](https://github.com/Freshly/flow/pull/67)
 - Adopt `spicerack-styleguide` in favor of hand-rolled rubocop
+- Fix double run bug [#98](https://github.com/Freshly/flow/pull/98)
+- Externalize the base of state gem [#100](https://github.com/Freshly/flow/pull/100)
 
-# 0.9.3
+## 0.9.3
 
 *Release Date*: 2019/4/10
 
 - Add define_context matcher
 - Update docs
 
-# 0.9.2
+## 0.9.2
 
 *Release Date*: 2019/4/3
 
 - Bump spicerack version
 
-# 0.3.0
+## 0.3.0
 
 *Release Date*: 2018/12/10
 
 - Added Spicerack gem
 - Added logging around flows and operations
 
-# 0.2.0
+## 0.2.0
 
 *Release Date*: 2018/12/2
 
@@ -37,7 +44,7 @@
 - StateBase
 - OperationBase
 
-# 0.1.0
+## 0.1.0
 
 *Release Date*: 2018/11/29
 
