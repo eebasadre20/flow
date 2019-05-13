@@ -1,14 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Output, type: :module do
-  include_context "with an example state", [
-    ActiveModel::Model,
-    ActiveModel::Validations::Callbacks,
-    Flow::State::Status,
-    Flow::State::Defaults,
-    Flow::State::Attributes,
-    described_class,
-  ]
+  include_context "with an example state", [ Flow::State::Status, described_class ]
 
   describe ".output" do
     it_behaves_like "a class which defines into a class collection", :output, :_outputs
