@@ -85,6 +85,17 @@ RSpec.describe Flow::State::Output, type: :module do
         expect { example_state.test_output2 = :z }.to change { example_state.test_output2 }.from(:default_value2).to(:z)
       end
     end
+
+    context "when run twice after output set" do
+      it "allows read/write of output" do
+        valid?
+
+        expect { example_state.test_output1 = :y }.to change { example_state.test_output1 }.from(:default_value1).to(:y)
+
+        # can't use subject cause it's memoized
+        expect { example_state.valid? }.not_to change { example_state.test_output1 }
+      end
+    end
   end
 
   describe "#outputs" do
