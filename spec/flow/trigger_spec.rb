@@ -8,12 +8,14 @@ RSpec.describe Flow::Trigger, type: :module do
   describe ".trigger!" do
     it_behaves_like "a class pass method", :trigger! do
       let(:test_class) { example_flow_class }
+      let(:call_class) { example_flow_class }
     end
   end
 
   describe ".trigger" do
     it_behaves_like "a class pass method", :trigger do
       let(:test_class) { example_flow_class }
+      let(:call_class) { example_flow_class }
     end
   end
 
