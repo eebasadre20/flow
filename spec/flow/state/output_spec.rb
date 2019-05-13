@@ -1,17 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Output, type: :module do
-  include_context "with an example state", [
-    ActiveModel::Model,
-    ActiveModel::Validations::Callbacks,
-    Flow::State::Status,
-    Flow::State::Defaults,
-    Flow::State::Attributes,
-    described_class,
-  ]
+  include_context "with an example state", [ Flow::State::Status, described_class ]
 
   describe ".output" do
-    it_behaves_like "a class which defines into a class collection", :output, :_outputs
+    it_behaves_like "an instructor with a class collection attribute", :output, :_outputs do
+      let(:example_instructor_class) { example_state_class }
+    end
   end
 
   describe ".inherited" do
@@ -83,6 +78,17 @@ RSpec.describe Flow::State::Output, type: :module do
         expect { example_state.test_output0 = :x }.to change { example_state.test_output0 }.from(nil).to(:x)
         expect { example_state.test_output1 = :y }.to change { example_state.test_output1 }.from(:default_value1).to(:y)
         expect { example_state.test_output2 = :z }.to change { example_state.test_output2 }.from(:default_value2).to(:z)
+      end
+    end
+
+    context "when run twice after output set" do
+      it "allows read/write of output" do
+        valid?
+
+        expect { example_state.test_output1 = :y }.to change { example_state.test_output1 }.from(:default_value1).to(:y)
+
+        # can't use subject cause it's memoized
+        expect { example_state.valid? }.not_to change { example_state.test_output1 }
       end
     end
   end
