@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Status, type: :module do
-  include_context "with an example state", [
-    ActiveModel::Model,
-    ActiveModel::Validations::Callbacks,
-    Flow::State::Attributes,
-    described_class,
-  ]
+  include_context "with an example state", described_class
 
   describe "#validated?" do
     subject { example_state.validated? }
