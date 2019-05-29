@@ -4,9 +4,7 @@ require "active_model"
 require "active_record"
 require "active_support"
 
-require "instructor"
-require "short_circu_it"
-require "technologic"
+require "spicerack"
 
 require "flow/version"
 
