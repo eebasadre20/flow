@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "instructor/spec_helper"
+require "spicerack/spec_helper"
 
 require_relative "custom_matchers"
 require_relative "shoulda_matcher_helper"
