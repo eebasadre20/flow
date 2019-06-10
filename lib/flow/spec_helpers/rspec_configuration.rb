@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 RSpec.configure do |config|
-  config.include CustomMatchers
+  config.include Flow::CustomMatchers
 end
