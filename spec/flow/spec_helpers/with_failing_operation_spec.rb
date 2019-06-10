@@ -2,12 +2,12 @@
 
 require_relative "../../support/test_classes/bottles_on_the_wall_flow"
 
-RSpec.describe "with stubbed operation failure" do
+RSpec.describe "with failing operation" do
   subject(:flow) { failing_flow_class.new(bottles_of: :test_fluid) }
 
   let(:failing_flow_class) { BottlesOnTheWallFlow }
 
-  include_context "with stubbed operation failure"
+  include_context "with failing operation"
 
   before { flow.trigger }
 

@@ -7,7 +7,7 @@
 #
 # Defines the following variable:
 # * failure_problem
-RSpec.shared_context "with stubbed operation failure" do
+RSpec.shared_context "with failing operation" do
   let(:failure_problem) { Faker::Lorem.words.join("-").parameterize.underscore }
   let(:failing_operation) do
     Class.new(Flow::OperationBase).tap do |klass|
@@ -22,12 +22,7 @@ RSpec.shared_context "with stubbed operation failure" do
   end
 
   before do
+    allow(failing_flow_class).to receive(:_operations).and_return([ failing_operation ])
     stub_const("FailingOperation", failing_operation)
-
-    failing_flow_class._operations.unshift failing_operation
-  end
-
-  after do
-    failing_flow_class._operations.shift
   end
 end
