@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Stubs a given flow to always fail when triggered.
-# Requires the following let variables to be defined in the incnlusion context:
+# Requires the following let variables to be defined in the inclusion context:
 # * failing_flow_class
 # * failure_problem
 RSpec.shared_context "with stubbed operation failure" do
