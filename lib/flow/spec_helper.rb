@@ -2,6 +2,6 @@
 
 require "spicerack/spec_helper"
 
-require_relative "spec_helpers/custom_matchers"
-require_relative "spec_helpers/shoulda_matcher_helper"
-require_relative "spec_helpers/rspec_configuration"
+require_relative "spec_helper/custom_matchers"
+require_relative "spec_helper/shoulda_matcher_helper"
+require_relative "spec_helper/rspec_configuration"
