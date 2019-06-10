@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 # Stubs a given flow to always fail when triggered.
-# Requires the following let variables to be defined in the inclusion context:
-# * failing_flow_class
-# * failure_problem
+# Expects the following let variables to be defined in the inclusion context:
+# * failing_flow_class - required
+# * failure_problem - optional
 RSpec.shared_context "with stubbed operation failure" do
+  let(:failure_problem) { Faker::Lorem.words.join("-").parameterize.underscore }
   let(:failing_operation) do
     Class.new(Flow::OperationBase).tap do |klass|
       klass.instance_exec(self) do |spec_context|
