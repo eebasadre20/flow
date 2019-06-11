@@ -2,6 +2,21 @@
 
 # Stubs a given flow to always fail when triggered.
 #
+# Usage:
+#   describe SomeFlow do
+#     let(:flow) { described_class.new }
+#     let(:failing_flow_class) { described_class }
+#
+#     include_context "with failing operation"
+#
+#     before { flow.trigger }
+#
+#     it "is failed" do
+#       expect(flow).to be_failed
+#       expect(flow.failed_operation.operation_failure.problem).to eq failing_problem
+#     end
+#   end
+#
 # Requires let variables to be defined in the inclusion context:
 # * failing_flow_class
 #

@@ -1,5 +1,8 @@
 # Changelog
 
+## Upcoming
+- `with_failing_operation` shared context
+
 ## 0.10.0
 
 *Release Date*: 2019/5/12
