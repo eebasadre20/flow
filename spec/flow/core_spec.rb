@@ -49,6 +49,20 @@ RSpec.describe Flow::Core, type: :module do
 
         let(:example) { example_flow_class }
       end
+
+      context "when the argument is a state class instance" do
+        subject(:instance) { example_flow_class.new(example_state_class) }
+
+        it "assigns the argument as the state" do
+          expect(instance.state).to eq(example_state_class)
+        end
+
+        it_behaves_like "a class with callback" do
+          subject(:callback_runner) { instance }
+
+          let(:example) { example_flow_class }
+        end
+      end
     end
   end
 end
