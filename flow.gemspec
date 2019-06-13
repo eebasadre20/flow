@@ -7,7 +7,7 @@ require "flow/version"
 Gem::Specification.new do |spec|
   spec.name          = "flow"
   spec.version       = Flow::VERSION
-  spec.authors       = ["Eric Garside", "Allen Rettberg", "Jordan Minneti", "Vinod Lala"]
+  spec.authors       = ["Eric Garside", "Allen Rettberg", "Jordan Minneti", "Vinod Lala", "Andrew Cross"]
   spec.email         = ["eric.garside@freshly.com"]
 
   spec.summary       = "Write modular and reusable business logic that's understandable and maintainable."
