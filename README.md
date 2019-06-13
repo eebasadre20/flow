@@ -299,7 +299,7 @@ If the default value is static, it can be specified in the class definition.
 
 If the default value is dynamic, you may provide a block to compute the default value.
 
-⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or it's other variables!
+⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or its other variables!
 
 ```ruby
 class ExampleFlow < ApplicationFlow; end
