@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.1
+
+*Release Date*: 2019/6/14
+
+- less pessimistic gemspec requirements [#109](https://github.com/Freshly/flow/pull/109)
+- `with_failing_operation` shared context [#110](https://github.com/Freshly/flow/pull/110)
+- allow triggering a flow with a provided state [#112](https://github.com/Freshly/flow/pull/112)
+
 ## 0.10.0
 
 *Release Date*: 2019/5/12

@@ -18,8 +18,10 @@ module Flow
       attr_reader :state
     end
 
-    def initialize(**input)
-      run_callbacks(:initialize) { @state = state_class.new(**input) }
+    def initialize(state_instance = nil, **options)
+      run_callbacks(:initialize) do
+        @state = state_instance || state_class.new(**options)
+      end
     end
   end
 end

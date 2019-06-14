@@ -4,8 +4,8 @@ RSpec.describe Flow::State::Output, type: :module do
   include_context "with an example state", [ Flow::State::Status, described_class ]
 
   describe ".output" do
-    it_behaves_like "an instructor with a class collection attribute", :output, :_outputs do
-      let(:example_instructor_class) { example_state_class }
+    it_behaves_like "an input object with a class collection attribute", :output, :_outputs do
+      let(:example_input_object_class) { example_state_class }
     end
   end
 

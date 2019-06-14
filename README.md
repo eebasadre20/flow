@@ -131,6 +131,14 @@ class ExampleFlow < ApplicationState
 end
 ```
 
+If you _already have_ an instance of a state class that you want to execute a Flow on, you can simply pass it directly to trigger:
+
+```ruby
+state_instance = ExampleState.new(...)
+
+CalculateTimetablesFlow.trigger(state_instance)
+```
+
 ### Operations
 
 An **Operation** is a service object which is executed with a **State**.
@@ -299,7 +307,7 @@ If the default value is static, it can be specified in the class definition.
 
 If the default value is dynamic, you may provide a block to compute the default value.
 
-⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or it's other variables!
+⚠️‍ **Heads Up**: The default value blocks **DO NOT** provide access to the state or its other variables!
 
 ```ruby
 class ExampleFlow < ApplicationFlow; end
