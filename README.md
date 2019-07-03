@@ -1120,7 +1120,7 @@ You are heavily encouraged *not* to do that. If your Operation is used by severa
 
 Instead, use the spec as a way to communicate the contract of the Operation with the next developer. By boiling out a very clean example state that only includes what is necessary for the operation, you provide clear guidance on what the Operation's minimum requirements for a state are in a very transparent way.
 
-However, the emphasis is on _minimum_ requirements. `Option`'s and `attribute`'s are therefore discouraged in example states in operation specs, as well as providing contexts for when optional input is not provided. An operation designed for use with a State using optional inputs will _always_ require those methods to be available on its state class, so example states should always use arguments for input.
+However, the emphasis is on _minimum_ requirements. `Option`s and `attribute`s are therefore discouraged in example states for operation specs, as well are contexts for when optional input is not provided. An operation designed for use with a State using optional inputs will _always_ require those methods to be available on its state class, so example states should always use arguments to define input.
 
 ```ruby
 let(:example_state_class) do
