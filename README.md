@@ -1183,7 +1183,11 @@ RSpec.describe FooState, type: :state do
   # it { is_expected.to define_argument :necessary_input, allow_nil: false }
   # it { is_expected.to define_option(:optional_input) }
   # it { is_expected.to define_option(:option_with_default, default: :default_static_value) }
+
+  # let(:default_block_value) { SecureRandom.uuid }
+  # before { allow(SecureRandom).to receive(:uuid).and_return(default_block_value) }
   # it { is_expected.to define_option(:option_with_default_from_block, default: default_block_value) }
+
   # it { is_expected.to validate_presence_of ... }
   # it { is_expected.to define_output :foo }
   # it { is_expected.to define_output :foo, default: :bar }
