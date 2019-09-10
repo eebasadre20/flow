@@ -124,7 +124,7 @@ Ex: `FooBarBazFlow` assumes there is a defined `FooBarBazState`.
 If you want to customize this behavior, define the state class explicitly:
 
 ```ruby
-class ExampleFlow < ApplicationState
+class ExampleFlow < ApplicationFlow
   def self.state_class
     MyCoolState
   end
