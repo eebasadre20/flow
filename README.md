@@ -586,7 +586,7 @@ Errors handling can be either either **proactive** or **reactive**; ideally all 
 
 ### Exceptions
 
-When an exception is raised during during execution, but a handler can rescue, it causes a failure instead.
+When an exception is raised during execution, but a handler can rescue, it causes a failure instead.
 
 Otherwise, an unhandled exception will raise through both the Operation and Flow.
 `
