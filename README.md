@@ -124,7 +124,7 @@ Ex: `FooBarBazFlow` assumes there is a defined `FooBarBazState`.
 If you want to customize this behavior, define the state class explicitly:
 
 ```ruby
-class ExampleFlow < ApplicationState
+class ExampleFlow < ApplicationFlow
   def self.state_class
     MyCoolState
   end
@@ -1062,7 +1062,7 @@ The easiest and best way to test an Operation is with a unit test.
 
 Operation unit tests work best when you treat them like integration tests! (Read: **No Mocking!**)
 
-Operations are generated with the following RSPec template:
+Operations are generated with the following RSpec template:
 
 ```ruby
 # frozen_string_literal: true
@@ -1076,8 +1076,7 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
   let(:example_state_class) do
     Class.new(ApplicationState) do
       # argument :foo
-      # option :bar
-      # attribute :baz 
+
       # output :gaz 
     end
   end
@@ -1103,8 +1102,7 @@ In the boilerplate from the generator, there is the following snippet:
 let(:example_state_class) do
   Class.new(ApplicationState) do
     # argument :foo
-    # option :bar
-    # attribute :baz
+
     # output :gaz
   end
 end
@@ -1122,21 +1120,23 @@ You are heavily encouraged *not* to do that. If your Operation is used by severa
 
 Instead, use the spec as a way to communicate the contract of the Operation with the next developer. By boiling out a very clean example state that only includes what is necessary for the operation, you provide clear guidance on what the Operation's minimum requirements for a state are in a very transparent way.
 
+However, the emphasis is on _minimum_ requirements. `Option`s and `attribute`s are therefore discouraged in example states for operation specs, as well are contexts for when optional input is not provided. An operation designed for use with a State using optional inputs will _always_ require those methods to be available on its state class, so example states should always use arguments to define input.
+
 ```ruby
 let(:example_state_class) do
   Class.new(ApplicationState) do
     argument :foo
-    option :bar
-    attribute :baz
+    argument :bar
+
     output :gaz
   end
   
   let(:state_input) do
-    { foo: foo, bar: bar }
+    { foo: foo }
   end
   
   let(:foo) { ... }
-  let(:bar) { ... }
+  let(:bar) { nil }
 end
 ```
 
@@ -1183,7 +1183,11 @@ RSpec.describe FooState, type: :state do
   # it { is_expected.to define_argument :necessary_input, allow_nil: false }
   # it { is_expected.to define_option(:optional_input) }
   # it { is_expected.to define_option(:option_with_default, default: :default_static_value) }
+
+  # let(:default_block_value) { SecureRandom.uuid }
+  # before { allow(SecureRandom).to receive(:uuid).and_return(default_block_value) }
   # it { is_expected.to define_option(:option_with_default_from_block, default: default_block_value) }
+
   # it { is_expected.to validate_presence_of ... }
   # it { is_expected.to define_output :foo }
   # it { is_expected.to define_output :foo, default: :bar }

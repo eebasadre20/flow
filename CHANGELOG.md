@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.2
+
+*Release Date*: 2019/9/18
+
+- Losen gemspec requirements to allow the Rails 6 suite [#123](https://github.com/Freshly/flow/pull/123)
+- Documentation updates
+- Tweak operation spec generator
+
 ## 0.10.1
 
 *Release Date*: 2019/6/14
