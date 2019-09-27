@@ -10,6 +10,8 @@ module Flow
 
       attr_reader :failed_operation
 
+      delegate :operation_failure, to: :failed_operation, allow_nil: true
+
       private
 
       attr_reader :executed_operations

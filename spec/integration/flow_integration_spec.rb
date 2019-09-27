@@ -55,14 +55,14 @@ RSpec.describe Flow, type: :integration do
       it { is_expected.not_to be_success }
     end
 
-    describe "#failed_operation#operation_failure" do
-      subject { flow.failed_operation.operation_failure }
+    describe "#operation_failure" do
+      subject { flow.operation_failure }
 
       it { is_expected.to be_an_instance_of Flow::Operation::Failures::OperationFailure }
     end
 
-    describe "#failed_operation#operation_failure#problem" do
-      subject { flow.failed_operation.operation_failure.problem }
+    describe "#operation_failure#problem" do
+      subject { flow.operation_failure.problem }
 
       it { is_expected.to eq failure_problem }
     end

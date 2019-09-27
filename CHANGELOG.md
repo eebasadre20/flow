@@ -1,10 +1,16 @@
 # Changelog
 
+## 0.10.3
+
+*Release Date*: 2019/9/27
+
+- Delegate `operation_failure` to `flow.failed_operation` ([#125](https://github.com/Freshly/flow/pull/125))
+
 ## 0.10.2
 
 *Release Date*: 2019/9/18
 
-- Losen gemspec requirements to allow the Rails 6 suite [#123](https://github.com/Freshly/flow/pull/123)
+- Losen gemspec requirements to allow the Rails 6 suite ([#123](https://github.com/Freshly/flow/pull/123))
 - Documentation updates
 - Tweak operation spec generator
 
