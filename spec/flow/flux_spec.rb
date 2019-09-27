@@ -3,6 +3,8 @@
 RSpec.describe Flow::Flux, type: :module do
   include_context "with example flow having state", [ Flow::Operations, described_class ]
 
+  it { is_expected.to delegate_method(:operation_failure).to(:failed_operation).allow_nil }
+
   describe "#executed_operations" do
     subject { example_flow.__send__(:executed_operations) }
 
