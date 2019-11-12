@@ -4,8 +4,11 @@ RSpec.describe Flow::Operation::Core, type: :module do
   include_context "with an example operation"
 
   describe "#initialize" do
-    subject { example_operation.state }
+    subject(:operation) { example_operation }
 
-    it { is_expected.to eq state }
+    it "has state proxy" do
+      expect(operation.state).to be_an_instance_of Flow::StateProxy
+      expect(operation.state.__send__(:state)).to eq state
+    end
   end
 end

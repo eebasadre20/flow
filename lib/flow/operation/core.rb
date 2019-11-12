@@ -11,7 +11,7 @@ module Flow
       end
 
       def initialize(state)
-        @state = state
+        @state = StateProxy.new(state, _state_readers, _state_writers)
       end
     end
   end
