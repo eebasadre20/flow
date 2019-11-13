@@ -10,5 +10,10 @@ RSpec.shared_context "with an example state" do |state_modules = nil|
     end
   end
 
+  let(:example_name) { Faker::Internet.domain_word.capitalize }
+  let(:example_state_name) { "#{example_name}State" }
+
   let(:input) { [] }
+
+  before { stub_const(example_state_name, example_state_class) }
 end
