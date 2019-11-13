@@ -50,7 +50,10 @@ RSpec.describe Flow::StateProxy, type: :state_proxy do
 
     shared_examples_for "a NoMethodError is raised" do
       it "raises NoMethodError" do
-        expect { call }.to raise_error NoMethodError, "undefined method `#{method_name}' for #{state_proxy.inspect}"
+        expect { call }.to raise_error do |error|
+          expect(error).to be_an_instance_of NoMethodError
+          expect(error.message).to include "undefined method `#{method_name}' for"
+        end
       end
     end
 

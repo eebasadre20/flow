@@ -9,15 +9,9 @@ module Flow
         class_attribute :_state_readers, instance_writer: false, default: []
         class_attribute :_state_writers, instance_writer: false, default: []
         class_attribute :_state_accessors, instance_writer: false, default: []
-
-        delegate :state_accessors?, to: :class
       end
 
       class_methods do
-        def state_accessors?
-          _state_readers.any? || _state_writers.any?
-        end
-
         protected
 
         def state_reader(name)

@@ -30,7 +30,7 @@ module Flow
       end
 
       def initialize(state)
-        @state = state_accessors? ? state_proxy_class.new(state) : state
+        @state = state_proxy_class.new(state)
       end
     end
   end
