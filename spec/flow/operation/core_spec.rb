@@ -8,19 +8,9 @@ RSpec.describe Flow::Operation::Core, type: :module do
   describe "#initialize" do
     subject(:operation) { example_operation }
 
-    context "without state accessors" do
-      it "has state" do
-        expect(operation.state).to eq state
-      end
-    end
-
-    context "with state accessors" do
-      before { example_operation_class.__send__(:state_reader, :attribute) }
-
-      it "has state proxy" do
-        expect(operation.state.class < Flow::StateProxy).to eq true
-        expect(operation.state.__send__(:state)).to eq state
-      end
+    it "has state proxy" do
+      expect(operation.state.class < Flow::StateProxy).to eq true
+      expect(operation.state.__send__(:state)).to eq state
     end
   end
 

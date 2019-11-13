@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.0
+
+*Release Date*: 2019/mm/dd
+
+- Add `StateProxy` to deprecate direct state access ([#135](https://github.com/Freshly/flow/pull/135))
+
 ## 0.10.3
 
 *Release Date*: 2019/9/27

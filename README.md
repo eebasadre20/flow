@@ -214,6 +214,8 @@ operation.execute
 operation.executed? # => true 
 ```
 
+⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
+
 #### Accessors
 
 **Operations** define, through *State Accessors*, what data they will read from and/or write to a **State**. 
