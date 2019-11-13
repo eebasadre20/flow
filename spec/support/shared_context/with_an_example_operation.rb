@@ -15,5 +15,6 @@ RSpec.shared_context "with an example operation" do |extra_operation_modules = n
     end
   end
 
-  let(:state) { Class.new(Flow::StateBase) }
+  let(:state_class) { Class.new(Flow::StateBase) }
+  let(:state) { state_class.new }
 end

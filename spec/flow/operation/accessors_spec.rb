@@ -8,7 +8,9 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   let(:state_attribute_writer) { "#{state_attribute}=".to_sym }
   let(:state_attribute_value) { Faker::Hipster.word }
 
-  before { state.attr_accessor(state_attribute) }
+  before { state_class.attr_accessor(state_attribute) }
+
+  it { is_expected.to delegate_method(:state_accessors?).to(:class) }
 
   shared_examples_for "it has exactly ? of type" do |count, tracker_type|
     subject { operation.public_send(tracker_name).count(state_attribute) }
@@ -146,6 +148,32 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
       it_behaves_like "it has exactly one tracker variable of type", :writer
       it_behaves_like "it has exactly one tracker variable of type", :reader
       it_behaves_like "it has exactly one tracker variable of type", :accessor
+    end
+  end
+
+  describe ".state_accessors?" do
+    subject { operation_class }
+
+    context "with no accessors" do
+      it { is_expected.not_to be_state_accessors }
+    end
+
+    context "with reader" do
+      before { operation_class.__send__(:state_reader, state_attribute) }
+
+      it { is_expected.to be_state_accessors }
+    end
+
+    context "with writer" do
+      before { operation_class.__send__(:state_writer, state_attribute) }
+
+      it { is_expected.to be_state_accessors }
+    end
+
+    context "with accessors" do
+      before { operation_class.__send__(:state_accessor, state_attribute) }
+
+      it { is_expected.to be_state_accessors }
     end
   end
 end
