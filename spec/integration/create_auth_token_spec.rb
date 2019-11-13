@@ -20,6 +20,9 @@ RSpec.describe CreateAuthToken, type: :operation do
 
   it { is_expected.to inherit_from Flow::OperationBase }
 
+  it { is_expected.to read_state :user }
+  it { is_expected.to write_state :auth_token }
+
   it { is_expected.to define_failure :invalid_user }
 
   describe "#execute!" do
