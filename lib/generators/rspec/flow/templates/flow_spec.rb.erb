@@ -11,10 +11,4 @@ RSpec.describe <%= class_name %>Flow, type: :flow do
 
   it { is_expected.to inherit_from ApplicationFlow }
   # it { is_expected.to use_operations ExampleOperation }
-
-  describe "#trigger" do
-    subject(:trigger) { flow.trigger! }
-
-    pending "describe the effects of a successful `Flow#flux` (or delete) #{__FILE__}"
-  end
 end
