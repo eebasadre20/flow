@@ -4,7 +4,8 @@
 
 *Release Date*: 2019/mm/dd
 
-- Add `StateProxy` to deprecate direct state access ([#135](https://github.com/Freshly/flow/pull/135))
+- Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
+- Add integration testing for State Accessors ([#135](https://github.com/Freshly/flow/pull/135))
 
 ## 0.10.3
 
