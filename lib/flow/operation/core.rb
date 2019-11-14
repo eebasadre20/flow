@@ -19,7 +19,7 @@ module Flow
           unless instance_variable_defined?(ivar_name)
             delegate_method_names = _state_writers.map { |method_name| "#{method_name}=" } + _state_readers
 
-            proxy_class = Class.new(Flow::StateProxy)
+            proxy_class = Class.new(StateProxy)
             proxy_class.delegate(*delegate_method_names, to: :state) if delegate_method_names.any?
 
             instance_variable_set(ivar_name, proxy_class)

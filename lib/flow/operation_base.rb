@@ -17,14 +17,14 @@ module Flow
   class OperationBase
     include ShortCircuIt
     include Technologic
-    include Flow::TransactionWrapper
-    include Flow::Operation::Accessors
-    include Flow::Operation::Callbacks
-    include Flow::Operation::Core
-    include Flow::Operation::ErrorHandler
-    include Flow::Operation::Execute
-    include Flow::Operation::Failures
-    include Flow::Operation::Status
-    include Flow::Operation::Transactions
+    include TransactionWrapper
+    include Operation::Accessors
+    include Operation::Callbacks
+    include Operation::Core
+    include Operation::ErrorHandler
+    include Operation::Execute
+    include Operation::Failures
+    include Operation::Status
+    include Operation::Transactions
   end
 end

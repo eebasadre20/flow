@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Flow::Flux, type: :module do
-  include_context "with example flow having state", [ Flow::Operations, described_class ]
+RSpec.describe Flow::Flow::Flux, type: :module do
+  include_context "with example flow having state", [ Flow::Flow::Operations, described_class ]
 
   it { is_expected.to delegate_method(:operation_failure).to(:failed_operation).allow_nil }
 
@@ -57,7 +57,7 @@ RSpec.describe Flow::Flux, type: :module do
       before { allow(example_flow).to receive(:flux!).and_raise example_error }
 
       context "when Flow::Flux::Failure" do
-        let(:example_error) { Flow::Flux::Failure }
+        let(:example_error) { Flow::Flow::Flux::Failure }
 
         it "calls logs the exception without raising" do
           flux
@@ -80,9 +80,9 @@ RSpec.describe Flow::Flux, type: :module do
     end
 
     context "when a failure occurs" do
-      let(:expected_exception) { instance_of(Flow::Flux::Failure) }
+      let(:expected_exception) { instance_of(Flow::Flow::Flux::Failure) }
 
-      before { allow(example_flow).to receive(:flux!).and_raise Flow::Flux::Failure }
+      before { allow(example_flow).to receive(:flux!).and_raise Flow::Flow::Flux::Failure }
 
       it "logs the exception" do
         flux
@@ -145,7 +145,7 @@ RSpec.describe Flow::Flux, type: :module do
 
       it "raises, sets failed operation, and halts" do
         expect { flux! }.
-          to raise_error(Flow::Flux::Failure).
+          to raise_error(Flow::Flow::Flux::Failure).
           and change { example_flow.__send__(:failed_operation) }.from(nil).to(operations.second).
           and change { example_flow.__send__(:executed_operations) }.from([]).to([ instance_of_operations.first ])
         expect(operations.last).not_to have_received(:execute)
