@@ -8,6 +8,7 @@
 
 - Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
 - Add integration testing for State Accessors ([#135](https://github.com/Freshly/flow/pull/135))
+- Add custom matchers for State Accessors and Document ([#136](https://github.com/Freshly/flow/pull/136))
 
 ## 0.10.3
 
