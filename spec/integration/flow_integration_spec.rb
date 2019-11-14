@@ -190,7 +190,7 @@ RSpec.describe Flow, type: :integration do
         subject(:trigger!) { BottlesOnTheWallFlow.trigger!(**input) }
 
         it "raises" do
-          expect { trigger! }.to raise_error Flow::Flow::Errors::StateInvalid
+          expect { trigger! }.to raise_error Flow::StateInvalidError
         end
       end
     end

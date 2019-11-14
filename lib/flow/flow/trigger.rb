@@ -23,7 +23,7 @@ module Flow
       end
 
       def trigger!
-        raise Flow::Errors::StateInvalid unless state_valid?
+        raise StateInvalidError unless state_valid?
 
         run_callbacks(:trigger) { flux }
 
@@ -32,7 +32,7 @@ module Flow
 
       def trigger
         trigger!
-      rescue Flow::Errors::StateInvalid
+      rescue StateInvalidError
         self
       end
     end
