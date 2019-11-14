@@ -14,9 +14,7 @@ require_relative "operation/transactions"
 
 # An **Operation** is a service object which is executed with a **State**.
 module Flow
-  class OperationBase
-    include ShortCircuIt
-    include Technologic
+  class OperationBase < Spicerack::RootObject
     include Flow::TransactionWrapper
     include Flow::Operation::Accessors
     include Flow::Operation::Callbacks
