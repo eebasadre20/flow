@@ -4,9 +4,11 @@
 
 *Release Date*: 2019/mm/dd
 
+🚨 **Breaking Change**: Flow concerns have been re-modularized!
 ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
 
 - Add `StateProxy` to deprecate direct state access ([#135](https://github.com/Freshly/flow/pull/135))
+- Remodularized `Flow` concerns ([#149](https://github.com/Freshly/flow/pull/149))
 
 ## 0.10.3
 
