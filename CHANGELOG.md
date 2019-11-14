@@ -4,7 +4,9 @@
 
 *Release Date*: 2019/mm/dd
 
-- Add `StateProxy` to deprecate direct state access ([#135](https://github.com/Freshly/flow/pull/135))
+ ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
+
+- Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
 
 ## 0.10.3
 
