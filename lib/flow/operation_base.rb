@@ -15,14 +15,14 @@ require_relative "operation/transactions"
 # An **Operation** is a service object which is executed with a **State**.
 module Flow
   class OperationBase < Spicerack::RootObject
-    include Flow::TransactionWrapper
-    include Flow::Operation::Accessors
-    include Flow::Operation::Callbacks
-    include Flow::Operation::Core
-    include Flow::Operation::ErrorHandler
-    include Flow::Operation::Execute
-    include Flow::Operation::Failures
-    include Flow::Operation::Status
-    include Flow::Operation::Transactions
+    include TransactionWrapper
+    include Operation::Accessors
+    include Operation::Callbacks
+    include Operation::Core
+    include Operation::ErrorHandler
+    include Operation::Execute
+    include Operation::Failures
+    include Operation::Status
+    include Operation::Transactions
   end
 end

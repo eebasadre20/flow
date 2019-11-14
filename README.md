@@ -11,6 +11,7 @@
 * [How it Works](#how-it-works)
    * [Flows](#flows)
    * [Operations](#operations)
+      * [Accessors](#accessors)
    * [States](#states)
       * [Input](#input)
       * [Output](#output)
@@ -146,19 +147,24 @@ An **Operation** is a service object which is executed with a **State**.
 Operations should **not** be named with the `Operation` suffix; name them what they do!
 
 ```ruby
-class ClearExistingTimetables < ApplicationOperation
+class ClearExistingTimetable < ApplicationOperation
+  state_accessor :existing_timetable_cells
+
   def behavior
-    state.existing_timetable_cells.update_all(total_minutes: 0)
+    existing_timetable_cells.update_all(total_minutes: 0)
   end
 end
 ```
 
 ```ruby
 class CalculateTimetables < ApplicationOperation
+  state_accessor :minutes_by_project_employee
+  state_reader :timeframe
+  
   def behavior
-    state.minutes_by_project_employee.each do |project_employee, total_minutes|
+    minutes_by_project_employee.each do |project_employee, total_minutes|
       project_id, employee_id = project_employee
-      timetable = state.timeframe.timetables.find_or_create_by!(project_id: project_id)
+      timetable = timeframe.timetables.find_or_create_by!(project_id: project_id)
       cell = timetable.cells.find_or_create_by!(employee_id: employee_id)
       
       cell.update!(total_minutes: total_minutes)
@@ -169,8 +175,10 @@ end
 
 ```ruby
 class SummarizeTimetables < ApplicationOperation
+  state_accessor :timetables
+  
   def behavior
-    state.timetables.each do |timetable| 
+    timetables.each do |timetable| 
       timetable.update!(total_minutes: timetable.cells.sum(:total_minutes))
     end
   end
@@ -179,8 +187,10 @@ end
 
 ```ruby
 class DestroyEmptyTimetableCells < ApplicationOperation
+  state_accessor :empty_cells
+
   def behavior
-    state.empty_cells.destroy_all
+    empty_cells.destroy_all
   end
 end
 ```
@@ -191,8 +201,10 @@ Operations take a state as input and define a `#behavior` that occurs when `#exe
 
 ```ruby
 class ExampleOperation < ApplicationOperation
+  state_reader :first_name
+
   def behavior
-    puts "Hello, #{state.first_name}"
+    puts "Hello, #{first_name}"
   end
 end
 
@@ -200,6 +212,117 @@ operation = ExampleOperation.new(OpenStruct.new(first_name: "Eric"))
 operation.execute 
 # Hello, Eric
 operation.executed? # => true 
+```
+
+⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
+
+#### Accessors
+
+**Operations** define, through *State Accessors*, what data they will read from and/or write to a **State**. 
+
+These accessors provide an explicit means to declare input needs and output expectations.
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  state_reader :foo
+  state_writer :bar
+  state_accessor :baz
+end
+```
+
+Under the hood, a **StateProxy** adapts a **State** to an **Operation** using these accessors.
+
+⚠️ *Warning*: Your Operation will not be able to access methods on your State if you do not declare them using these accessors!
+
+The following are considered best practices for working with state accessors:
+
+`state_reader` should **only** read data and not alter it
+
+```ruby
+# Bad, don't do it this way:
+class BadOperation < ApplicationOperation
+  state_reader :foo
+  
+  def behavior
+    foo << :more_dataz
+  end
+end
+
+# Good, do it this way:
+class GoodOperation < ApplicationOperation
+  state_reader :foo
+  
+  def behavior
+    SomeThirdParty.do_a_thing if foo == :foo
+  end
+end
+```
+
+`state_writer` should map to a field marked as `output` on the State
+
+```ruby
+class ExampleOperation < ApplicationOperation
+  state_writer :foo
+  
+  def behavior
+    state.foo = :foo
+  end
+end
+
+# Bad, don't do it this way:
+class BadState < ApplicationState
+  option :foo
+end
+
+# Good, do it this way:
+class GoodState < ApplicationState
+  output :foo
+end
+```
+
+`state_accessor` should be used rather than defining both setters and getters:
+
+```ruby
+# Bad, don't do it this way:
+class BadOperation < ApplicationOperation
+  state_reader :foo
+  state_writer :foo
+  
+  def behavior
+    state.foo = :bar if foo == :baz
+  end
+end
+
+# Good, do it this way:
+class GoodOperation < ApplicationOperation
+  state_acceessor :foo
+  
+  def behavior
+    state.foo = :bar if foo == :baz
+  end
+end
+```
+
+`state_accessor` should also be used when altering a memory object (ex: Array, Hash, ActiveModel):
+
+```ruby
+# Bad, don't do it this way:
+class BadOperation < ApplicationOperation
+  state_reader :foo
+  
+  def behavior
+    foo << :more_dataz
+  end
+end
+
+# Good, do it this way:
+class GoodOperation < ApplicationOperation
+  state_acceessor :foo
+  
+  def behavior
+    foo << :more_dataz
+  end
+end
 ```
 
 ### States
@@ -1024,6 +1147,9 @@ This will allow you to use the following custom matchers:
  * [use_operations](lib/flow/custom_matchers/use_operations.rb) tests usage of `ApplicationFlow.operations`
  * [wrap_in_transaction](lib/flow/custom_matchers/wrap_in_transaction.rb) tests usage of `.wrap_in_transaction` for `ApplicationFlow` or `ApplicationOperation`
  * [have_on_state](lib/flow/custom_matchers/have_on_state.rb) tests for data on State after a `ApplicationFlow` or `ApplicationOperation` has been run
+* [access_state](lib/flow/custom_matchers/access_state.rb) tests usage of `ApplicationOperation.state_accessor` (or use of both `state_(reader|writer)`)
+* [read_state](lib/flow/custom_matchers/read_state.rb) tests usage of `ApplicationOperation.state_reader`
+* [write_state](lib/flow/custom_matchers/write_state.rb) tests usage of `ApplicationOperation.state_writer`
 
 ### Testing Flows
 
@@ -1086,6 +1212,10 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
 
   it { is_expected.to inherit_from ApplicationOperation }
 
+  # it { is_expected.to access_state :foo }
+  # it { is_expected.to read_state :bar }
+  # it { is_expected.to write_state :baz }
+
   describe "#execute" do
     subject(:execute) { operation.execute }
   
@@ -1145,10 +1275,12 @@ You are encouraged to use `execute`, rather than `execute!` in testing. You can 
 Doing so will allow you to make assertions on the failure without having to expect errors:
 ```ruby
 class SomeOperation < ApplicationOperation
+  state_reader :foo
+
   failure :somethings_invalid
 
   def behavior
-    somethings_invalid_failure! baz: "relevant data" if state.foo == "something invalid"
+    somethings_invalid_failure! baz: "relevant data" if foo == "something invalid"
   end
 end
 ```
