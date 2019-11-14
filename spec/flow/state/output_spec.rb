@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::State::Output, type: :module do
-  include_context "with an example state", [ Flow::State::Status, described_class ]
+  include_context "with an example state"
 
   describe ".output" do
     it_behaves_like "an input object with a class collection attribute", :output, :_outputs do
