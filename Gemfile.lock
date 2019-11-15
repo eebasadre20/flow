@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/freshly/spicerack.git
-  revision: 297ceaf1d3b0480ff098f65301cb42e9da46185e
-  ref: conjunction/integration_tests
+  revision: b0e57978f41ccb39bc3aee213160c58af59a55c2
+  ref: conjunction/no-prototype-intermediary
   specs:
     around_the_world (0.18.0)
       activesupport (>= 5.2.1)
