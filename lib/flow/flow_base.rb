@@ -11,6 +11,9 @@ require_relative "flow/trigger"
 # A **Flow** is a collection of procedurally executed **Operations** sharing a common **State**.
 module Flow
   class FlowBase < Spicerack::RootObject
+    include Conjunction::Junction
+    suffixed_with "Flow"
+
     include TransactionWrapper
     include Flow::Callbacks
     include Flow::Core

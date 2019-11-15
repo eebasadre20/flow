@@ -3,6 +3,8 @@
 RSpec.describe Flow::Flow::Core, type: :module do
   include_context "with example flow having state"
 
+  it { is_expected.to include_module Conjunction::Junction }
+
   it { is_expected.to delegate_method(:state_class).to(:class) }
   it { is_expected.to delegate_method(:outputs).to(:state) }
 
