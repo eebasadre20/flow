@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::FlowBase, type: :flow do
-  subject(:flow) { example_flow_class.new }
+  subject(:flow) { example_flow_class }
 
   let(:example_flow_class) { Class.new(described_class) }
   let(:example_state_class) { Class.new(Flow::StateBase) }
