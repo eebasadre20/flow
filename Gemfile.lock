@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/freshly/malfunction.git
-  revision: cf7322afe3a34bbf5257218929b28325d8cabec8
+  revision: cbe2e4540d5dcf54f06dac9b1ff65cf606edd346
   ref: develop
   specs:
     malfunction (0.1.0)
