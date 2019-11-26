@@ -7,6 +7,7 @@ SimpleCov.start do
 end
 
 require "spicerack/spec_helper"
+require "malfunction/spec_helper"
 require "shoulda-matchers"
 
 require_relative "../lib/flow/spec_helper"

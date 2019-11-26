@@ -12,6 +12,7 @@ require "flow/version"
 require "flow/concerns/transaction_wrapper"
 
 require "flow/malfunction/base"
+require "flow/malfunction/invalid_state"
 
 require "flow/flow_base"
 require "flow/operation_base"
