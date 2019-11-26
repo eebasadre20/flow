@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Flow::Flow::Flux, type: :module do
-  include_context "with example flow having state", [ Flow::Flow::Operations, described_class ]
+RSpec.describe Flow::Flow::Flux, type: :concern do
+  include_context "with example flow having state"
 
   it { is_expected.to delegate_method(:operation_failure).to(:failed_operation).allow_nil }
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Flow::Flow::Trigger, type: :module do
-  include_context "with example flow having state", [ Flow::Flow::Operations, Flow::Flow::Flux, described_class ]
+RSpec.describe Flow::Flow::Trigger, type: :concern do
+  include_context "with example flow having state"
 
   it { is_expected.to delegate_method(:valid?).to(:state).with_prefix(true) }
 
