@@ -56,8 +56,8 @@ RSpec.describe Flow::Flow::Flux, type: :concern do
 
       before { allow(example_flow).to receive(:flux!).and_raise example_error }
 
-      context "when Flow::Flux::Failure" do
-        let(:example_error) { Flow::Flow::Flux::Failure }
+      context "when Flow::FluxError" do
+        let(:example_error) { Flow::FluxError }
 
         it "calls logs the exception without raising" do
           flux
@@ -80,9 +80,9 @@ RSpec.describe Flow::Flow::Flux, type: :concern do
     end
 
     context "when a failure occurs" do
-      let(:expected_exception) { instance_of(Flow::Flow::Flux::Failure) }
+      let(:expected_exception) { instance_of(Flow::FluxError) }
 
-      before { allow(example_flow).to receive(:flux!).and_raise Flow::Flow::Flux::Failure }
+      before { allow(example_flow).to receive(:flux!).and_raise Flow::FluxError }
 
       it "logs the exception" do
         flux
@@ -145,7 +145,7 @@ RSpec.describe Flow::Flow::Flux, type: :concern do
 
       it "raises, sets failed operation, and halts" do
         expect { flux! }.
-          to raise_error(Flow::Flow::Flux::Failure).
+          to raise_error(Flow::FluxError).
           and change { example_flow.__send__(:failed_operation) }.from(nil).to(operations.second).
           and change { example_flow.__send__(:executed_operations) }.from([]).to([ instance_of_operations.first ])
         expect(operations.last).not_to have_received(:execute)
