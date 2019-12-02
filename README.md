@@ -89,6 +89,8 @@ Flows allow you to encapsulate your application's [business logic](http://en.wik
 
 After installing Flow in your Rails project, you will need create state, operation(s), and the flow itself.
 
+### State
+
 Define state object that will be used for a certain flow:
 
 ```bash
@@ -111,7 +113,9 @@ class ChargeState < ApplicationState
 end
 ```
 
-Define operation with a Single Responsibility:
+### Operations
+
+Define operation that operates on the state using the `behavior` method. State accessor methods allows the operation to read and write to the state object:
 
 ```bash
 $ rails generate flow:operation CreateCharge
@@ -121,6 +125,7 @@ $ rails generate flow:operation CreateCharge
 # app/operations/create_charge.rb
 
 class CreateCharge < ApplicationOperation
+  # state accessor methods
   state_reader :order
   state_reader :user
   state_reader :payment_method
@@ -128,6 +133,7 @@ class CreateCharge < ApplicationOperation
   state_writer :charge
 
   def behavior
+    # payment_method is an optional state input, so it may not be present
     payment_method_to_charge = payment_method.present? payment_method : user.default_payment_method
 
     # write to charge on state
@@ -136,7 +142,7 @@ class CreateCharge < ApplicationOperation
 end
 ```
 
-If you want a failure in an operation to fail and stop the Flow, define a failure method:
+Define another operation. To handle errors in your flow define a failure method. When a failure method is called it will stop and mark the flow as failed:
 
 ```bash
 $ rails generate flow:operation SubmitCharge
@@ -165,7 +171,9 @@ class SubmitCharge < ApplicationOperation
 end
 ```
 
-Define the flow comprised of some ordered operations. Flow will automatically associate the correct state to a flow if they follow the naming convention `<FlowName>Flow` <=> `<FlowName>State`:
+### FLow
+
+Define the flow comprised of some ordered operations. Changes to the state will persist from one operation to the next.
 
 ```bash
 $ rails generate flow Charge
@@ -175,9 +183,12 @@ $ rails generate flow Charge
 # app/flow/charge_flow.rb
 
 class ChargeFlow < ApplicationFlow
-  operations CreateCharge, SubmitCharge
+  operations CreateCharge,
+             SubmitCharge
 end
 ```
+
+### Usage
 
 Trigger the Flow in your code with required state inputs, any any optional ones:
 
