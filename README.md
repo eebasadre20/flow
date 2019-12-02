@@ -87,7 +87,9 @@ Flows allow you to encapsulate your application's [business logic](http://en.wik
 
 ## Quickstart
 
-Define state object that will be used throughout the Flow:
+After installing Flow in your Rails project, you will need create state, operation(s), and the flow itself.
+
+Define state object that will be used for a certain flow:
 ```ruby
 # app/states/charge_state.rb
 
@@ -104,7 +106,7 @@ class ChargeState < ApplicationState
 end
 ```
 
-Define operations with a Single Responsibility:
+Define operation with a Single Responsibility:
 ```ruby
 # app/operations/create_charge.rb
 
@@ -123,11 +125,13 @@ class CreateCharge < ApplicationOperation
   end
 end
 ```
+
+If you want a failure in an operation to fail and stop the Flow, define a failure method:
 ```ruby
 # app/operations/create_charge.rb
 
 class SubmitCharge < ApplicationOperation
-  # define error method
+  # define failure method
   failure :charge_unsuccessful
 
   state_reader :charge
@@ -138,13 +142,15 @@ class SubmitCharge < ApplicationOperation
     if response.body.success == "false"
       charge.update(success: true)
     else
+      # raise failure with this method, you can pass a hash of whatever you want and
+      # it will be readable on the Flow state
       charge_unsuccessful_failure!(response_body: response.body)
     end
   end
 end
 ```
 
-Define the flow comprised of the ordered operations:
+Define the flow comprised of some ordered operations. Flow will automatically associate the correct state to a flow if they follow the naming convention `<FlowName>Flow` <=> `<FlowName>State`:
 ```ruby
 # app/flow/charge_flow.rb
 
@@ -156,16 +162,13 @@ end
 Trigger the Flow in your code with required state inputs, any any optional ones:
 ```ruby
 flow_input = {
-  # required arguments
   order: order,
   user: current_user,
-  # optional arguments
   payment_method: visa_credit_card,
 }
 
 flow = ChargeFlow.trigger(flow_input)
 ```
-
 Arguments defined on state will be required inputs to the Flow trigger:
 ```
 > ChargeFlow.trigger({})
@@ -175,13 +178,12 @@ ArgumentError: Missing arguments: order, user
 State can be accessed from the Flow instance:
 ```
 > flow = ChargeFlow.trigger(flow_input)
-=> #<ChargeFlow:0x00007fd5c5cd9d88 ... >
 
 > flow.state.charge
 => #<Charge:0x00007fd5c5cda080 ... >
 ```
 
-Success of the flow can be determined with:
+Success of the triggered flow can be determined with:
 ```
 > flow.success?
 => true
@@ -193,6 +195,8 @@ Success of the flow can be determined with:
 
 Data set in an operation's error methods can be be accessed from the Flow instance too:
 ```
+> flow = ChargeFlow.trigger(flow_input)
+
 > flow.success?
 => false
 
