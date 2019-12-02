@@ -142,7 +142,7 @@ class CreateCharge < ApplicationOperation
 end
 ```
 
-Define another operation. To handle errors in your flow define a failure method. When a failure method is called it will stop and mark the flow as failed:
+Define another operation. Use a failure method when an operation, and any remaining operations in a flow, should fail and no longer run:
 
 ```bash
 $ rails generate flow:operation SubmitCharge
@@ -152,7 +152,7 @@ $ rails generate flow:operation SubmitCharge
 # app/operations/submit_charge.rb
 
 class SubmitCharge < ApplicationOperation
-  # define failure method
+  # define failure method, creates :charge_unsuccessful_failure! method
   failure :charge_unsuccessful
 
   state_reader :charge
@@ -163,17 +163,16 @@ class SubmitCharge < ApplicationOperation
     if response.body.success == "false"
       charge.update(success: true)
     else
-      # raise failure with this method, you can pass a hash of whatever you want and
-      # it will be readable on the Flow state
+      # stops operation and flow, you can pass a hash unstructured data that will be accessible on the failed flow
       charge_unsuccessful_failure!(response_body: response.body)
     end
   end
 end
 ```
 
-### FLow
+### Flow
 
-Define the flow comprised of some ordered operations. Changes to the state will persist from one operation to the next.
+Define the flow comprised of one or more ordered operations. Changes to the state will persist from one operation to the next.
 
 ```bash
 $ rails generate flow Charge
@@ -190,7 +189,7 @@ end
 
 ### Usage
 
-Trigger the Flow in your code with required state inputs, any any optional ones:
+Trigger the flow in your code with state inputs:
 
 ```ruby
 flow_input = {
@@ -202,14 +201,14 @@ flow_input = {
 flow = ChargeFlow.trigger(flow_input)
 ```
 
-Arguments defined on state will be required inputs to the Flow trigger:
+Arguments defined on state will be required inputs to the Flow trigger, optional ones not required:
 
 ```
 > ChargeFlow.trigger({})
 ArgumentError: Missing arguments: order, user
 ```
 
-State can be accessed from the Flow instance:
+Output state can be accessed from the flow instance:
 
 ```
 > flow = ChargeFlow.trigger(flow_input)
@@ -228,16 +227,21 @@ Success of the triggered flow can be determined with:
 => false
 ```
 
-
-Data set in an operation's error methods can be be accessed from the Flow instance too:
+See any flow failures:
 
 ```
+# some flow that results in a failure...
 > flow = ChargeFlow.trigger(flow_input)
 
 > flow.success?
 => false
 
-> flow.state.response_body
+# failure
+> flow.problem
+=> :charge_unsuccessful
+
+# access unstructured hash passed into failure method
+> flow.details.response_body
 => { some_response_body_here: ... }
 ```
 
