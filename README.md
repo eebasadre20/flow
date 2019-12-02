@@ -8,6 +8,7 @@
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [What is Flow?](#what-is-flow)
+* [Quickstart](#quickstart)
 * [How it Works](#how-it-works)
    * [Flows](#flows)
    * [Operations](#operations)
@@ -84,6 +85,121 @@ Flow is a [SOLID](https://en.wikipedia.org/wiki/SOLID) implementation of the [Co
 
 Flows allow you to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic) into a set of extensible and reusable objects.
 
+## Quickstart
+
+Define state object that will be used throughout the Flow:
+```ruby
+# app/states/charge_state.rb
+
+class ChargeState < ApplicationState
+  # required state input, will raise error if missing
+  argument :order
+  argument :user
+
+  # optional state input
+  option :payment_method
+
+  # expected output from the flow
+  output :charge
+end
+```
+
+Define operations with a Single Responsibility:
+```ruby
+# app/operations/create_charge.rb
+
+class CreateCharge < ApplicationOperation
+  state_reader :order
+  state_reader :user
+  state_reader :payment_method
+
+  state_writer :charge
+
+  def behavior
+    payment_method_to_charge = payment_method.present? payment_method : user.default_payment_method
+
+    # write to charge on state
+    state.charge = Charge.create(payment_method: payment_method_to_charge, order: order, user: user)
+  end
+end
+```
+```ruby
+# app/operations/create_charge.rb
+
+class SubmitCharge < ApplicationOperation
+  # define error method
+  failure :charge_unsuccessful
+
+  state_reader :charge
+
+  def behavior
+    response = PaymentProcessorClient.submit_charge(charge)
+
+    if response.body.success == "false"
+      charge.update(success: true)
+    else
+      charge_unsuccessful_failure!(response_body: response.body)
+    end
+  end
+end
+```
+
+Define the flow comprised of the ordered operations:
+```ruby
+# app/flow/charge_flow.rb
+
+class ChargeFlow < ApplicationFlow
+  operations CreateCharge, SubmitCharge
+end
+```
+
+Trigger the Flow in your code with required state inputs, any any optional ones:
+```ruby
+flow_input = {
+  # required arguments
+  order: order,
+  user: current_user,
+  # optional arguments
+  payment_method: visa_credit_card,
+}
+
+flow = ChargeFlow.trigger(flow_input)
+```
+
+Arguments defined on state will be required inputs to the Flow trigger:
+```
+> ChargeFlow.trigger({})
+ArgumentError: Missing arguments: order, user
+```
+
+State can be accessed from the Flow instance:
+```
+> flow = ChargeFlow.trigger(flow_input)
+=> #<ChargeFlow:0x00007fd5c5cd9d88 ... >
+
+> flow.state.charge
+=> #<Charge:0x00007fd5c5cda080 ... >
+```
+
+Success of the flow can be determined with:
+```
+> flow.success?
+=> true
+
+> flow.failed?
+=> false
+```
+
+
+Data set in an operation's error methods can be be accessed from the Flow instance too:
+```
+> flow.success?
+=> false
+
+> flow.state.response_body
+=> { some_response_body_here: ... }
+```
+
 ## How it Works
 
 ![Flow Basics](docs/images/flow.png)
@@ -98,9 +214,9 @@ All Flows should be named with the `Flow` suffix (ex: `FooFlow`).
 
 ```ruby
 class CalculateTimetablesFlow < ApplicationFlow
-  operations ClearExistingTimetables, 
-             CalculateTimetables, 
-             SummarizeTimetables, 
+  operations ClearExistingTimetables,
+             CalculateTimetables,
+             SummarizeTimetables,
              DestroyEmptyTimetableCells
 end
 ```
@@ -160,7 +276,7 @@ class CalculateTimetables < ApplicationOperation
       project_id, employee_id = project_employee
       timetable = state.timeframe.timetables.find_or_create_by!(project_id: project_id)
       cell = timetable.cells.find_or_create_by!(employee_id: employee_id)
-      
+
       cell.update!(total_minutes: total_minutes)
     end
   end
@@ -170,7 +286,7 @@ end
 ```ruby
 class SummarizeTimetables < ApplicationOperation
   def behavior
-    state.timetables.each do |timetable| 
+    state.timetables.each do |timetable|
       timetable.update!(total_minutes: timetable.cells.sum(:total_minutes))
     end
   end
@@ -197,9 +313,9 @@ class ExampleOperation < ApplicationOperation
 end
 
 operation = ExampleOperation.new(OpenStruct.new(first_name: "Eric"))
-operation.execute 
+operation.execute
 # Hello, Eric
-operation.executed? # => true 
+operation.executed? # => true
 ```
 
 ### States
@@ -217,7 +333,7 @@ class CalculateTimetablesState < ApplicationState
   end
 
   def minutes_by_project_employee
-    @minutes_by_project_employee ||= data_by_employee_project.transform_values do |values| 
+    @minutes_by_project_employee ||= data_by_employee_project.transform_values do |values|
       values.sum(&:total_minutes)
     end
   end
@@ -245,7 +361,7 @@ class CalculateTimetablesState < ApplicationState
   end
 
   def data_by_employee_project
-    @data_by_employee_project ||= timesheet_data.group_by do |data| 
+    @data_by_employee_project ||= timesheet_data.group_by do |data|
       [ data.project_id, data.employee_id ]
     end
   end
@@ -263,7 +379,7 @@ end
 #### Input
 
 A state accepts input represented by **arguments** and **options** which initialize it.
- 
+
 **Arguments** describe input required to define the initial state.
 
 If any arguments are missing, an `ArgumentError` is raised.
@@ -299,7 +415,7 @@ ExampleFlow.trigger(foo: nil, bar: nil) # => ArgumentError (Missing argument: ba
 
 **Options** describe input which may be provided to define or override the initial state.
 
-Options can optionally define a default value. 
+Options can optionally define a default value.
 
 If no default is specified, the value will be `nil`.
 
@@ -332,7 +448,7 @@ Output data is created by Operations during runtime and CANNOT be validated or p
 ```ruby
 class ExampleState < ApplicationState
   argument :name
-  
+
   validates :name, length: { minimum: 3 }
   output :foo
 end
@@ -352,7 +468,7 @@ state.foo = :something # => :something
 state.outputs.foo # :something
 ```
 
-Outputs can optionally define a default value. 
+Outputs can optionally define a default value.
 
 If no default is specified, the value will be `nil`.
 
@@ -386,7 +502,7 @@ end
 result = ExampleFlow.trigger
 result.outputs.story.join("\n")
 # Bah Bah, Black Sheep. Have you any wool?
-# Yes sir, yes sir! Three bags full! 
+# Yes sir, yes sir! Three bags full!
 ```
 
 If you are creating something in your operation it's usually best practice to use [Transactions](#transactions) on either the Flow or Operation.
@@ -411,9 +527,9 @@ Instead, always define data retrieval within the state and use output for create
 ```ruby
 class GoodState < ApplicationState
   argument :foo
-  
+
   output :gaz
-  
+
   def bar
     Bar.where(foo: foo)
   end
@@ -436,7 +552,7 @@ class GoodState < ApplicationState
   argument :foo
   option :bar, default: :nar
   output :gaz
-  
+
   def results
     outputs.to_h.dup.merge(foo: foo, bar: bar)
   end
@@ -456,7 +572,7 @@ class ExampleState < ApplicationState
   def most_actionable_order
     editable_orders.order(ship_date: :desc).first
   end
-  
+
   private
 
   def editable_orders
@@ -474,13 +590,13 @@ Consider the following example:
 ```ruby
 class MyExampleState < ApplicationState
   argument :user
-  
+
   def most_actionable_order
     editable_orders.order(ship_date: :desc).first
   end
-  
+
   private
-  
+
   def editable_orders
     user.orders.unshipped.paid
   end
@@ -488,13 +604,13 @@ end
 
 class MyOtherExampleState < ApplicationState
   argument :user
-  
+
   def least_actionable_order
     editable_orders.order(ship_date: :desc).last
   end
-  
+
   private
-  
+
   def editable_orders
     user.orders.unshipped.paid
   end
@@ -508,17 +624,17 @@ For example, we could create `app/states/concerns/actionable_user_orders.rb`:
 ```ruby
 module ActionableUserOrders
   extend ActiveSupport::Concern
-  
+
   included do
     argument :user
   end
-  
+
   private
 
   def orders_by_ship_data
     editable_orders.order(ship_date: :desc)
   end
-  
+
   def editable_orders
     user.orders.unshipped.paid
   end
@@ -530,7 +646,7 @@ Then your states become nice and clean:
 ```ruby
 class MyExampleState < ApplicationState
   include ActionableUserOrders
-  
+
   def most_actionable_order
     orders_by_ship_data.first
   end
@@ -538,7 +654,7 @@ end
 
 class MyOtherExampleState < ApplicationState
   include ActionableUserOrders
-  
+
   def least_actionable_order
     orders_by_ship_data.last
   end
@@ -559,7 +675,7 @@ Flows which have an invalid state will NOT execute any Operations, so it is inhe
 class ExampleFlow < ApplicationFlow; end
 class ExampleState < ApplicationState
   argument :first_name
-  
+
   validates :first_name, length: { minimum: 2 }
 end
 
@@ -597,7 +713,7 @@ end
 
 class ExampleOperation < ApplicationOperation
   handle_error RuntimeError
-  
+
   def behavior
     raise (state.number % 2 == 0 ? StandardError : RuntimeError)
   end
@@ -624,7 +740,7 @@ If no problem is specified explicitly, a demodulized underscored version of the 
 class ExampleOperation < ApplicationOperation
   handle_error RuntimeError, problem: :something_bad_happened
   handle_error ActiveRecord::RecordInvalid
-  
+
   def behavior
     raise (state.number % 2 == 0 ? ActiveRecord::RecordInvalid : RuntimeError)
   end
@@ -647,13 +763,13 @@ class ExampleOperation < ApplicationOperation
   handle_error ActiveRecord::RecordInvalid do
     # Do something here
   end
-  
+
   def behavior
     raise (state.number % 2 == 0 ? ActiveRecord::RecordInvalid : RuntimeError)
   end
-  
+
   private
-  
+
   def handle_some_error
     # Do something different here
   end
@@ -699,7 +815,7 @@ class PassBottlesAround < ApplicationOperation
   def behavior
     if state.number_to_take_down >= 4
       disappointment_level = state.number_to_take_down >= 10 ? :wow_very_disappoint : :am_disappoint
-      too_generous_failure!(disappointment_level: disappointment_level) 
+      too_generous_failure!(disappointment_level: disappointment_level)
     end
   end
 end
@@ -721,11 +837,11 @@ You can also specify `if:` / `unless:` options to proactively trigger failures a
 class PassBottlesAround < ApplicationOperation
   failure :too_dangerous, if: -> { state.bottle_of == "tequila" }
   failure :not_dangerous_enough, unless: :drink_dangerous?
-  
+
   private
-  
+
   def drink_dangerous?
-    %[water juice soda].exclude? state.bottle_of 
+    %[water juice soda].exclude? state.bottle_of
   end
 end
  ```
@@ -739,7 +855,7 @@ This works for explictly defined failures:
 ```ruby
 class OperationOne < ApplicationOperation
   failure :too_greedy
-  
+
   on_too_greedy_failure do
     SlackClient.send_message(:engineering, "Someones trying to give away too much stuff!")
   end
@@ -751,7 +867,7 @@ As well as manually handled errors (using the demodulized underscored name of th
 ```ruby
 class OperationTwo < ApplicationOperation
   handle_error ActiveRecord::RecordInvalid
-  
+
   on_record_invalid_failure do
     Redis.incr("operation_two:invalid_records")
   end
@@ -763,7 +879,7 @@ You can also listen for any problems using the generic failure event:
 ```ruby
 class OperationThree < ApplicationOperation
   handle_error RuntimeError
-  
+
   on_failure do
     EngineeringMailer.on_runtime_error(self.class.name)
   end
@@ -785,7 +901,7 @@ Flows where no operation should be persisted unless all are successful should us
 ```ruby
 class ExampleFlow < ApplicationFlow
   wrap_in_transaction
-  
+
   operations OperationOne, OperationTwo, OperationThree
 end
 ```
@@ -797,7 +913,7 @@ Operations which modify several persisted objects together should use a transact
 ```ruby
 class OperationTwo < ApplicationFlow
   wrap_in_transaction
- 
+
   def behavior
     # do a thing
   end
@@ -843,7 +959,7 @@ Flows, Operations, and States all make use of [ActiveSupport::Callbacks](https:/
 class TakeBottlesDown < ApplicationOperation
   set_callback(:execute, :before) { bottle_count_term }
   set_callback(:execute, :after) { state.output.push("You take #{bottle_count_term} down.") }
-  
+
   def bottle_count_term
     return "it" if state.bottles.number_on_the_wall == 1
     return "one" if state.taking_down_one?
@@ -905,12 +1021,12 @@ The gems adds methods to Flows, Operations, and States which share names with lo
 ```ruby
 class ExampleOperation < ApplicationOperation
   def behavior
-    warn(:nothing_to_do, { empty_object: obj }) and return if obj.empty? 
-    
+    warn(:nothing_to_do, { empty_object: obj }) and return if obj.empty?
+
     debug(:doing_a_thing)
-    
+
     results = do_thing
-    
+
     log(:did_a_thing, results: results)
   end
 end
@@ -992,7 +1108,7 @@ Flow works best with [shoulda-matchers](https://github.com/thoughtbot/shoulda-ma
 Add those to the `development` and `test` group of your Gemfile:
 
 ```ruby
-group :development, :test do 
+group :development, :test do
   gem "shoulda-matchers", git: "https://github.com/thoughtbot/shoulda-matchers.git", branch: "rails-5"
   gem "rspice"
 end
@@ -1047,10 +1163,10 @@ RSpec.describe FooFlow, type: :flow do
 
   it { is_expected.to inherit_from ApplicationFlow }
   # it { is_expected.to use_operations ExampleOperation }
- 
+
   describe "#trigger" do
     subject(:trigger) { flow.trigger! }
- 
+
     pending "describe the effects of a successful `Flow#flux` (or delete) #{__FILE__}"
   end
 end
@@ -1077,7 +1193,7 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
     Class.new(ApplicationState) do
       # argument :foo
 
-      # output :gaz 
+      # output :gaz
     end
   end
   let(:state_input) do
@@ -1088,7 +1204,7 @@ RSpec.describe MakeTheThingDoTheStuff, type: :operation do
 
   describe "#execute" do
     subject(:execute) { operation.execute }
-  
+
     pending "describe `Operation#behavior` (or delete) #{__FILE__}"
   end
 end
@@ -1110,7 +1226,7 @@ end
 
 By default, your operation specs are broken! The reason for this is to encourage resilient test writing.
 
-Let's say that you have an Operation in your system called `CreateFoo` which is part of the `CreateFooFlow` and therefore is only ever called with a `CreateFooState`. You may be tempted to write something like: 
+Let's say that you have an Operation in your system called `CreateFoo` which is part of the `CreateFooFlow` and therefore is only ever called with a `CreateFooState`. You may be tempted to write something like:
 
 ```ruby
 let(:example_state_class) { CreateFooState }
@@ -1130,11 +1246,11 @@ let(:example_state_class) do
 
     output :gaz
   end
-  
+
   let(:state_input) do
     { foo: foo }
   end
-  
+
   let(:foo) { ... }
   let(:bar) { nil }
 end
@@ -1198,18 +1314,18 @@ end
 
 ### Integration Testing
 
-The best integration tests are the simplest! 
+The best integration tests are the simplest!
 
 Create a state of the universe and confirm your flow changes it.
 
 ```ruby
 describe "integration test" do
   subject(:flow) { ChangePreferencesFlow.trigger(user: user, favorite_food: new_favorite_food) }
-  
+
   let(:user) { create :user, favorite_food: original_favorite_food }
   let(:original_favorite_food) { Faker::Lorem.unique.word }
   let(:new_favorite_food) { Faker::Lorem.unique.word }
-  
+
   it "changes User#favorite_food" do
     expect { flow }.
       to change { user.favorite_food }.
@@ -1219,7 +1335,7 @@ describe "integration test" do
 end
 ```
 
-💡 *Note*: It's considered a best practice to put your integration test in the same file as the unit test. 
+💡 *Note*: It's considered a best practice to put your integration test in the same file as the unit test.
 
 And always remember: **Good integration tests don't use mocking**!
 
