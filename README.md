@@ -160,7 +160,7 @@ class SubmitCharge < ApplicationOperation
   def behavior
     response = PaymentProcessorClient.submit_charge(charge)
 
-    if response.body.success == "false"
+    if response.body.success == "true"
       charge.update(success: true)
     else
       # stops the operation and flow, you can pass a hash of unstructured data that will be accessible the flow instance
@@ -258,11 +258,9 @@ A **Flow** is a collection of procedurally executed **Operations** sharing a com
 All Flows should be named with the `Flow` suffix (ex: `FooFlow`).
 
 ```ruby
-class CalculateTimetablesFlow < ApplicationFlow
-  operations ClearExistingTimetables,
-             CalculateTimetables,
-             SummarizeTimetables,
-             DestroyEmptyTimetableCells
+class ChargeFlow < ApplicationFlow
+  operations CreateCharge,
+             SubmitCharge
 end
 ```
 
@@ -271,7 +269,7 @@ The `operations` are an ordered list of the behaviors which are executed with (a
 Flows accept input representing the arguments and options which define the initial state.
 
 ```ruby
-CalculateTimetablesFlow.trigger(timeframe: Day.today)
+ChargeFlow.trigger(order: order, user: current_user)
 ```
 
 Triggering a Flow executes all its operations in sequential order if **and only if** it has a valid state.
@@ -297,7 +295,7 @@ If you _already have_ an instance of a state class that you want to execute a Fl
 ```ruby
 state_instance = ExampleState.new(...)
 
-CalculateTimetablesFlow.trigger(state_instance)
+ChargeFlow.trigger(order: order, user: current_user)
 ```
 
 ### Operations
@@ -307,41 +305,35 @@ An **Operation** is a service object which is executed with a **State**.
 Operations should **not** be named with the `Operation` suffix; name them what they do!
 
 ```ruby
-class ClearExistingTimetables < ApplicationOperation
+class CreateCharge < ApplicationOperation
+  state_reader :order
+  state_reader :user
+  state_reader :payment_method
+
+  state_writer :charge
+
   def behavior
-    state.existing_timetable_cells.update_all(total_minutes: 0)
+    payment_method_to_charge = payment_method.present? payment_method : user.default_payment_method
+
+    state.charge = Charge.create(payment_method: payment_method_to_charge, order: order, user: user)
   end
 end
 ```
 
 ```ruby
-class CalculateTimetables < ApplicationOperation
-  def behavior
-    state.minutes_by_project_employee.each do |project_employee, total_minutes|
-      project_id, employee_id = project_employee
-      timetable = state.timeframe.timetables.find_or_create_by!(project_id: project_id)
-      cell = timetable.cells.find_or_create_by!(employee_id: employee_id)
+class SubmitCharge < ApplicationOperation
+  failure :charge_unsuccessful
 
-      cell.update!(total_minutes: total_minutes)
+  state_reader :charge
+
+  def behavior
+    response = PaymentProcessorClient.submit_charge(charge)
+
+    if response.body.success == "true"
+      charge.update(success: true)
+    else
+      charge_unsuccessful_failure!(response_body: response.body)
     end
-  end
-end
-```
-
-```ruby
-class SummarizeTimetables < ApplicationOperation
-  def behavior
-    state.timetables.each do |timetable|
-      timetable.update!(total_minutes: timetable.cells.sum(:total_minutes))
-    end
-  end
-end
-```
-
-```ruby
-class DestroyEmptyTimetableCells < ApplicationOperation
-  def behavior
-    state.empty_cells.destroy_all
   end
 end
 ```
@@ -370,54 +362,15 @@ A **State** is an aggregation of input and derived data.
 All States should be named with the `State` suffix (ex: `FooState`).
 
 ```ruby
-class CalculateTimetablesState < ApplicationState
-  argument :timeframe
+class ChargeState < ApplicationState
+  argument :order
+  argument :user
 
-  def existing_timetable_cells
-    @existing_timetable_cells ||= TimetableCell.where(timetable: existing_timetables)
-  end
+  option :payment_method
 
-  def minutes_by_project_employee
-    @minutes_by_project_employee ||= data_by_employee_project.transform_values do |values|
-      values.sum(&:total_minutes)
-    end
-  end
+  output :charge
+end
 
-  def timetables
-    @timetables ||= Timetable.where(project_id: project_ids)
-  end
-
-  def empty_cells
-    @empty_cells ||= TimetableCell.
-      joins(:timetable).
-      where(total_minutes: 0, timetables: { project_id: project_ids })
-  end
-
-  private
-
-  delegate :timesheets, to: :timeframe
-
-  def existing_timetables
-    @existing_timetables ||= timeframe.timetables.where(project_id: project_ids)
-  end
-
-  def project_ids
-    @project_ids ||= timesheet_data.map(&:project_id).uniq
-  end
-
-  def data_by_employee_project
-    @data_by_employee_project ||= timesheet_data.group_by do |data|
-      [ data.project_id, data.employee_id ]
-    end
-  end
-
-  def timesheet_data
-    @timesheet_data ||= timesheets.
-      reportable.
-      summarizable.
-      joins(:timeclock).
-      select("timeclocks.project_id, timeclocks.employee_id, timesheets.total_minutes")
-  end
 end
 ```
 
