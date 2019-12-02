@@ -8,7 +8,7 @@
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [What is Flow?](#what-is-flow)
-* [Quickstart](#quickstart)
+* [Quickstart Example](#quickstart-example)
 * [How it Works](#how-it-works)
    * [Flows](#flows)
    * [Operations](#operations)
@@ -85,11 +85,16 @@ Flow is a [SOLID](https://en.wikipedia.org/wiki/SOLID) implementation of the [Co
 
 Flows allow you to encapsulate your application's [business logic](http://en.wikipedia.org/wiki/Business_logic) into a set of extensible and reusable objects.
 
-## Quickstart
+## Quickstart Example
 
 After installing Flow in your Rails project, you will need create state, operation(s), and the flow itself.
 
 Define state object that will be used for a certain flow:
+
+```bash
+$ rails generate flow:state Charge
+```
+
 ```ruby
 # app/states/charge_state.rb
 
@@ -107,6 +112,11 @@ end
 ```
 
 Define operation with a Single Responsibility:
+
+```bash
+$ rails generate flow:operation CreateCharge
+```
+
 ```ruby
 # app/operations/create_charge.rb
 
@@ -127,8 +137,13 @@ end
 ```
 
 If you want a failure in an operation to fail and stop the Flow, define a failure method:
+
+```bash
+$ rails generate flow:operation SubmitCharge
+```
+
 ```ruby
-# app/operations/create_charge.rb
+# app/operations/submit_charge.rb
 
 class SubmitCharge < ApplicationOperation
   # define failure method
@@ -151,6 +166,11 @@ end
 ```
 
 Define the flow comprised of some ordered operations. Flow will automatically associate the correct state to a flow if they follow the naming convention `<FlowName>Flow` <=> `<FlowName>State`:
+
+```bash
+$ rails generate flow Charge
+```
+
 ```ruby
 # app/flow/charge_flow.rb
 
@@ -160,6 +180,7 @@ end
 ```
 
 Trigger the Flow in your code with required state inputs, any any optional ones:
+
 ```ruby
 flow_input = {
   order: order,
@@ -169,13 +190,16 @@ flow_input = {
 
 flow = ChargeFlow.trigger(flow_input)
 ```
+
 Arguments defined on state will be required inputs to the Flow trigger:
+
 ```
 > ChargeFlow.trigger({})
 ArgumentError: Missing arguments: order, user
 ```
 
 State can be accessed from the Flow instance:
+
 ```
 > flow = ChargeFlow.trigger(flow_input)
 
@@ -184,6 +208,7 @@ State can be accessed from the Flow instance:
 ```
 
 Success of the triggered flow can be determined with:
+
 ```
 > flow.success?
 => true
@@ -194,6 +219,7 @@ Success of the triggered flow can be determined with:
 
 
 Data set in an operation's error methods can be be accessed from the Flow instance too:
+
 ```
 > flow = ChargeFlow.trigger(flow_input)
 
