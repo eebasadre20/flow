@@ -87,11 +87,11 @@ Flows allow you to encapsulate your application's [business logic](http://en.wik
 
 ## Quickstart Example
 
-After installing Flow in your Rails project, you will need create state, operation(s), and the flow itself.
+Install Flow to your Rails project. Then define the state, operation(s), and flow.
 
 ### State
 
-Define state object that will be used for a certain flow:
+Define a state object:
 
 ```bash
 $ rails generate flow:state Charge
@@ -115,7 +115,7 @@ end
 
 ### Operations
 
-Define operation that operates on the state using the `behavior` method. State accessor methods allows the operation to read and write to the state object:
+Define operation that can _operates_ on the state using the `behavior` method. Accessor methods allow operations to read and write to state:
 
 ```bash
 $ rails generate flow:operation CreateCharge
@@ -142,7 +142,7 @@ class CreateCharge < ApplicationOperation
 end
 ```
 
-Define another operation. Use a failure method when an operation, and any remaining operations in a flow, should fail and no longer run:
+Define another operation. Use failure methods when an operation and flow should fail and no longer run:
 
 ```bash
 $ rails generate flow:operation SubmitCharge
@@ -152,7 +152,7 @@ $ rails generate flow:operation SubmitCharge
 # app/operations/submit_charge.rb
 
 class SubmitCharge < ApplicationOperation
-  # define failure method, creates :charge_unsuccessful_failure! method
+  # defined failure method, creates #charge_unsuccessful_failure! method used below
   failure :charge_unsuccessful
 
   state_reader :charge
@@ -163,7 +163,7 @@ class SubmitCharge < ApplicationOperation
     if response.body.success == "false"
       charge.update(success: true)
     else
-      # stops operation and flow, you can pass a hash unstructured data that will be accessible on the failed flow
+      # stops the operation and flow, you can pass a hash of unstructured data that will be accessible the flow instance
       charge_unsuccessful_failure!(response_body: response.body)
     end
   end
@@ -172,7 +172,7 @@ end
 
 ### Flow
 
-Define the flow comprised of one or more ordered operations. Changes to the state will persist from one operation to the next.
+Define the flow comprised of one or more ordered operations. Changes to the state will persist from one operation to the next:
 
 ```bash
 $ rails generate flow Charge
@@ -201,14 +201,14 @@ flow_input = {
 flow = ChargeFlow.trigger(flow_input)
 ```
 
-Arguments defined on state will be required inputs to the Flow trigger, optional ones not required:
+Arguments defined on state are required when triggering a flow, optional ones are optional:
 
 ```
 > ChargeFlow.trigger({})
 ArgumentError: Missing arguments: order, user
 ```
 
-Output state can be accessed from the flow instance:
+State output can be accessed from the flow instance:
 
 ```
 > flow = ChargeFlow.trigger(flow_input)
@@ -217,7 +217,7 @@ Output state can be accessed from the flow instance:
 => #<Charge:0x00007fd5c5cda080 ... >
 ```
 
-Success of the triggered flow can be determined with:
+Success of the triggered flow can be determined with these methods:
 
 ```
 > flow.success?
@@ -227,7 +227,7 @@ Success of the triggered flow can be determined with:
 => false
 ```
 
-See any flow failures:
+If the flow fails you can see the failures on the instance:
 
 ```
 # some flow that results in a failure...
@@ -236,7 +236,7 @@ See any flow failures:
 > flow.success?
 => false
 
-# failure
+# get the failure
 > flow.problem
 => :charge_unsuccessful
 
