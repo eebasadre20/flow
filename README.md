@@ -92,11 +92,11 @@ Install Flow to your Rails project:
 $ rails generate flow:install
 ```
 
-Then define the state, operation(s), and flow.
+Then define `State`, `Operation`(s), and `Flow` objects.
 
 ### State
 
-Create a `State` object that will define data that is used throughout the `Flow`. There are several types of data for `State`, such as `argument`, `option`, and `output`:
+A `State` object defines data that is to be read or written in `Operation` objects throughout the `Flow`. There are several types of data that can be defined, such as `argument`, `option`, and `output`.
 
 ```bash
 $ rails generate flow:state Charge
@@ -106,21 +106,18 @@ $ rails generate flow:state Charge
 # app/states/charge_state.rb
 
 class ChargeState < ApplicationState
-  # required state input, will raise error if missing
   argument :order
   argument :user
 
-  # optional state input
   option :payment_method
 
-  # expected output from the flow
   output :charge
 end
 ```
 
 ### Operations
 
-Create `Operation` objects that _operate_ on `State` using the `#behavior` method. Accessor methods allow operations to read and write `State`:
+`Operation` objects execute some procedure defined in a `#behavior` method and can read and write to `State` data via defined accessor methods.
 
 ```bash
 $ rails generate flow:operation CreateCharge
@@ -186,7 +183,7 @@ end
 
 ### Flow
 
-Define the `Flow` comprised of one or more ordered `Operation`s. Changes to the state will persist from one `Operation` to the next:
+A `Flow` object is composed of one or more ordered `Operation`s. Changes to the state will persist from one `Operation` to the next:
 
 ```bash
 $ rails generate flow Charge
