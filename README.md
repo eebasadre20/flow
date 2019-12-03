@@ -106,11 +106,19 @@ $ rails generate flow:state Charge
 # app/states/charge_state.rb
 
 class ChargeState < ApplicationState
+  # @!attribute [r]
+  # Order hash, readonly, required
   argument :order
+  # @!attribute [r]
+  # User model instance readonly, required
   argument :user
 
+  # @!attribute [r]
+  # PaymentMethod model instance readonly, optional
   option :payment_method
 
+  # @!attribute [rw]
+  # Charge model instance readwrite, required
   output :charge
 end
 ```
@@ -127,15 +135,21 @@ $ rails generate flow:operation CreateCharge
 # app/operations/create_charge.rb
 
 class CreateCharge < ApplicationOperation
-  # state accessor methods
+  # @!attribute [r]
+  # Order hash, readonly
   state_reader :order
+  # @!attribute [r]
+  # User model instance readonly
   state_reader :user
+  # @!attribute [r]
+  # PaymentMethod model instance readonly
   state_reader :payment_method
 
+  # @!attribute [rw]
+  # Charge model instance readwrite
   state_writer :charge
 
   def behavior
-    # write to charge on state
     state.charge = Charge.create(payment_method: payment_method, order: order, user: user)
   end
 
@@ -157,9 +171,12 @@ $ rails generate flow:operation SubmitCharge
 # app/operations/submit_charge.rb
 
 class SubmitCharge < ApplicationOperation
-  # defined failure method, creates #charge_unsuccessful_failure! method used below
+  # @!method charge_unsuccessful_failure!(data = {})
+  # Raises, stops the Operation and Flow, takes unstructured data hash
   failure :charge_unsuccessful
 
+  # @!attribute [rw]
+  # Charge model instance read only
   state_reader :charge
 
   def behavior
