@@ -87,11 +87,16 @@ Flows allow you to encapsulate your application's [business logic](http://en.wik
 
 ## Quickstart Example
 
-Install Flow to your Rails project. Then define the state, operation(s), and flow.
+Install Flow to your Rails project:
+```bash
+$ rails generate flow:install
+```
+
+Then define the state, operation(s), and flow.
 
 ### State
 
-Define a state object:
+Create a `State` object that will define data that is used throughout the `Flow`. There are several types of data for `State`, such as `argument`, `option`, and `output`:
 
 ```bash
 $ rails generate flow:state Charge
@@ -115,7 +120,7 @@ end
 
 ### Operations
 
-Define operation that can _operates_ on the state using the `behavior` method. Accessor methods allow operations to read and write to state:
+Create `Operation` objects that _operate_ on `State` using the `#behavior` method. Accessor methods allow operations to read and write `State`:
 
 ```bash
 $ rails generate flow:operation CreateCharge
@@ -133,16 +138,19 @@ class CreateCharge < ApplicationOperation
   state_writer :charge
 
   def behavior
-    # payment_method is an optional state input, so it may not be present
-    payment_method_to_charge = payment_method.present? payment_method : user.default_payment_method
-
     # write to charge on state
-    state.charge = Charge.create(payment_method: payment_method_to_charge, order: order, user: user)
+    state.charge = Charge.create(payment_method: payment_method, order: order, user: user)
+  end
+
+  private
+
+  def payment_method
+    payment_method.present? payment_method : user.default_payment_method
   end
 end
 ```
 
-Define another operation. Use failure methods when an operation and flow should fail and no longer run:
+Use failure methods when an `Operation` and `Flow` should fail and no longer run:
 
 ```bash
 $ rails generate flow:operation SubmitCharge
@@ -158,21 +166,27 @@ class SubmitCharge < ApplicationOperation
   state_reader :charge
 
   def behavior
-    response = PaymentProcessorClient.submit_charge(charge)
+    charge_unsuccessful_failure!(response_body: response.body) unless success?
 
-    if response.body.success == "true"
-      charge.update(success: true)
-    else
-      # stops the operation and flow, you can pass a hash of unstructured data that will be accessible the flow instance
-      charge_unsuccessful_failure!(response_body: response.body)
-    end
+    charge.update(success: true)
   end
+
+  private
+
+  def success?
+    response.body.success == "true"
+  end
+
+  def response
+    PaymentProcessorClient.submit_charge(charge)
+  end
+  memoize :response
 end
 ```
 
 ### Flow
 
-Define the flow comprised of one or more ordered operations. Changes to the state will persist from one operation to the next:
+Define the `Flow` comprised of one or more ordered `Operation`s. Changes to the state will persist from one `Operation` to the next:
 
 ```bash
 $ rails generate flow Charge
@@ -189,7 +203,7 @@ end
 
 ### Usage
 
-Trigger the flow in your code with state inputs:
+Trigger the `Flow` in your code with `State` inputs:
 
 ```ruby
 flow_input = {
@@ -201,7 +215,7 @@ flow_input = {
 flow = ChargeFlow.trigger(flow_input)
 ```
 
-Arguments defined on state are required when triggering a flow, optional ones are optional:
+Arguments defined on `State` are required when triggering a `Flow`, options are optional:
 
 ```
 > ChargeFlow.trigger({})
@@ -217,7 +231,7 @@ State output can be accessed from the flow instance:
 => #<Charge:0x00007fd5c5cda080 ... >
 ```
 
-Success of the triggered flow can be determined with these methods:
+Success of the triggered `Flow` can be determined with these methods:
 
 ```
 > flow.success?
@@ -227,7 +241,7 @@ Success of the triggered flow can be determined with these methods:
 => false
 ```
 
-If the flow fails you can see the failures on the instance:
+If the `Flow` fails you can see the failures on the instance:
 
 ```
 # some flow that results in a failure...
@@ -313,9 +327,13 @@ class CreateCharge < ApplicationOperation
   state_writer :charge
 
   def behavior
-    payment_method_to_charge = payment_method.present? payment_method : user.default_payment_method
+    state.charge = Charge.create(payment_method: payment_method, order: order, user: user)
+  end
 
-    state.charge = Charge.create(payment_method: payment_method_to_charge, order: order, user: user)
+  private
+
+  def payment_method
+    payment_method.present? payment_method : user.default_payment_method
   end
 end
 ```
@@ -327,14 +345,21 @@ class SubmitCharge < ApplicationOperation
   state_reader :charge
 
   def behavior
-    response = PaymentProcessorClient.submit_charge(charge)
+    charge_unsuccessful_failure!(response_body: response.body) unless success?
 
-    if response.body.success == "true"
-      charge.update(success: true)
-    else
-      charge_unsuccessful_failure!(response_body: response.body)
-    end
+    charge.update(success: true)
   end
+
+  private
+
+  def success?
+    response.body.success == "true"
+  end
+
+  def response
+    PaymentProcessorClient.submit_charge(charge)
+  end
+  memoize :response
 end
 ```
 
