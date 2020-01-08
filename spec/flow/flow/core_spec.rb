@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Flow::Core, type: :module do
+RSpec.describe Flow::Flow::Core, type: :module do
   include_context "with example flow having state"
 
   it { is_expected.to delegate_method(:state_class).to(:class) }
@@ -29,7 +29,7 @@ RSpec.describe Flow::Core, type: :module do
 
     context "when the state class is defined" do
       let(:root_flow_class) { example_class_having_callback }
-      let(:root_flow_modules) { [ Flow::Core ] }
+      let(:root_flow_modules) { [ Flow::Flow::Core ] }
 
       let(:example_state_class) do
         Class.new(Flow::StateBase).tap do |state_class|

@@ -3,7 +3,7 @@
 RSpec.shared_context "with example flow having state" do |extra_flow_modules = nil|
   subject(:example_flow) { example_flow_class.new }
 
-  let(:root_flow_modules) { [ ShortCircuIt, Technologic, Flow::Callbacks, Flow::Core ] }
+  let(:root_flow_modules) { [ ShortCircuIt, Technologic, Flow::Flow::Callbacks, Flow::Flow::Core ] }
   let(:flow_modules) { root_flow_modules + Array.wrap(extra_flow_modules) }
 
   let(:root_flow_class) { Class.new }

@@ -4,11 +4,13 @@
 
 *Release Date*: 2020/1/8
 
- ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
+🚨 **Breaking Change**: Flow concerns have been re-modularized!
+⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
 
 - Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
 - Add integration testing for State Accessors ([#135](https://github.com/Freshly/flow/pull/135))
 - Add custom matchers for State Accessors and Document ([#136](https://github.com/Freshly/flow/pull/136))
+- Remodularized `Flow` concerns ([#149](https://github.com/Freshly/flow/pull/149))
 
 ## 0.10.4
 

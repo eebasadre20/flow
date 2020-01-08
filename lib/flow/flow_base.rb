@@ -15,7 +15,7 @@ module Flow
   class FlowBase
     include ShortCircuIt
     include Technologic
-    include Flow::TransactionWrapper
+    include TransactionWrapper
     include Flow::Callbacks
     include Flow::Core
     include Flow::Flux
