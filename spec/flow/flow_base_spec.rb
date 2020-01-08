@@ -12,8 +12,8 @@ RSpec.describe Flow::FlowBase, type: :flow do
     stub_const("#{example_flow_name}State", example_state_class)
   end
 
-  it { is_expected.to include_module ShortCircuIt }
-  it { is_expected.to include_module Technologic }
+  it { is_expected.to inherit_from Spicerack::RootObject }
+
   it { is_expected.to include_module Flow::TransactionWrapper }
   it { is_expected.to include_module Flow::Flow::Callbacks }
   it { is_expected.to include_module Flow::Flow::Core }
