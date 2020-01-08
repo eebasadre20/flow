@@ -202,6 +202,8 @@ operation.execute
 operation.executed? # => true 
 ```
 
+⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
+
 ### States
 
 A **State** is an aggregation of input and derived data.

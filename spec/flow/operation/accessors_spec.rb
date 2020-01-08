@@ -8,9 +8,7 @@ RSpec.describe Flow::Operation::Accessors, type: :module do
   let(:state_attribute_writer) { "#{state_attribute}=".to_sym }
   let(:state_attribute_value) { Faker::Hipster.word }
 
-  before do
-    state.attr_accessor(state_attribute)
-  end
+  before { state_class.attr_accessor(state_attribute) }
 
   shared_examples_for "it has exactly ? of type" do |count, tracker_type|
     subject { operation.public_send(tracker_name).count(state_attribute) }
