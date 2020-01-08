@@ -17,10 +17,7 @@ RSpec.describe Flow::Operation::Execute, type: :module do
       example_operation_class.attr_accessor :before_hook_run, :around_hook_run, :after_hook_run
     end
 
-    it_behaves_like "operation double runs are prevented",
-                    :execute!,
-                    :behavior,
-                    Flow::Operation::Errors::AlreadyExecuted
+    it_behaves_like "operation double runs are prevented", :execute!, :behavior, Flow::AlreadyExecutedError
 
     it_behaves_like "a class with callback" do
       include_context "with operation callbacks", :execute

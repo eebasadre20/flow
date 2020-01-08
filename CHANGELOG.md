@@ -4,7 +4,7 @@
 
 *Release Date*: 2020/1/8
 
-🚨 **Breaking Change**: Flow concerns have been re-modularized!
+🚨 **Breaking Change**: Errors have been renamed and Flow concerns have been re-modularized!
 ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
 
 - Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
@@ -12,6 +12,7 @@
 - Add custom matchers for State Accessors and Document ([#136](https://github.com/Freshly/flow/pull/136))
 - Remodularized `Flow` concerns ([#149](https://github.com/Freshly/flow/pull/149))
 - Refactor to use `Spicerack::RootObject` ([#145](https://github.com/Freshly/flow/pull/145))
+- Consolidated errors under the root namespace ([#150](https://github.com/Freshly/flow/pull/150))
 
 ## 0.10.4
 

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "state/errors/not_validated"
-
 require_relative "state/status"
 require_relative "state/output"
 

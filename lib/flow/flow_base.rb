@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "flow/errors/state_invalid"
-
 require_relative "flow/callbacks"
 require_relative "flow/core"
 require_relative "flow/flux"
