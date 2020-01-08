@@ -10,7 +10,7 @@ RSpec.describe Flow::Operation::Core, type: :module do
 
     it "has state proxy" do
       expect(operation.state.class < Flow::StateProxy).to eq true
-      expect(operation.state.__send__(:state)).to eq state
+      expect(operation.state.__send__(:state)).to eq example_state
     end
   end
 
@@ -31,7 +31,7 @@ RSpec.describe Flow::Operation::Core, type: :module do
     end
 
     describe "with reader" do
-      subject { state_proxy_class.new(state) }
+      subject { state_proxy_class.new(example_state) }
 
       before { example_operation_class.__send__(:state_reader, :test_reader) }
 
@@ -39,7 +39,7 @@ RSpec.describe Flow::Operation::Core, type: :module do
     end
 
     describe "with writer" do
-      subject { state_proxy_class.new(state) }
+      subject { state_proxy_class.new(example_state) }
 
       before { example_operation_class.__send__(:state_writer, :test_writer) }
 
@@ -47,7 +47,7 @@ RSpec.describe Flow::Operation::Core, type: :module do
     end
 
     describe "with accessor" do
-      subject { state_proxy_class.new(state) }
+      subject { state_proxy_class.new(example_state) }
 
       before { example_operation_class.__send__(:state_accessor, :attribute) }
 

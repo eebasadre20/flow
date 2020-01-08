@@ -1,20 +1,18 @@
 # frozen_string_literal: true
 
-RSpec.shared_context "with an example operation" do |extra_operation_modules = nil|
-  subject(:example_operation) { example_operation_class.new(state) }
+RSpec.shared_context "with an example operation" do
+  subject(:example_operation) { example_operation_class.new(example_state) }
 
-  let(:root_operation_modules) do
-    [ ShortCircuIt, Technologic, Flow::Operation::Callbacks, Flow::Operation::Core, Flow::Operation::Accessors ]
+  let(:example_operation_class) { Class.new(Flow::OperationBase) }
+
+  let(:example_state_class) { Class.new(Flow::StateBase) }
+  let(:example_state) { example_state_class.new }
+
+  let(:example_operation_name) { Faker::Internet.domain_word.capitalize }
+  let(:example_state_name) { "#{example_operation_name}State" }
+
+  before do
+    stub_const(example_operation_name, example_operation_class)
+    stub_const(example_state_name, example_state_class)
   end
-  let(:operation_modules) { root_operation_modules + Array.wrap(extra_operation_modules) }
-
-  let(:root_operation_class) { Class.new }
-  let(:example_operation_class) do
-    root_operation_class.tap do |operation_class|
-      operation_modules.each { |operation_module| operation_class.include operation_module }
-    end
-  end
-
-  let(:state_class) { Class.new(Flow::StateBase) }
-  let(:state) { state_class.new }
 end

@@ -5,7 +5,7 @@ RSpec.describe Flow::Operation::Execute, type: :module do
 
   it { is_expected.to include_module ActiveSupport::Rescuable }
 
-  include_context "with an example operation", [ described_class, Flow::Operation::Status ]
+  include_context "with an example operation"
 
   describe "#execute!" do
     subject(:execute!) { example_operation.execute! }
