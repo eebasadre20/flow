@@ -8,7 +8,7 @@ require_relative "state/output"
 # A **State** is an aggregation of input and derived data.
 module Flow
   class StateBase < Spicerack::InputModel
-    include Flow::State::Status
-    include Flow::State::Output
+    include State::Status
+    include State::Output
   end
 end
