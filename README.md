@@ -295,7 +295,7 @@ end
 
 # Good, do it this way:
 class GoodOperation < ApplicationOperation
-  state_acceessor :foo
+  state_accessor :foo
   
   def behavior
     state.foo = :bar if foo == :baz
@@ -317,7 +317,7 @@ end
 
 # Good, do it this way:
 class GoodOperation < ApplicationOperation
-  state_acceessor :foo
+  state_accessor :foo
   
   def behavior
     foo << :more_dataz
