@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CountOutCurrentBottles < Flow::OperationBase
-  state_reader :stanza
+  state_accessor :stanza
   state_reader :bottles
 
   def behavior

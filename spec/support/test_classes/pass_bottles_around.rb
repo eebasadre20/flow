@@ -3,10 +3,10 @@
 class PassBottlesAround < Flow::OperationBase
   wrap_in_transaction
 
-  state_reader :stanza
+  state_accessor :bottles
+  state_accessor :stanza
   state_reader :number_to_take_down
   state_reader :taking_down_one?
-  state_reader :bottles
   state_reader :bottles_of
 
   class NonTakedownError < StandardError; end
