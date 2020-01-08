@@ -1,13 +1,19 @@
 # Changelog
 
-## 0.11.0
+## 0.10.5
 
-*Release Date*: 2019/mm/dd
+*Release Date*: 2020/1/8
 
  ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
 
 - Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
 - Add integration testing for State Accessors ([#135](https://github.com/Freshly/flow/pull/135))
+
+## 0.10.4
+
+*Release Date*: 2020/1/7
+
+- Operation failures log an `info` log instead of `error` ([#162](https://github.com/Freshly/flow/pull/162))
 
 ## 0.10.3
 
