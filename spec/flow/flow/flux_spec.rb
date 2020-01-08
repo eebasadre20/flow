@@ -39,7 +39,7 @@ RSpec.describe Flow::Flow::Flux, type: :module do
     let(:expected_state) { instance_of(example_state_class) }
 
     before do
-      allow(example_flow).to receive(:error).and_call_original
+      allow(example_flow).to receive(:info).and_call_original
     end
 
     context "when successful" do
@@ -62,7 +62,7 @@ RSpec.describe Flow::Flow::Flux, type: :module do
         it "calls logs the exception without raising" do
           flux
           expect(example_flow).
-            to have_received(:error).
+            to have_received(:info).
             with(:error_executing_operation, state: expected_state, exception: expected_exception)
         end
       end
@@ -73,7 +73,7 @@ RSpec.describe Flow::Flow::Flux, type: :module do
         it "calls logs the exception and raises" do
           expect { flux }.to raise_error example_error
           expect(example_flow).
-            to have_received(:error).
+            to have_received(:info).
             with(:error_executing_operation, state: expected_state, exception: expected_exception)
         end
       end
@@ -87,7 +87,7 @@ RSpec.describe Flow::Flow::Flux, type: :module do
       it "logs the exception" do
         flux
         expect(example_flow).
-          to have_received(:error).
+          to have_received(:info).
           with(:error_executing_operation, state: expected_state, exception: expected_exception)
       end
     end
