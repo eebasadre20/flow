@@ -7,6 +7,7 @@
  ⚠️ **Deprecation Warning**: Direct state access in Operations is being removed. [Learn more](./DEPRECATION_NOTICE.md)
 
 - Add `StateProxy` to deprecate direct state access ([#128](https://github.com/Freshly/flow/pull/128))
+- Add integration testing for State Accessors ([#135](https://github.com/Freshly/flow/pull/135))
 
 ## 0.10.4
 

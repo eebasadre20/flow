@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "faker", "~> 1.8"
   spec.add_development_dependency "pry-byebug", ">= 3.7.0"
   spec.add_development_dependency "sqlite3", "~> 1.3"
+  spec.add_development_dependency "bcrypt", "~> 3.1.13"
 
   spec.add_development_dependency "rspice", ">= 0.13.3", "< 1.0"
   spec.add_development_dependency "spicerack-styleguide", ">= 0.13.3", "< 1.0"
