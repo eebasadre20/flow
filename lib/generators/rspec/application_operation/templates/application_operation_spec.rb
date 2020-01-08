@@ -9,7 +9,13 @@ RSpec.describe ApplicationOperation, type: :operation do
   
   describe "#execute" do
     subject(:execute) { operation.execute }
-
-    pending "describe the effects of a successful `Operation#execute` (or delete) #{__FILE__}"
+    
+    context "when unsuccessful" do
+      pending "describe the effects of an unsuccessful `Operation#execute` (or delete) #{__FILE__}"
+    end
+    
+    context "when successful" do
+      pending "describe the effects of a successful `Operation#execute` (or delete) #{__FILE__}"
+    end
   end
 end
