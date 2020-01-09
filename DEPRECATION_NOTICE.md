@@ -56,7 +56,7 @@ end
 
 ## State Accessors
 
-These should be used when reading and writing too the same variable on the state:
+These should be used when reading and writing to the same variable on the state:
 
 ```ruby
 # Don't do this:
