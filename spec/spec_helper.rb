@@ -6,7 +6,7 @@ SimpleCov.start do
   add_filter "/rspec/"
 end
 
-require "spicerack/spec_helper"
+require "spicery/spec_helper"
 require "malfunction/spec_helper"
 require "shoulda-matchers"
 
