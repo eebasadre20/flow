@@ -8,7 +8,7 @@ module Flow
 
       class_methods do
         def state_class
-          "#{name.chomp("Flow")}State".constantize
+          conjugate(StateBase)
         end
       end
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Flow::FlowBase, type: :flow do
-  subject(:flow) { example_flow_class.new }
+  subject(:flow) { example_flow_class }
 
   let(:example_flow_class) { Class.new(described_class) }
   let(:example_state_class) { Class.new(Flow::StateBase) }
@@ -13,6 +13,9 @@ RSpec.describe Flow::FlowBase, type: :flow do
   end
 
   it { is_expected.to inherit_from Spicerack::RootObject }
+
+  it { is_expected.to include_module Conjunction::Junction }
+  it { is_expected.to have_conjunction_suffix "Flow" }
 
   it { is_expected.to include_module Flow::TransactionWrapper }
   it { is_expected.to include_module Flow::Flow::Callbacks }
