@@ -4,7 +4,7 @@ require "active_model"
 require "active_record"
 require "active_support"
 
-require "spicerack"
+require "spicery"
 
 require "flow/version"
 

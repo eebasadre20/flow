@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.6
+
+*Release Date*: 2020/1/9
+
+- Use `Conjunction` gem ([#152](https://github.com/Freshly/flow/pull/152))
+
 ## 0.10.5
 
 *Release Date*: 2020/1/8
