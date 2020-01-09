@@ -42,7 +42,8 @@ module Flow
       def flux
         flux!
       rescue StandardError => exception
-        error :error_executing_operation, state: state, exception: exception
+        info :error_executing_operation, state: state, exception: exception
+
         raise exception unless exception.is_a? FluxError
         build_malfunction ::Flow::Malfunction::FailedOperation, @failed_operation
       end

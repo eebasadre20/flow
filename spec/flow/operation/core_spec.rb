@@ -23,6 +23,8 @@ RSpec.describe Flow::Operation::Core, type: :concern do
       let(:child_operation_class) { Class.new(example_operation_class) }
 
       it "is not inherited" do
+        expect { state_proxy_class }.to change { example_operation_class.instance_variable_get(:@state_proxy_class) }
+        expect(child_operation_class.instance_variable_get(:@state_proxy_class)).to be_nil
         expect(child_operation_class.state_proxy_class).not_to eq state_proxy_class
         expect(child_operation_class.state_proxy_class < Flow::StateProxy).to eq true
       end
